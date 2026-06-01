@@ -1,0 +1,65 @@
+site_name: Jeremy's Lab Notes
+site_description: How-tos, references, notes, and project write-ups.
+site_url: https://jchimp.tech
+
+repo_name: jchimp/jchimp.github.io
+repo_url: https://github.com/jchimp/jchimp.github.io
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+    - navigation.top
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - How-To:
+      - Overview: how-to/README.md
+      - Site Workflow: how-to/site-workflow.md
+  - Projects:
+      - Overview: projects/README.md
+      - Zonerr: projects/zonerr.md
+      - JRepo: projects/jrepo.md
+  - Notes:
+      - Overview: notes/README.md
+      - Capture Template: notes/capture-template.md
+  - References:
+      - Overview: references/README.md
+      - Custom Domain and HTTPS: references/custom-domain-and-https.md
+      - GitHub Actions Deployment (Later): references/github-actions-deploy.md
+      - Writing Template: _templates/post-template.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - meta
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+
+extra:
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+
+extra_css: []
+extra_javascript: []
