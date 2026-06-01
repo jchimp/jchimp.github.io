@@ -1,0 +1,14 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# MkDocs build output
+site/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
