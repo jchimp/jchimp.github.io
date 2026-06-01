@@ -12,11 +12,11 @@ theme:
     - navigation.tabs
     - navigation.sections
     - navigation.expand
+    - navigation.top
     - search.highlight
     - search.suggest
     - content.code.copy
     - content.tabs.link
-    - navigation.top
 
 plugins:
   - search
@@ -26,18 +26,21 @@ nav:
   - How-To:
       - Overview: how-to/README.md
       - Site Workflow: how-to/site-workflow.md
+      - How-To Template: _templates/how-to-template.md
   - Projects:
       - Overview: projects/README.md
       - Zonerr: projects/zonerr.md
       - JRepo: projects/jrepo.md
+      - Project Template: _templates/project-template.md
   - Notes:
       - Overview: notes/README.md
       - Capture Template: notes/capture-template.md
+      - Post Template: _templates/post-template.md
   - References:
       - Overview: references/README.md
+      - Image Workflow: references/image-workflow.md
       - Custom Domain and HTTPS: references/custom-domain-and-https.md
       - GitHub Actions Deployment (Later): references/github-actions-deploy.md
-      - Writing Template: _templates/post-template.md
 
 markdown_extensions:
   - admonition
@@ -61,5 +64,7 @@ extra:
     provider: google
     property: G-XXXXXXXXXX
 
-extra_css: []
+extra_css:
+  - stylesheets/extra.css
+
 extra_javascript: []

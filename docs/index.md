@@ -4,36 +4,77 @@ title: Home
 
 # Jeremy's Lab Notes
 
-This site is where I publish:
+A small publishing hub for how-tos, operational notes, technical references, and longer project write-ups.
 
-- how-tos
-- technical references
-- operating notes
-- project write-ups
-- screenshots and diagrams
+<div class="grid cards" markdown>
 
-## Start here
+-   :material-file-document-multiple-outline: __How-To__
 
-- [How-To](how-to/README.md)
-- [Projects](projects/README.md)
-- [Notes](notes/README.md)
-- [References](references/README.md)
+    ---
 
-## Publishing workflow
+    Step-by-step procedures, break/fix runbooks, installation notes, and maintenance guides.
 
-- `git push` syncs the source repo
-- `mkdocs gh-deploy` publishes the live site
+    [:octicons-arrow-right-24: Browse how-to](how-to/README.md)
 
-## Image conventions
+-   :material-folder-cog-outline: __Projects__
 
-Store images here:
+    ---
 
-```text
-docs/images/<topic>/
-```
+    Architecture notes, screenshots, deployment examples, and lessons learned for active projects.
 
-Example:
+    [:octicons-arrow-right-24: Browse projects](projects/README.md)
 
-```text
-docs/images/proxmox/ceph-health.png
-```
+-   :material-notebook-outline: __Notes__
+
+    ---
+
+    Short captures, troubleshooting breadcrumbs, command snippets, and known-good configs.
+
+    [:octicons-arrow-right-24: Browse notes](notes/README.md)
+
+-   :material-bookshelf: __References__
+
+    ---
+
+    Stable lookup material such as commands, file paths, service names, and site operations.
+
+    [:octicons-arrow-right-24: Browse references](references/README.md)
+
+</div>
+
+## Featured projects
+
+<div class="grid cards" markdown>
+
+-   :material-dns-outline: __Zonerr__
+
+    ---
+
+    DNS manager project with a modular provider model and container-friendly deployment.
+
+    [:octicons-arrow-right-24: Read the project page](projects/zonerr.md)
+
+-   :material-source-repository: __JRepo__
+
+    ---
+
+    File sync and repository helper focused on safe defaults, logging, and unattended jobs.
+
+    [:octicons-arrow-right-24: Read the project page](projects/jrepo.md)
+
+</div>
+
+## Author workflow
+
+1. Create or update markdown under `docs/`
+2. Add screenshots to `docs/images/<topic>/`
+3. Preview with `mkdocs serve`
+4. Compress screenshots before commit
+5. `git push` to sync source
+6. `mkdocs gh-deploy` to publish
+
+## Quick links
+
+- [Site workflow](how-to/site-workflow.md)
+- [Image workflow](references/image-workflow.md)
+- [Custom domain and HTTPS](references/custom-domain-and-https.md)

@@ -13,51 +13,17 @@ tags:
 
 State the outcome and why someone would care.
 
-## Scope
+## Takeaways
 
-- what this covers
-- what it does not cover
-- assumptions / environment
-
-## Steps
-
-### 1. Prerequisites
-
-```bash
-# commands or package names
-```
-
-### 2. Procedure
-
-```bash
-# commands here
-```
-
-### 3. Validation
-
-```bash
-# checks here
-```
+- takeaway one
+- takeaway two
+- takeaway three
 
 ## Notes
 
-- caveat
-- gotcha
-- rollback idea
-
-## Images
-
-Store related images here:
-
-```text
-docs/images/<topic>/
-```
-
-Example embed:
-
-```md
-![Screenshot](../images/<topic>/example.png)
-```
+- context
+- constraints
+- related follow-up work
 
 ## References
 

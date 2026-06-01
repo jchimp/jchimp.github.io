@@ -50,9 +50,9 @@ yourname.github.io
 
 ## Domain verification (recommended)
 
-Verification happens at the **profile/account** level, not the repository level.
+Verification happens at the profile or account level, not the repository level.
 
-1. In GitHub, open your **profile settings**.
+1. In GitHub, open your profile settings.
 2. Go to **Pages**.
 3. Start domain verification for `yourdomain.com`.
 4. Add the TXT record(s) GitHub gives you at your DNS provider.

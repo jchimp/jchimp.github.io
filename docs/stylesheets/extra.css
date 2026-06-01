@@ -1,0 +1,18 @@
+.md-main__inner {
+  margin-top: 0.5rem;
+}
+
+.md-typeset h1 {
+  margin-bottom: 0.75rem;
+}
+
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid.cards > ol > li {
+  border-radius: 1rem;
+  box-shadow: var(--md-shadow-z1);
+}
+
+.md-typeset .grid.cards > ul > li:hover,
+.md-typeset .grid.cards > ol > li:hover {
+  box-shadow: var(--md-shadow-z2);
+}

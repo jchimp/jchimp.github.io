@@ -72,20 +72,18 @@ This builds the static site and pushes the generated output to the `gh-pages` br
 1. Edit markdown in `docs/`
 2. Add images under `docs/images/<topic>/`
 3. Preview locally with `mkdocs serve`
-4. Commit and push source changes
-5. Run `mkdocs gh-deploy` when you want the live site updated
+4. Run image compression before commit:
+   - `python scripts/compress-images.py`
+   - or `./scripts/compress-images.sh`
+   - or `./scripts/compress-images.ps1`
+5. Commit and push source changes
+6. Run `mkdocs gh-deploy` when you want the live site updated
 
-## Content layout
+## Templates
 
-```text
-docs/
-├── index.md
-├── how-to/
-├── projects/
-├── notes/
-├── references/
-└── images/
-```
+- `docs/_templates/post-template.md`
+- `docs/_templates/project-template.md`
+- `docs/_templates/how-to-template.md`
 
 ## Analytics
 
