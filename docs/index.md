@@ -2,79 +2,155 @@
 title: Home
 ---
 
+<section class="home-hero" markdown>
+
 # Jeremy's Lab Notes
 
-A small publishing hub for how-tos, operational notes, technical references, and longer project write-ups.
+How-tos, references, operating notes, and project write-ups from my homelab and tooling work.
+{: .hero-subtitle }
+
+<div class="home-hero-actions" markdown>
+[Browse How-To](how-to/README.md){ .hero-btn }
+[Browse Projects](projects/README.md){ .hero-btn }
+[Browse References](references/README.md){ .hero-btn }
+</div>
+
+</section>
+
+<div class="home-section" markdown>
+
+## Main sections
 
 <div class="grid cards" markdown>
 
--   :material-file-document-multiple-outline: __How-To__
+-   __How-To__
 
     ---
 
     Step-by-step procedures, break/fix runbooks, installation notes, and maintenance guides.
 
-    [:octicons-arrow-right-24: Browse how-to](how-to/README.md)
+    [Browse how-to :arrow_right:](how-to/README.md)
 
--   :material-folder-cog-outline: __Projects__
-
-    ---
-
-    Architecture notes, screenshots, deployment examples, and lessons learned for active projects.
-
-    [:octicons-arrow-right-24: Browse projects](projects/README.md)
-
--   :material-notebook-outline: __Notes__
+-   __Projects__
 
     ---
 
-    Short captures, troubleshooting breadcrumbs, command snippets, and known-good configs.
+    Architecture notes, deployment examples, screenshots, and lessons learned.
 
-    [:octicons-arrow-right-24: Browse notes](notes/README.md)
+    [Browse projects :arrow_right:](projects/README.md)
 
--   :material-bookshelf: __References__
+-   __Notes__
 
     ---
 
-    Stable lookup material such as commands, file paths, service names, and site operations.
+    Short captures, troubleshooting breadcrumbs, and known-good configs.
 
-    [:octicons-arrow-right-24: Browse references](references/README.md)
+    [Browse notes :arrow_right:](notes/README.md)
+
+-   __References__
+
+    ---
+
+    Stable lookup material such as paths, commands, and service notes.
+
+    [Browse references :arrow_right:](references/README.md)
 
 </div>
+
+</div>
+
+<div class="home-section" markdown>
 
 ## Featured projects
 
 <div class="grid cards" markdown>
 
--   :material-dns-outline: __Zonerr__
+-   __Zonerr__
 
     ---
 
-    DNS manager project with a modular provider model and container-friendly deployment.
+    DNS manager with a modular provider model and container-friendly deployment.
 
-    [:octicons-arrow-right-24: Read the project page](projects/zonerr.md)
+    [Read the project page :arrow_right:](projects/zonerr.md)
 
--   :material-source-repository: __JRepo__
+-   __JRepo__
 
     ---
 
-    File sync and repository helper focused on safe defaults, logging, and unattended jobs.
+    File sync and repository helper with safe defaults and unattended-job focus.
 
-    [:octicons-arrow-right-24: Read the project page](projects/jrepo.md)
+    [Read the project page :arrow_right:](projects/jrepo.md)
 
 </div>
 
-## Author workflow
+</div>
 
-1. Create or update markdown under `docs/`
-2. Add screenshots to `docs/images/<topic>/`
-3. Preview with `mkdocs serve`
-4. Compress screenshots before commit
-5. `git push` to sync source
-6. `mkdocs gh-deploy` to publish
+<div class="home-section" markdown>
 
-## Quick links
+## Recent updates
 
-- [Site workflow](how-to/site-workflow.md)
-- [Image workflow](references/image-workflow.md)
-- [Custom domain and HTTPS](references/custom-domain-and-https.md)
+<div class="recent-columns" markdown>
+
+<div markdown>
+
+### Recent posts
+
+<div class="recent-list">
+
+<div class="recent-item">
+<h4><a href="how-to/README.md">Proxmox Ceph Health Checks</a></h4>
+<span class="recent-meta">2026-06-01 &middot; proxmox, ceph, monitoring</span>
+<p>Quick runbook for checking Ceph cluster health after a node reboot or OSD replacement.</p>
+</div>
+
+<div class="recent-item">
+<h4><a href="how-to/README.md">Docker Compose Patterns</a></h4>
+<span class="recent-meta">2026-05-28 &middot; docker, compose, patterns</span>
+<p>Reusable Compose patterns for reverse proxy, logging, and health checks.</p>
+</div>
+
+<div class="recent-item">
+<h4><a href="how-to/README.md">Ubuntu Host Hardening</a></h4>
+<span class="recent-meta">2026-05-22 &middot; ubuntu, security, hardening</span>
+<p>Baseline hardening checklist for new Ubuntu servers before joining the cluster.</p>
+</div>
+
+</div>
+
+</div>
+
+<div markdown>
+
+### Recent projects
+
+<div class="recent-list">
+
+<div class="recent-item">
+<h4><a href="projects/zonerr.md">Zonerr</a></h4>
+<span class="recent-meta">2026-06-01 &middot; dns, flask, docker</span>
+<p>Added provider abstraction layer and updated container deployment notes.</p>
+</div>
+
+<div class="recent-item">
+<h4><a href="projects/jrepo.md">JRepo</a></h4>
+<span class="recent-meta">2026-05-25 &middot; sync, backup</span>
+<p>Documented dry-run workflow and added scheduling examples for cron and Task Scheduler.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="quick-links" markdown>
+
+**Quick links:**
+[Site workflow](how-to/site-workflow.md) ·
+[Image workflow](references/image-workflow.md) ·
+[Custom domain & HTTPS](references/custom-domain-and-https.md) ·
+[GitHub Actions (later)](references/github-actions-deploy.md)
+
+</div>
