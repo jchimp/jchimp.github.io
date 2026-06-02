@@ -1,0 +1,195 @@
+# ============================================================================
+#  zensical.toml — Jeremy's Lab Notes
+#
+#  Full config for Zensical static site generator
+#  Replaces mkdocs.yml
+#
+#  Docs: https://zensical.org/docs/
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+#  Core project settings
+# ----------------------------------------------------------------------------
+
+[project]
+
+site_name = "Jeremy's Lab Notes"
+site_description = "How-tos, references, notes, and project write-ups."
+site_author = "Jeremy Champion"
+site_url = "https://jchimp.tech/"
+copyright = "Copyright &copy; 2026 Jeremy Champion"
+
+repo_name = "jchimp/jchimp.github.io"
+repo_url = "https://github.com/jchimp/jchimp.github.io"
+
+# Avoid Windows excluded port range on 8000
+dev_addr = "127.0.0.1:8001"
+
+# Custom CSS (paths relative to docs/)
+extra_css = [
+    "stylesheets/extra.css",
+    "stylesheets/site-theme.css",
+    "stylesheets/homepage.css",
+]
+
+# Custom JS (uncomment when needed)
+# extra_javascript = ["javascripts/extra.js"]
+
+# ----------------------------------------------------------------------------
+#  Navigation
+# ----------------------------------------------------------------------------
+
+nav = [
+    { "Home" = "index.md" },
+    { "How-To" = [
+        { "Overview"       = "how-to/README.md" },
+        { "Site Workflow"  = "how-to/site-workflow.md" },
+    ]},
+    { "Projects" = [
+        { "Overview" = "projects/README.md" },
+        { "Zonerr"   = "projects/zonerr.md" },
+        { "JRepo"    = "projects/jrepo.md" },
+    ]},
+    { "Notes" = [
+        { "Overview"          = "notes/README.md" },
+        { "Capture Template"  = "notes/capture-template.md" },
+    ]},
+    { "References" = [
+        { "Overview"                        = "references/README.md" },
+        { "Image Workflow"                  = "references/image-workflow.md" },
+        { "Custom Domain and HTTPS"         = "references/custom-domain-and-https.md" },
+        { "GitHub Actions Deployment"       = "references/github-actions-deploy.md" },
+    ]},
+    { "Templates" = [
+        { "Post Template"     = "_templates/post-template.md" },
+        { "Project Template"  = "_templates/project-template.md" },
+        { "How-To Template"   = "_templates/how-to-template.md" },
+    ]},
+]
+
+# ----------------------------------------------------------------------------
+#  Theme
+# ----------------------------------------------------------------------------
+
+[project.theme]
+
+# "modern" = Inter + JetBrains Mono + Lucide icons (new Zensical look)
+# "classic" = Roboto + Roboto Mono (Material for MkDocs look)
+variant = "modern"
+
+language = "en"
+
+features = [
+    # Navigation
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.tabs",
+    "navigation.sections",
+    "navigation.expand",
+    "navigation.top",
+    "navigation.path",
+
+    # Search
+    "search.highlight",
+    "search.suggest",
+
+    # Content
+    "content.code.copy",
+    "content.code.annotate",
+    "content.tabs.link",
+]
+
+# Site icon (Lucide set available by default in modern variant)
+[project.theme.icon]
+logo = "lucide/notebook-pen"
+repo = "lucide/github"
+
+# ----------------------------------------------------------------------------
+#  Color palette — dark/light toggle
+# ----------------------------------------------------------------------------
+
+# Light mode
+[[project.theme.palette]]
+scheme  = "default"
+primary = "indigo"
+accent  = "cyan"
+
+[project.theme.palette.toggle]
+icon = "lucide/sun"
+name = "Switch to dark mode"
+
+# Dark mode
+[[project.theme.palette]]
+scheme  = "slate"
+primary = "indigo"
+accent  = "cyan"
+
+[project.theme.palette.toggle]
+icon = "lucide/moon"
+name = "Switch to light mode"
+
+# ----------------------------------------------------------------------------
+#  Plugins
+# ----------------------------------------------------------------------------
+
+[project.plugins.search]
+enabled = true
+
+# Uncomment if you want offline support
+# [project.plugins.offline]
+# enabled = true
+
+# ----------------------------------------------------------------------------
+#  Markdown extensions
+# ----------------------------------------------------------------------------
+
+[project.markdown_extensions]
+
+# Core
+admonition = {}
+attr_list = {}
+md_in_html = {}
+footnotes = {}
+tables = {}
+
+[project.markdown_extensions.toc]
+permalink = true
+
+# PyMdown Extensions
+"pymdownx.details" = {}
+"pymdownx.superfences" = {}
+
+[project.markdown_extensions."pymdownx.tabbed"]
+alternate_style = true
+
+[project.markdown_extensions."pymdownx.highlight"]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+
+[project.markdown_extensions."pymdownx.emoji"]
+emoji_index = "pymdownx.emoji.twemoji"
+emoji_generator = "pymdownx.emoji.to_svg"
+
+# ----------------------------------------------------------------------------
+#  Analytics (replace with your GA4 ID)
+# ----------------------------------------------------------------------------
+
+[project.extra.analytics]
+provider = "google"
+property = "G-XXXXXXXXXX"
+
+# ----------------------------------------------------------------------------
+#  Social links (footer)
+# ----------------------------------------------------------------------------
+
+[[project.extra.social]]
+icon = "lucide/github"
+link = "https://github.com/jchimp"
+name = "GitHub"
+
+# Uncomment and add more as needed:
+# [[project.extra.social]]
+# icon = "lucide/mail"
+# link = "mailto:you@example.com"
+# name = "Email"
