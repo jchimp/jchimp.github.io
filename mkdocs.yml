@@ -20,6 +20,9 @@ theme:
 
 plugins:
   - search
+  - blog
+      blog_dir: blog
+      post_url_format: "{slug}"
 
 nav:
   - Home: index.md
@@ -41,6 +44,8 @@ nav:
       - Image Workflow: references/image-workflow.md
       - Custom Domain and HTTPS: references/custom-domain-and-https.md
       - GitHub Actions Deployment (Later): references/github-actions-deploy.md
+  - Blog:
+    - blog/index.md
 
 markdown_extensions:
   - admonition
