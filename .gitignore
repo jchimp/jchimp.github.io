@@ -1,10 +1,13 @@
+# Obsidian
+docs/.obsidian/
+
 # Python
 venv/
 .venv/
 __pycache__/
 *.pyc
 
-# MkDocs build output
+# Zensical / MkDocs build output
 site/
 
 # OS/editor noise

@@ -101,7 +101,7 @@ try {
 finally {
     # Always switch back to original branch
     Log "switching back to $OriginalBranch ..."
-    git checkout $OriginalBranch 2>$null
+    git checkout $OriginalBranch 2>$null | Out-Null
 
     # Clean up temp
     if (Test-Path $TempDir) {
