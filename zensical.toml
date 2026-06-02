@@ -100,17 +100,17 @@ features = [
 ]
 
 # Site icon (Lucide set available by default in modern variant)
-[project.theme.icon]
-logo = "lucide/notebook-pen"
-repo = "lucide/github"
+#[project.theme.icon]
+#logo = "lucide/notebook-pen"
+#repo = "lucide/github"
 
 # ----------------------------------------------------------------------------
 #  Color palette — dark/light toggle
 # ----------------------------------------------------------------------------
 
-# Light mode
+# Dark mode
 [[project.theme.palette]]
-scheme  = "default"
+scheme  = "slate"
 primary = "indigo"
 accent  = "cyan"
 
@@ -118,9 +118,9 @@ accent  = "cyan"
 icon = "lucide/sun"
 name = "Switch to dark mode"
 
-# Dark mode
+# Light mode
 [[project.theme.palette]]
-scheme  = "slate"
+scheme  = "default"
 primary = "indigo"
 accent  = "cyan"
 
@@ -182,7 +182,7 @@ property = "G-XXXXXXXXXX"
 # ----------------------------------------------------------------------------
 
 [[project.extra.social]]
-icon = "lucide/github"
+icon = "simple/github"
 link = "https://github.com/jchimp"
 name = "GitHub"
 
