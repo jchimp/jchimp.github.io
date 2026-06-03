@@ -22,31 +22,48 @@ function LogErr{ param([string]$msg) Write-Host "[error]    $msg" -ForegroundCol
 # ---------- Pre-flight checks ----------
 
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    LogErr "git is not installed or not in PATH"; exit 1
+    LogErr "git is not installed or not in PATH"
+    exit 1
 }
+
 if (-not (Get-Command zensical -ErrorAction SilentlyContinue)) {
-    LogErr "zensical is not installed or not in PATH"; exit 1
+    LogErr "zensical is not installed or not in PATH"
+    exit 1
 }
+
 if (-not (Test-Path ".git")) {
-    LogErr "not inside a git repository"; exit 1
+    LogErr "not inside a git repository"
+    exit 1
 }
 
 $OriginalBranch = (git rev-parse --abbrev-ref HEAD).Trim()
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($OriginalBranch)) {
+    LogErr "failed to detect current git branch"
+    exit 1
+}
+
 Log "current branch: $OriginalBranch"
 
 # ---------- Build ----------
 
 Log "running zensical build ..."
 zensical build
-if ($LASTEXITCODE -ne 0) { LogErr "zensical build failed"; exit 1 }
+if ($LASTEXITCODE -ne 0) {
+    LogErr "zensical build failed"
+    exit 1
+}
 
 if (-not (Test-Path $BuildDir)) {
-    LogErr "build directory '$BuildDir' does not exist"; exit 1
+    LogErr "build directory '$BuildDir' does not exist"
+    exit 1
 }
+
 $FileCount = (Get-ChildItem -Path $BuildDir -Recurse -File).Count
 if ($FileCount -eq 0) {
-    LogErr "build directory '$BuildDir' is empty"; exit 1
+    LogErr "build directory '$BuildDir' is empty"
+    exit 1
 }
+
 Log "build produced $FileCount file(s)"
 
 # ---------- Dry run ----------
@@ -66,34 +83,64 @@ if ($DryRun) {
 $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) "zensical-deploy-$(Get-Random)"
 
 try {
+
     # Copy build output to safe temp location
     Log "copying build output to temp ..."
-    Copy-Item -Path $BuildDir -Destination $TempDir -Recurse -Force
+    New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
+    Copy-Item -Path (Join-Path $BuildDir '*') -Destination $TempDir -Recurse -Force
 
     # Switch to deploy branch (orphan if new)
-    $BranchExists = git branch --list $Branch
+    $BranchExists = @(git branch --list $Branch).Count -gt 0
+
     if ($BranchExists) {
         Log "checking out existing branch '$Branch' ..."
-        git checkout $Branch
-    } else {
+        git switch --quiet $Branch 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Log "git switch failed, trying checkout ..."
+            git checkout --quiet $Branch 2>$null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to checkout existing branch '$Branch'" }
+        }
+    }
+    else {
         Log "creating orphan branch '$Branch' ..."
         git checkout --orphan $Branch
+        if ($LASTEXITCODE -ne 0) { throw "Failed to create orphan branch '$Branch'" }
     }
 
-    # Remove all tracked files
+    # Remove tracked files (ignore noise if branch is empty)
     Log "cleaning working tree ..."
-    git rm -rf . 2>$null
-    if (Test-Path ".gitignore") { Remove-Item ".gitignore" -Force }
+
+    $oldEAP = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        git rm -rf . 2>$null
+        $null = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $oldEAP
+    }
+
+    # Remove remaining untracked files/folders except .git
+    Get-ChildItem -Force |
+        Where-Object { $_.Name -ne ".git" } |
+        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     # Copy build output back
     Log "copying build output into branch ..."
-    Get-ChildItem -Path $TempDir -Force | Copy-Item -Destination . -Recurse -Force
+    Copy-Item -Path (Join-Path $TempDir '*') -Destination . -Recurse -Force
 
-    # Stage, commit, push
+    # Stage
     git add --all
+    if ($LASTEXITCODE -ne 0) { throw "git add failed" }
+
+    # Commit
     git commit -m $CommitMsg --allow-empty
+    if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
+
+    # Push
     Log "pushing to origin/$Branch ..."
     git push origin $Branch --force
+    if ($LASTEXITCODE -ne 0) { throw "git push failed" }
 
     LogOk "deployed successfully"
     LogOk "site will be available once GitHub Pages picks up the gh-pages branch"
@@ -101,10 +148,31 @@ try {
 finally {
     # Always switch back to original branch
     Log "switching back to $OriginalBranch ..."
-    git checkout $OriginalBranch *> $null | Out-Null
+
+    $exit = 0
+    $oldEAP = $ErrorActionPreference
+
+    try {
+        $ErrorActionPreference = "Continue"
+
+        git switch --quiet $OriginalBranch 2>$null
+        $exit = $LASTEXITCODE
+
+        if ($exit -ne 0) {
+            git checkout --quiet $OriginalBranch 2>$null
+            $exit = $LASTEXITCODE
+        }
+    }
+    finally {
+        $ErrorActionPreference = $oldEAP
+    }
+
+    if ($exit -ne 0) {
+        throw "Failed to switch back to branch '$OriginalBranch'"
+    }
 
     # Clean up temp
     if (Test-Path $TempDir) {
-        Remove-Item $TempDir -Recurse -Force 2>$null
+        Remove-Item $TempDir -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
