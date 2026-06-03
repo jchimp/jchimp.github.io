@@ -47,6 +47,7 @@ nav = [
     ]},
     { "Projects" = [
         { "Overview" = "projects/README.md" },
+        { "Backup-SQLExpressDB" = "projects/backup-sqlexpress.md" },
         { "Zonerr"   = "projects/zonerr.md" },
         { "JRepo"    = "projects/jrepo.md" },
     ]},
