@@ -60,3 +60,4 @@ jobs:
           publish_dir: ./site
           publish_branch: gh-pages
           force_orphan: true
+          cname: jchimp.tech

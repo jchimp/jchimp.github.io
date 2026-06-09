@@ -1,7 +1,8 @@
 # Key-Rex
 > Tiny Arms. Massive Entropy.
 
-A browser-based password and cryptographic key generator
+A browser-based password and cryptographic key generator.
+Link below to the application and source code on GitHub.
 
 ## Links
 
