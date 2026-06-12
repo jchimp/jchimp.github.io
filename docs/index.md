@@ -19,32 +19,6 @@ How-tos, references, operating notes, and project write-ups from my homelab and 
 
 <div class="home-section" markdown>
 
-## Featured projects
-
-<div class="grid cards" markdown>
-
--   __Zonerr__
-
-    ---
-
-    DNS manager with a modular provider model and container-friendly deployment.
-
-    [Read the project page :arrow_right:](projects/zonerr.md)
-
--   __JRepo__
-
-    ---
-
-    File sync and repository helper with safe defaults and unattended-job focus.
-
-    [Read the project page :arrow_right:](projects/jrepo.md)
-
-</div>
-
-</div>
-
-<div class="home-section" markdown>
-
 ## Recent updates
 
 <div class="recent-columns" markdown>
