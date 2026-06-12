@@ -46,21 +46,19 @@ nav = [
         { "Site Workflow"  = "how-to/site-workflow.md" },
     ]},
     { "Projects" = [
-        { "Overview" = "projects/README.md" },
+        { "Overview"            = "projects/README.md" },
         { "Backup-SQLExpressDB" = "projects/backup-sqlexpressdb.md" },
-        { "Zonerr"   = "projects/zonerr.md" },
-        { "JRepo"    = "projects/jrepo.md" },
-        { "Key-Rex"    = "projects/key-rex.md" },
+        { "Zonerr"              = "projects/zonerr.md" },
+        { "JRepo"               = "projects/jrepo.md" },
+        { "Key-Rex"             = "projects/key-rex.md" },
+        { "Town Pump Locator"   = "projects/townpump-locator.md" },
     ]},
     { "Notes" = [
         { "Overview"          = "notes/README.md" },
         { "Capture Template"  = "notes/capture-template.md" },
     ]},
     { "References" = [
-        { "Overview"                        = "references/README.md" },
-        { "Image Workflow"                  = "references/image-workflow.md" },
-        { "Custom Domain and HTTPS"         = "references/custom-domain-and-https.md" },
-        { "GitHub Actions Deployment"       = "references/github-actions-deploy.md" },
+        { "Overview"        = "references/README.md" },
     ]},
     { "Templates" = [
         { "Post Template"     = "_templates/post-template.md" },

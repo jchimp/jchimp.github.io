@@ -19,48 +19,6 @@ How-tos, references, operating notes, and project write-ups from my homelab and 
 
 <div class="home-section" markdown>
 
-## Main sections
-
-<div class="grid cards" markdown>
-
--   __How-To__
-
-    ---
-
-    Step-by-step procedures, break/fix runbooks, installation notes, and maintenance guides.
-
-    [Browse how-to :arrow_right:](how-to/README.md)
-
--   __Projects__
-
-    ---
-
-    Architecture notes, deployment examples, screenshots, and lessons learned.
-
-    [Browse projects :arrow_right:](projects/README.md)
-
--   __Notes__
-
-    ---
-
-    Short captures, troubleshooting breadcrumbs, and known-good configs.
-
-    [Browse notes :arrow_right:](notes/README.md)
-
--   __References__
-
-    ---
-
-    Stable lookup material such as paths, commands, and service notes.
-
-    [Browse references :arrow_right:](references/README.md)
-
-</div>
-
-</div>
-
-<div class="home-section" markdown>
-
 ## Featured projects
 
 <div class="grid cards" markdown>
@@ -109,12 +67,6 @@ How-tos, references, operating notes, and project write-ups from my homelab and 
 <p>Reusable Compose patterns for reverse proxy, logging, and health checks.</p>
 </div>
 
-<div class="recent-item">
-<h4><a href="how-to/README.md">Ubuntu Host Hardening</a></h4>
-<span class="recent-meta">2026-05-22 &middot; ubuntu, security, hardening</span>
-<p>Baseline hardening checklist for new Ubuntu servers before joining the cluster.</p>
-</div>
-
 </div>
 
 </div>
@@ -148,9 +100,7 @@ How-tos, references, operating notes, and project write-ups from my homelab and 
 <div class="quick-links" markdown>
 
 **Quick links:**
-[Site workflow](how-to/site-workflow.md) ·
-[Image workflow](references/image-workflow.md) ·
-[Custom domain & HTTPS](references/custom-domain-and-https.md) ·
-[GitHub Actions (later)](references/github-actions-deploy.md)
+[How-To](how-to/) ·
+[References](references/) ·
 
 </div>

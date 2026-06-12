@@ -4,18 +4,12 @@ title: Projects
 
 # Projects
 
+Things I have made.
+
 Longer-form write-ups for tools, scripts, and systems.
 
-## Suggested content types
-
-- architecture overview
-- lessons learned
-- screenshots
-- config examples
-- change logs
-- future work
-
-## Included starter pages
-
-- [Zonerr](zonerr.md)
+- [Backup-SQLExpressDB](backup-sqlexpressdb.md)
 - [JRepo](jrepo.md)
+- [Zonerr](zonerr.md)
+- [Key-Rex](key-rex.md)
+- [Town Pump Locator](townpump-locator.md)

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Town Pump Locations Heatmap</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sign-green:#00693E;
+    --sign-green-dark:#00532F;
+    --asphalt:#26282A;
+    --pump-red:#C8102E;
+    --route-yellow:#FFC72C;
+    --paper:#EFEEE9;
+    --line:#FFFFFF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Overpass',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--asphalt);
+    display:flex;flex-direction:column;
+  }
+  /* ---- Interstate guide-sign header ---- */
+  header{
+    background:var(--paper);
+    padding:14px 16px 10px;
+    display:flex;justify-content:center;
+  }
+  .sign{
+    background:var(--sign-green);
+    border:3px solid var(--line);
+    outline:2px solid var(--sign-green-dark);
+    border-radius:12px;
+    box-shadow:0 4px 14px rgba(0,0,0,.22);
+    color:#fff;
+    padding:12px 22px 14px;
+    max-width:920px;width:100%;
+    position:relative;
+    display:flex;align-items:center;gap:14px;
+  }
+  .sign-text{flex:1;min-width:0}
+  .clear-btn{
+    flex:none;
+    font-family:'Overpass',system-ui,sans-serif;
+    font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    background:var(--route-yellow);color:var(--asphalt);
+    border:2px solid #fff;border-radius:8px;
+    padding:8px 14px 7px;cursor:pointer;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:transform .08s ease, background .15s ease;
+  }
+  .clear-btn:hover{background:#FFD75E}
+  .clear-btn:active{transform:scale(.96)}
+  .clear-btn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+  .exit-tab{
+    position:absolute;top:-13px;right:26px;
+    background:var(--sign-green);
+    border:2px solid var(--line);
+    border-radius:6px;
+    font-size:11px;font-weight:800;letter-spacing:.14em;
+    padding:2px 12px 1px;text-transform:uppercase;
+  }
+  .sign h1{
+    font-weight:900;font-size:clamp(20px,4vw,32px);
+    letter-spacing:.02em;line-height:1.05;text-transform:uppercase;
+  }
+  .sign h1 .arrow{color:var(--route-yellow)}
+  .sign .sub{
+    margin-top:4px;font-size:clamp(12px,2vw,14px);font-weight:600;
+    display:flex;flex-wrap:wrap;gap:6px 18px;opacity:.95;
+  }
+  .sub .dot{color:var(--route-yellow)}
+  /* ---- Map ---- */
+  #map{flex:1;min-height:420px;background:#dcdcd6}
+  .leaflet-container{font-family:'Overpass',system-ui,sans-serif}
+  /* custom layer-toggle control */
+  .tp-control{
+    background:#fff;border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.25);
+    padding:10px 12px;font-size:13px;line-height:1.3;min-width:170px;
+  }
+  .tp-control .ttl{
+    font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+    font-size:10.5px;color:#6b7177;margin-bottom:7px;
+  }
+  .tp-control label{
+    display:flex;align-items:center;gap:8px;cursor:pointer;
+    font-weight:600;padding:3px 0;
+  }
+  .tp-control input{accent-color:var(--pump-red);width:15px;height:15px;cursor:pointer}
+  .tp-legend{
+    margin-top:9px;padding-top:8px;border-top:1px solid #e4e4e0;
+  }
+  .tp-legend .bar{
+    height:9px;border-radius:5px;
+    background:linear-gradient(90deg,#2c7fb8,#41b6c4,#fecc5c,#fd8d3c,#C8102E);
+  }
+  .tp-legend .lbls{
+    display:flex;justify-content:space-between;
+    font-size:10px;color:#6b7177;font-weight:600;margin-top:3px;
+    text-transform:uppercase;letter-spacing:.06em;
+  }
+  /* popup card */
+  .leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 6px 22px rgba(0,0,0,.28)}
+  .leaflet-popup-content{margin:0;width:262px !important}
+  .pop{padding:0}
+  .pop .head{
+    background:var(--sign-green);color:#fff;
+    border-radius:12px 12px 0 0;padding:10px 14px 8px;
+  }
+  .pop .head .town{
+    font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--route-yellow);
+  }
+  .pop .head .nm{font-size:16px;font-weight:800;line-height:1.15}
+  .pop .body{padding:10px 14px 12px;font-size:12.5px}
+  .pop .row{display:flex;gap:8px;margin:5px 0;align-items:baseline}
+  .pop .row .ic{width:16px;text-align:center;flex:none}
+  .pop a{color:var(--pump-red);font-weight:700;text-decoration:none}
+  .pop a:hover{text-decoration:underline}
+  .pop .stars{color:#E8A100;letter-spacing:1px;font-size:12px}
+  .pop .rc{color:#7a8087;font-size:11px}
+  .pop .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .pop .chip{
+    background:#F1F0EB;border:1px solid #E0DFD8;color:#41464b;
+    border-radius:999px;padding:2px 9px 1px;font-size:10.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.05em;
+  }
+  .pop .chip.brand{background:var(--pump-red);border-color:var(--pump-red);color:#fff}
+  .pop .gmaps{
+    display:block;margin-top:10px;text-align:center;
+    border:1.5px solid var(--pump-red);border-radius:8px;
+    padding:5px 0 4px;font-size:12px;
+  }
+  /* ---- Drop-a-pin distance finder ---- */
+  .you-icon{
+    width:18px;height:18px;border-radius:50%;
+    background:#1A6FBF;border:3px solid #fff;
+    box-shadow:0 0 0 3px rgba(26,111,191,.30),0 2px 6px rgba(0,0,0,.4);
+  }
+  .dist-tip{
+    background:#fff;border:1px solid #cfcec7;border-radius:6px;
+    color:#41464b;font-weight:700;font-size:10.5px;
+    padding:1px 7px 0;box-shadow:0 1px 4px rgba(0,0,0,.2);
+    white-space:nowrap;
+  }
+  .dist-tip.near{background:var(--pump-red);border-color:var(--pump-red);color:#fff}
+  .dist-tip::before{display:none}
+  .you-pop{font-size:12.5px;line-height:1.5;padding:8px 6px 6px;max-width:230px}
+  .you-pop .yh{
+    font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+    font-size:10.5px;color:#1A6FBF;margin-bottom:2px;
+  }
+  .route-info{display:block;margin-top:5px;padding-top:5px;border-top:1px solid #eceae4;color:#555}
+  .route-info b{color:var(--asphalt)}
+  .route-swatch{
+    display:inline-block;width:18px;height:7px;border-radius:3px;vertical-align:1px;
+    background:var(--route-yellow);box-shadow:0 0 0 2px var(--asphalt);margin-right:5px;
+  }
+  /* ---- highway shield labels ---- */
+  .hwy-lbl{
+    font-family:'Overpass',system-ui,sans-serif;
+    font-weight:800;font-size:9.5px;letter-spacing:.03em;
+    padding:1px 6px 0;border-radius:5px;white-space:nowrap;
+    box-shadow:0 1px 3px rgba(0,0,0,.25);opacity:.92;
+  }
+  .hwy-lbl::before{display:none}
+  .hwy-lbl.i{background:#1B3F94;border:1px solid #fff;color:#fff;border-radius:8px}
+  .hwy-lbl.us{background:#fff;border:1.5px solid #41464b;color:#26282A}
+  .hwy-lbl.mt{background:#F1F0EB;border:1px solid #98A0AC;color:#55606E}
+  footer{
+    background:var(--asphalt);color:#b9bdc1;
+    font-size:11.5px;padding:8px 16px;text-align:center;line-height:1.5;
+  }
+  footer b{color:#fff}
+  @media (max-width:560px){
+    header{padding:10px 10px 8px}
+    .sign{padding:10px 14px 11px;flex-wrap:wrap}
+    .clear-btn{width:100%}
+    .exit-tab{right:14px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="sign">
+    <div class="exit-tab">Next Exit</div>
+    <div class="sign-text">
+      <h1>Town Pump <span class="arrow">&#9650;</span> Montana</h1>
+      <div class="sub">
+        <span><b id="storeCount">0</b>&nbsp;store locations</span>
+        <span class="dot">&#9670;</span>
+        <span>Tap a pin for store details</span>
+        <span class="dot">&#9670;</span>
+        <span>Click anywhere on the map to measure your distance to the nearest Town Pump</span>
+      </div>
+    </div>
+    <button id="clearBtn" class="clear-btn" hidden>&#10005; Clear pin</button>
+  </div>
+</header>
+
+<div id="map"></div>
+
+<footer>
+  Locations compiled June 2026 from public map data — <b>unofficial</b>, may not include every store.
+  Highway lines are simplified town-to-town runs for orientation, not navigation; driving routes use real road data.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<script>
+/* ============================================================
+   STORE DATA — 99 Town Pump convenience stores & travel plazas
+   Fields: n=name suffix, t=town, a=address, lat, lng,
+           p=phone, r=rating, rc=rating count, h=hours,
+           am=amenities, b=brand note
+   ============================================================ */
+const H24 = "Open 24 hours";
+const STORES = [
+ // ---- Billings ----
+ {t:"Billings", a:"450 Main St, Billings, MT 59105", lat:45.8073823, lng:-108.4756281, p:"406-601-1396", r:4.2, rc:336, h:H24, am:["Gas"]},
+ {t:"Billings", a:"3150 King Ave W Ste A, Billings, MT 59102", lat:45.754335, lng:-108.596085, p:"406-651-1385", r:3.5, rc:51, h:H24, am:["Gas"]},
+ {t:"Billings", a:"3975 King Ave W Ste 1, Billings, MT 59102", lat:45.7558346, lng:-108.6162552, p:"406-998-6643", r:4.0, rc:65, h:H24, am:["Gas"]},
+ {t:"Billings", a:"3415 Grand Ave, Billings, MT 59102", lat:45.7847691, lng:-108.6017311, p:"406-534-2450", r:4.3, rc:112, h:H24, am:["Gas","RV dump"]},
+ {t:"Billings", a:"1030 US-87 Unit E, Billings, MT 59101", lat:45.796618, lng:-108.459633, p:"406-248-6382", r:3.3, rc:42, h:H24, am:["Gas","Truck stop"]},
+ {t:"Billings", a:"2711 N Frontage Rd, Billings, MT 59101", lat:45.8163612, lng:-108.4165872, p:"406-238-9823", r:3.0, rc:86, h:H24, am:["Gas","Truck stop","Showers"], b:"Pilot"},
+ {t:"Billings", a:"2775 Old Hardin Rd, Billings, MT 59101", lat:45.8128981, lng:-108.4151338, p:"406-256-8826", r:2.6, rc:69, h:H24, am:["Truck stop"]},
+ {t:"Billings", a:"3969 Grand Ave, Billings, MT 59102", lat:45.7848111, lng:-108.6168967, p:"406-652-0703", r:4.0, rc:28, h:H24, am:["Gas"]},
+ // ---- Bozeman ----
+ {t:"Bozeman", a:"803 E Main St, Bozeman, MT 59715", lat:45.6796264, lng:-111.0253658, p:"406-587-7052", r:2.7, rc:31, h:H24, am:["Gas","ATM"]},
+ {t:"Bozeman", a:"77 E Valley Center Rd, Bozeman, MT 59718", lat:45.7299658, lng:-111.183674, p:"406-813-1008", r:4.0, rc:131, h:H24, am:["Deli","RV dump"]},
+ {t:"Bozeman", a:"2707 W Main St, Bozeman, MT 59718", lat:45.6736901, lng:-111.0741523, p:"406-586-8017", r:3.9, rc:23, h:H24, am:["Gas","ATM"]},
+ {t:"Bozeman", a:"2525 N 19th Ave, Bozeman, MT 59718", lat:45.7045649, lng:-111.066178, p:"406-813-6117", r:3.1, rc:16, h:H24, am:[]},
+ {t:"Bozeman", a:"1871 Baxter Ln, Bozeman, MT 59715", lat:45.7006834, lng:-111.064814, p:"406-404-1636", r:3.2, rc:59, h:H24, am:["Gas","Car wash","RV dump"]},
+ {t:"Bozeman", a:"850 S Cottonwood Rd, Bozeman, MT 59718", lat:45.6708772, lng:-111.1038981, p:"406-404-1125", r:3.0, rc:39, h:H24, am:["Gas"]},
+ {t:"Bozeman", a:"8439 Huffine Ln, Bozeman, MT 59718", lat:45.671126, lng:-111.1358619, p:"406-219-4490", r:4.1, rc:39, h:H24, am:["Gas","Casino"]},
+ {t:"Four Corners", a:"29001 Norris Rd, Bozeman, MT 59718", lat:45.6715391, lng:-111.186594, p:"406-587-0163", r:3.5, rc:53, h:H24, am:["Gas","Truck stop","ATM"]},
+ // ---- Missoula area ----
+ {t:"Missoula", a:"2210 N Reserve St, Missoula, MT 59808", lat:46.8854593, lng:-114.0385144, p:"406-728-3219", r:2.5, rc:42, h:H24, am:["Gas","Truck stop","Car wash"]},
+ {t:"Missoula", a:"2001 Brooks St, Missoula, MT 59801", lat:46.8522799, lng:-114.0141727, p:"406-926-1768", r:3.8, rc:37, h:H24, am:["Gas","Truck stop"]},
+ {t:"Missoula", a:"3420 Mullan Rd Ste C, Missoula, MT 59808", lat:46.8856182, lng:-114.040422, p:"406-721-6143", r:3.1, rc:33, h:H24, am:["Gas"]},
+ {t:"Missoula", a:"5310 Grant Creek Rd, Missoula, MT 59808", lat:46.9146691, lng:-114.0326158, p:"406-543-0033", r:3.7, rc:44, h:H24, am:["Gas","RV dump"]},
+ {t:"Milltown", a:"7985 MT-200, Milltown, MT 59851", lat:46.8744408, lng:-113.8870571, p:"406-258-6588", r:2.9, rc:93, h:H24, am:["Gas","Truck stop","ATM"]},
+ {t:"Missoula", a:"8745 US-93 N Suite B, Missoula, MT 59808", lat:46.9551711, lng:-114.1324994, p:"406-542-0400", r:4.1, rc:1200, h:H24, am:["Gas","Truck stop","Showers"], b:"Flying J", n:"Travel Center"},
+ // ---- Butte ----
+ {t:"Butte", a:"531 S Montana St, Butte, MT 59701", lat:46.0073025, lng:-112.539659, p:"406-782-7653", r:3.7, rc:47, h:H24, am:["Gas","Truck stop","Casino"]},
+ {t:"Butte", a:"3700 Harrison Ave #1, Butte, MT 59701", lat:45.9695081, lng:-112.5073398, p:"406-494-2434", r:4.1, rc:48, h:H24, am:["Gas","Truck stop","Car wash","RV dump"]},
+ {t:"Butte", a:"1370 Harrison Ave, Butte, MT 59701", lat:46.00062, lng:-112.518332, p:"406-782-4442", r:3.9, rc:30, h:H24, am:["Gas","Truck stop","Casino"]},
+ {t:"Butte", a:"2711 Harrison Ave, Butte, MT 59701", lat:45.9839273, lng:-112.5092635, p:"406-494-3744", r:3.0, rc:27, h:H24, am:["Gas","Truck stop"]},
+ {t:"Rocker (Butte)", a:"1000 Grizzly Trail, Butte, MT 59701", lat:46.0050833, lng:-112.6118671, p:"406-723-0088", r:4.0, rc:974, h:H24, am:["Gas","Truck stop","Showers","Casino"], b:"Pilot", n:"Travel Plaza"},
+ {t:"Butte", a:"2305 Continental Dr, Butte, MT 59701", lat:45.9901635, lng:-112.487827, p:"406-299-2742", r:4.6, rc:19, h:H24, am:["Gas"]},
+ // ---- Great Falls ----
+ {t:"Great Falls", a:"1400 10th Ave S, Great Falls, MT 59405", lat:47.493866, lng:-111.283253, p:"406-564-1021", r:3.9, rc:44, h:H24, am:["Gas"]},
+ {t:"Great Falls", a:"1411 10th Ave S, Great Falls, MT 59405", lat:47.4947266, lng:-111.2825641, p:"406-952-0765", r:3.9, rc:50, h:H24, am:["Gas","Truck stop"]},
+ {t:"Great Falls", a:"401 10th Ave S, Great Falls, MT 59405", lat:47.494673, lng:-111.300545, p:"406-761-5424", r:3.8, rc:27, h:H24, am:["Gas","Truck stop","Liquor store"]},
+ {t:"Great Falls", a:"505 NW Bypass, Great Falls, MT 59404", lat:47.516639, lng:-111.323235, p:"406-268-1700", r:3.5, rc:40, h:H24, am:["Gas","Truck stop","Car wash","Casino"]},
+ {t:"Great Falls", a:"700 10th Ave S, Great Falls, MT 59405", lat:47.4938813, lng:-111.294928, p:"406-268-1866", r:3.3, rc:29, h:H24, am:["Gas","Truck stop"]},
+ {t:"Great Falls", a:"3700 31st St SW #1, Great Falls, MT 59404", lat:47.470035, lng:-111.360886, p:"406-452-0342", r:3.4, rc:34, h:H24, am:["Gas","Truck stop","Showers","Casino"], b:"Conoco · Pilot"},
+ {t:"Great Falls", a:"3715 31st St SW, Great Falls, MT 59404", lat:47.4702488, lng:-111.3584743, p:"406-761-0052", r:4.0, rc:278, h:H24, am:["Gas","Truck stop","Showers","Laundry"], b:"Flying J", n:"Travel Plaza"},
+ // ---- Helena / East Helena ----
+ {t:"Helena", a:"2401 N Montana Ave, Helena, MT 59601", lat:46.6090057, lng:-112.0201396, p:"406-443-5068", r:3.4, rc:13, h:"7:00 AM – 11:00 PM", am:[]},
+ {t:"Helena", a:"1240 Prospect Ave, Helena, MT 59601", lat:46.591415, lng:-112.019629, p:"406-443-3730", r:3.8, rc:37, h:H24, am:["Gas","Truck stop"]},
+ {t:"Helena", a:"1822 Custer Ave, Helena, MT 59602", lat:46.6172669, lng:-112.0060755, p:"406-442-1459", r:3.5, rc:44, h:H24, am:["Gas","Truck stop","ATM"]},
+ {t:"Helena", a:"2910 N Montana Ave, Helena, MT 59601", lat:46.6146794, lng:-112.0216894, p:"406-449-3207", r:3.8, rc:32, h:H24, am:["Deli"]},
+ {t:"Helena", a:"3161 N Sanders St, Helena, MT 59602", lat:46.617382, lng:-112.0152052, p:"406-502-1339", r:3.6, rc:23, h:H24, am:["Gas","Car wash"]},
+ {t:"Helena", a:"1140 Euclid Ave, Helena, MT 59601", lat:46.601829, lng:-112.05134, p:"406-443-6236", r:4.3, rc:15, h:"8:00 AM – 2:00 AM", am:["Gas"]},
+ {t:"East Helena", a:"3680 US-12, East Helena, MT 59635", lat:46.590645, lng:-111.9329003, p:"406-227-6074", r:4.3, rc:59, h:H24, am:["Gas","Truck stop","Showers","RV dump"]},
+ // ---- Kalispell ----
+ {t:"Kalispell", a:"2910 US-93 S, Kalispell, MT 59901", lat:48.1637988, lng:-114.2886654, p:"406-257-4031", r:4.0, rc:61, h:H24, am:["Gas","Truck stop","ATM","Deli"]},
+ {t:"Kalispell", a:"859 W Reserve Dr Ste 2, Kalispell, MT 59901", lat:48.2412102, lng:-114.327141, p:"406-314-6212", r:3.6, rc:60, h:H24, am:[]},
+ {t:"Kalispell", a:"445 W Idaho St, Kalispell, MT 59901", lat:48.2014632, lng:-114.322153, p:"406-755-3381", r:3.8, rc:30, h:H24, am:["Gas","Car wash"]},
+ {t:"Kalispell", a:"2605 US-2 E, Kalispell, MT 59901", lat:48.2408138, lng:-114.2751453, p:"406-755-1306", r:4.0, rc:48, h:H24, am:["Gas","Deli","Propane"]},
+ {t:"Kalispell", a:"1100 E Idaho St, Kalispell, MT 59901", lat:48.208566, lng:-114.2927666, p:"406-257-3926", r:3.3, rc:17, h:H24, am:["Gas"]},
+ // ---- Belgrade ----
+ {t:"Belgrade", a:"561 Business Hub Dr, Belgrade, MT 59714", lat:45.773858, lng:-111.1990266, p:"406-924-6990", r:3.4, rc:88, h:H24, am:["Gas","Truck stop"]},
+ {t:"Belgrade", a:"305 E Main St, Belgrade, MT 59714", lat:45.7744574, lng:-111.1727066, p:"406-388-4292", r:3.8, rc:32, h:H24, am:["Gas","Truck stop","Deli"]},
+ {t:"Belgrade", a:"206 W Jefferson Ave, Belgrade, MT 59714", lat:45.771488, lng:-111.184406, p:"406-388-0129", r:2.3, rc:18, h:H24, am:["Gas","Truck stop","Car wash"]},
+ {t:"Belgrade", a:"691 Jackrabbit Ln, Belgrade, MT 59714", lat:45.773657, lng:-111.1861476, p:"406-388-1520", r:3.5, rc:39, h:H24, am:["Gas","Truck stop","Car wash"]},
+ // ---- Smaller towns, A to Z ----
+ {t:"Anaconda", a:"6940 MT-1, Anaconda, MT 59711", lat:46.127172, lng:-112.92333, p:"406-563-8007", r:2.8, rc:23, h:H24, am:["Gas","Truck stop"]},
+ {t:"Anaconda", a:"819 Park Ave, Anaconda, MT 59711", lat:46.1308567, lng:-112.9638923, p:"406-563-6707", r:2.8, rc:14, h:H24, am:["Gas","Truck stop","Car wash"]},
+ {t:"Big Timber", a:"Loop Rd Ste C, Big Timber, MT 59011", lat:45.8270349, lng:-109.9721467, p:"406-932-4419", r:3.6, rc:89, h:H24, am:["Gas","Truck stop"]},
+ {t:"Big Timber", a:"510 W 1st Ave, Big Timber, MT 59011", lat:45.8320857, lng:-109.9615394, p:"406-932-5349", r:3.1, rc:14, h:H24, am:[]},
+ {t:"Boulder", a:"703 N Main St, Boulder, MT 59632", lat:46.2441135, lng:-112.1174017, p:"406-225-4330", r:3.5, rc:53, h:H24, am:["Gas","Truck stop","ATM"]},
+ {t:"Browning", a:"304 SE Boundary St, Browning, MT 59417", lat:48.553651, lng:-113.0091805, p:"406-338-7866", r:4.1, rc:29, h:H24, am:["Gas","Truck stop","ATM"]},
+ {t:"Chinook", a:"108 New York St, Chinook, MT 59523", lat:48.594647, lng:-109.232517, p:"406-357-2365", r:3.8, rc:25, h:H24, am:["Gas","Truck stop","Casino"]},
+ {t:"Columbia Falls", a:"6102 US-2 W, Columbia Falls, MT 59912", lat:48.3698593, lng:-114.2397315, p:"406-892-0747", r:2.7, rc:41, h:H24, am:["Gas","Truck stop","Deli"]},
+ {t:"Columbia Falls", a:"502 9th St W, Columbia Falls, MT 59912", lat:48.371056, lng:-114.189089, p:"406-892-2245", r:3.8, rc:16, h:H24, am:["Gas"]},
+ {t:"Columbus", a:"605 E 8th Ave, Columbus, MT 59019", lat:45.6434757, lng:-109.2465258, p:"406-322-4833", r:3.1, rc:65, h:H24, am:["Gas","Truck stop"]},
+ {t:"Conrad", a:"215 N Main St, Conrad, MT 59425", lat:48.1777683, lng:-111.9410551, p:"406-278-7971", r:3.4, rc:28, h:H24, am:["Deli"]},
+ {t:"Cut Bank", a:"1119 E Main St, Cut Bank, MT 59427", lat:48.6300637, lng:-112.3186269, p:"406-845-1002", r:3.9, rc:11, h:H24, am:["Gas","Truck stop","Casino"]},
+ {t:"Cut Bank", a:"510 W Main St #1, Cut Bank, MT 59427", lat:48.6389913, lng:-112.3389716, p:"406-873-2208", r:3.4, rc:12, h:H24, am:["Gas","Truck stop"]},
+ {t:"Deer Lodge", a:"203 N Main St, Deer Lodge, MT 59722", lat:46.403515, lng:-112.734343, p:"406-846-3710", r:2.1, rc:14, h:H24, am:["Gas","Truck stop","Deli"]},
+ {t:"Dillon", a:"635 N Montana St, Dillon, MT 59725", lat:45.226023, lng:-112.6300038, p:"406-683-5097", r:4.3, rc:18, h:H24, am:["Gas","Casino","Deli"]},
+ {t:"Dillon", a:"101 W Helena St, Dillon, MT 59725", lat:45.218528, lng:-112.6344319, p:"406-683-8323", r:4.0, rc:42, h:"6:00 AM – 2:00 AM", am:["Gas","Deli"]},
+ {t:"Ennis", a:"116 W Main St, Ennis, MT 59729", lat:45.3489518, lng:-111.7312647, p:"406-682-7439", r:4.1, rc:37, h:H24, am:["Gas","Truck stop"]},
+ {t:"Eureka", a:"10 Dewey Ave, Eureka, MT 59917", lat:48.8786689, lng:-115.0520298, p:"406-297-2431", r:3.9, rc:32, h:H24, am:["Gas","ATM"]},
+ {t:"Florence", a:"5495 US-93, Florence, MT 59833", lat:46.632337, lng:-114.079385, p:"406-273-6685", r:4.3, rc:34, h:H24, am:["Gas","Truck stop"]},
+ {t:"Forsyth", a:"974 Front St, Forsyth, MT 59327", lat:46.2636825, lng:-106.67638, p:"406-356-7952", r:3.2, rc:37, h:H24, am:["Gas","Truck stop"]},
+ {t:"Hamilton", a:"932 S 1st St, Hamilton, MT 59840", lat:46.2373444, lng:-114.1538995, p:"406-363-4454", r:4.4, rc:25, h:H24, am:["Gas","Truck stop"]},
+ {t:"Hamilton", a:"1117 N 1st St, Hamilton, MT 59840", lat:46.2587826, lng:-114.1584517, p:"406-363-4643", r:3.3, rc:20, h:H24, am:["Gas","Truck stop","Car wash"]},
+ {t:"Hardin", a:"1010 N Crawford Ave, Hardin, MT 59034", lat:45.7393056, lng:-107.6123981, p:"406-665-2423", r:3.4, rc:18, h:H24, am:["Gas","Truck stop"]},
+ {t:"Havre", a:"136 1st St W, Havre, MT 59501", lat:48.554028, lng:-109.685997, p:"406-265-9577", r:3.6, rc:35, h:H24, am:["Gas","Truck stop","Car wash","Deli"]},
+ {t:"Laurel", a:"312 S 1st Ave, Laurel, MT 59044", lat:45.6650678, lng:-108.7718584, p:"406-628-7576", r:3.9, rc:42, h:H24, am:["Gas","Truck stop","Car wash","Casino"]},
+ {t:"Lewistown", a:"520 E Main St, Lewistown, MT 59457", lat:47.0707842, lng:-109.4121015, p:"406-538-2217", r:3.9, rc:30, h:H24, am:["Gas","Deli"]},
+ {t:"Libby", a:"1315 Minnesota Ave, Libby, MT 59923", lat:48.3823486, lng:-115.5474773, p:"406-293-2222", r:3.6, rc:23, h:H24, am:["Deli"]},
+ {t:"Livingston", a:"2200 W Park St, Livingston, MT 59047", lat:45.6413135, lng:-110.5751663, p:"406-222-5107", r:3.8, rc:254, h:H24, am:["Gas"]},
+ {t:"Livingston", a:"716 E Park St, Livingston, MT 59047", lat:45.6662083, lng:-110.5533528, p:"406-222-5527", r:4.3, rc:3, h:H24, am:["Gas"]},
+ {t:"Lolo", a:"11882 US-93 & US-12, Lolo, MT 59847", lat:46.7574237, lng:-114.081528, p:"406-273-6666", r:3.9, rc:24, h:H24, am:["Gas"]},
+ {t:"Lolo", a:"10955 US-93, Lolo, MT 59847", lat:46.765771, lng:-114.0807808, p:"406-273-2724", r:3.2, rc:17, h:H24, am:["Gas","Truck stop"]},
+ {t:"Miles City", a:"1210 S Haynes Ave, Miles City, MT 59301", lat:46.3969405, lng:-105.8219531, p:"406-232-2582", r:3.2, rc:46, h:H24, am:["Gas","Truck stop","Casino"]},
+ {t:"Plains", a:"335 Railroad Ave, Plains, MT 59859", lat:47.4555099, lng:-114.877573, p:"406-826-3017", r:3.6, rc:61, h:H24, am:["Gas","Deli","Casino"]},
+ {t:"Polson", a:"50667 US-93, Polson, MT 59860", lat:47.6921876, lng:-114.1378071, p:"406-883-9445", r:3.8, rc:43, h:H24, am:["ATM"]},
+ {t:"Ronan", a:"63459 US-93, Ronan, MT 59864", lat:47.5246391, lng:-114.0975494, p:"406-676-5290", r:3.8, rc:33, h:H24, am:[]},
+ {t:"Shelby", a:"1350 W Roosevelt Hwy, Shelby, MT 59474", lat:48.5130404, lng:-111.8727389, p:"406-434-5221", r:3.3, rc:105, h:H24, am:["Truck stop","Showers","ATM"], b:"Pilot", n:"Travel Center"},
+ {t:"Sidney", a:"3150 S Central Ave, Sidney, MT 59270", lat:47.6857978, lng:-104.1764491, p:"406-433-5182", r:2.9, rc:52, h:H24, am:["Truck stop","Showers","Laundry"]},
+ {t:"Superior", a:"403 Diamond Rd, Superior, MT 59872", lat:47.189608, lng:-114.885952, p:"406-822-4444", r:2.7, rc:43, h:H24, am:["Gas","Truck stop"]},
+ {t:"Thompson Falls", a:"1301 W Main St, Thompson Falls, MT 59873", lat:47.5955763, lng:-115.3532145, p:"406-827-4141", r:4.3, rc:108, h:H24, am:["Deli"]},
+ {t:"Three Forks", a:"10800 US-287, Three Forks, MT 59752", lat:45.916711, lng:-111.599431, p:"406-285-3807", r:3.1, rc:219, h:H24, am:["Gas","Truck stop","Showers","ATM"]},
+ {t:"Townsend", a:"202 N Front St, Townsend, MT 59644", lat:46.3207279, lng:-111.5218295, p:"406-266-4028", r:3.3, rc:24, h:H24, am:["Gas","ATM","Deli"]},
+ {t:"Troy", a:"112 E Missoula Ave, Troy, MT 59935", lat:48.4636343, lng:-115.8954791, p:"406-295-4921", r:4.5, rc:31, h:H24, am:["Gas","ATM"]},
+ {t:"Victor", a:"6 State Hwy 373, Victor, MT 59875", lat:46.3120622, lng:-114.157232, p:"406-961-0121", r:4.0, rc:64, h:H24, am:["Gas","Truck stop","Deli"]},
+ {t:"Whitefish", a:"6600 US-93, Whitefish, MT 59937", lat:48.4011943, lng:-114.3360252, p:"406-862-7204", r:3.2, rc:29, h:H24, am:["Gas"]},
+ {t:"Whitefish", a:"4845 MT-40, Whitefish, MT 59937", lat:48.3787819, lng:-114.3350422, p:"406-743-9633", r:4.0, rc:68, h:H24, am:["Gas","EV charging"]},
+ {t:"Whitehall", a:"426 N Whitehall St, Whitehall, MT 59759", lat:45.8757488, lng:-112.1007558, p:"406-287-5630", r:4.0, rc:71, h:H24, am:["Gas","Truck stop","ATM"]},
+ {t:"Wolf Point", a:"401 Cascade St, Wolf Point, MT 59201", lat:48.0929967, lng:-105.6430908, p:"406-653-3206", r:3.6, rc:34, h:H24, am:["Gas","Deli"]},
+ {t:"Glendive", a:"73 MT-16, Glendive, MT 59330", lat:47.1169061, lng:-104.7368751, p:"406-377-7500", r:4.1, rc:529, h:H24, am:["Gas","Truck stop","Showers","Casino"], b:"Flying J", n:"Travel Center"},
+];
+
+/* ---------------- Map setup ---------------- */
+document.getElementById('storeCount').textContent = STORES.length;
+
+const map = L.map('map', {zoomControl:true});
+// Muted grayscale basemap so the heat layer pops
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains:'abcd', maxZoom:19
+}).addTo(map);
+
+// Fit to Montana
+const MT_BOUNDS = [[44.30,-116.10],[49.05,-104.00]];
+map.fitBounds(MT_BOUNDS);
+
+/* ============================================================
+   State border + major highways
+   Drawn in low z-index panes so they sit UNDER the heatmap
+   and store pins, as part of the base map.
+   ============================================================ */
+map.createPane('statePane');  map.getPane('statePane').style.zIndex  = 320;
+map.createPane('hwyPane');    map.getPane('hwyPane').style.zIndex    = 340;
+map.createPane('hwyLblPane'); map.getPane('hwyLblPane').style.zIndex = 430;
+
+/* ---- Montana border ----
+   Simplified fallback outline is embedded; a precise boundary is
+   fetched at runtime and swapped in when internet is available. */
+const MT_FALLBACK_BORDER = [
+  [49.00,-116.049],[49.00,-104.048],          // north line, NW -> NE
+  [45.945,-104.040],[45.00,-104.040],         // east line down to SE corner
+  [45.00,-111.055],                            // south line west to Yellowstone
+  [44.50,-111.053],                            // drop to MT-ID-WY tripoint
+  [44.66,-111.34],[44.71,-111.47],[44.55,-111.80],[44.53,-112.10],
+  [44.56,-112.32],[44.62,-112.65],[44.75,-113.05],[44.81,-113.28],
+  [44.97,-113.44],[45.12,-113.52],[45.35,-113.70],[45.55,-113.83],
+  [45.69,-113.95],[45.86,-114.21],[46.05,-114.45],[46.35,-114.46],
+  [46.63,-114.59],[46.84,-114.76],[47.06,-115.06],[47.26,-115.37],
+  [47.45,-115.70],[47.61,-115.73],[47.79,-115.86],[47.98,-116.049],
+  [48.50,-116.049]                             // up the panhandle line to NW corner
+];
+const borderLayer = L.layerGroup().addTo(map);
+function drawBorder(ring){
+  borderLayer.clearLayers();
+  // softly dim everything outside the state
+  const world = [[85,-180],[85,180],[-85,180],[-85,-180]];
+  L.polygon([world, ring], {
+    pane:'statePane', stroke:false, fillColor:'#5C6470', fillOpacity:.08, interactive:false
+  }).addTo(borderLayer);
+  // the border line itself, guide-sign green
+  L.polygon(ring, {
+    pane:'statePane', fill:false, color:'#00693E', weight:2.5, opacity:.85, interactive:false
+  }).addTo(borderLayer);
+}
+drawBorder(MT_FALLBACK_BORDER);
+fetch('https://raw.githubusercontent.com/glynnbird/usstatesgeojson/master/montana.geojson')
+  .then(r => r.json())
+  .then(gj => {
+    const g = gj.geometry || (gj.features && gj.features[0].geometry);
+    const ring = g.type === 'Polygon' ? g.coordinates[0] : g.coordinates[0][0];
+    drawBorder(ring.map(c => [c[1], c[0]]));
+  })
+  .catch(() => {});   // fallback outline stays
+
+/* ---- Major highways (schematic: straight runs between waypoint
+        towns, accurate enough at state zoom, not for navigation) ---- */
+const HIGHWAYS = [
+ {name:'I-90', cls:'i', lbl:[6,17,27], pts:[
+   [47.457,-115.694],[47.302,-115.100],[47.190,-114.892],[47.005,-114.480],
+   [46.920,-114.090],[46.870,-114.000],[46.864,-113.875],[46.760,-113.680],
+   [46.660,-113.150],[46.520,-112.800],[46.400,-112.730],[46.180,-112.640],
+   [46.000,-112.600],[45.952,-112.480],[45.930,-112.430],[45.900,-112.070],
+   [45.860,-111.760],[45.885,-111.550],[45.860,-111.330],[45.780,-111.160],
+   [45.680,-111.020],[45.660,-110.790],[45.660,-110.550],[45.760,-110.220],
+   [45.830,-109.960],[45.710,-109.550],[45.640,-109.250],[45.630,-108.920],
+   [45.670,-108.770],[45.780,-108.500],[45.788,-108.420],[45.740,-107.620],
+   [45.600,-107.460],[45.310,-107.360],[45.130,-107.410],[45.000,-107.340]]},
+ {name:'I-15', cls:'i', lbl:[3,9,16], pts:[
+   [48.998,-111.958],[48.832,-111.880],[48.510,-111.857],[48.178,-111.945],
+   [47.850,-111.700],[47.600,-111.350],[47.494,-111.300],[47.270,-111.700],
+   [47.060,-111.840],[46.770,-111.900],[46.600,-112.030],[46.420,-112.080],
+   [46.236,-112.120],[46.100,-112.410],[46.000,-112.530],[45.952,-112.480],
+   [45.800,-112.740],[45.620,-112.690],[45.420,-112.700],[45.220,-112.640],
+   [44.990,-112.850],[44.730,-112.720],[44.640,-112.590],[44.560,-112.320]]},
+ {name:'I-94', cls:'i', lbl:[3,8], pts:[
+   [45.788,-108.420],[45.970,-108.150],[46.130,-107.550],[46.290,-107.230],
+   [46.260,-106.680],[46.270,-106.450],[46.400,-105.820],[46.790,-105.310],
+   [46.840,-105.120],[47.100,-104.710],[46.980,-104.190],[46.930,-104.045]]},
+ {name:'US 2', cls:'us', lbl:[5,11,17], pts:[
+   [48.410,-116.049],[48.460,-115.890],[48.390,-115.550],[48.200,-115.180],
+   [48.080,-114.680],[48.160,-114.450],[48.200,-114.310],[48.370,-114.180],
+   [48.380,-114.060],[48.500,-113.980],[48.280,-113.610],[48.320,-113.350],
+   [48.440,-113.220],[48.560,-113.010],[48.630,-112.330],[48.510,-111.857],
+   [48.510,-110.970],[48.550,-109.680],[48.590,-109.230],[48.530,-108.780],
+   [48.360,-107.870],[48.460,-107.340],[48.200,-106.640],[48.130,-106.360],
+   [48.090,-105.640],[48.110,-105.200],[48.140,-104.510],[48.130,-104.045]]},
+ {name:'US 93', cls:'us', lbl:[3,12,19], pts:[
+   [45.693,-113.948],[45.850,-113.980],[46.020,-114.180],[46.250,-114.160],
+   [46.410,-114.150],[46.510,-114.090],[46.630,-114.080],[46.760,-114.080],
+   [46.870,-114.030],[47.010,-114.060],[47.170,-114.080],[47.270,-114.180],
+   [47.320,-114.100],[47.530,-114.100],[47.690,-114.160],[47.820,-114.350],
+   [48.020,-114.220],[48.080,-114.220],[48.200,-114.310],[48.410,-114.340],
+   [48.550,-114.580],[48.770,-114.900],[48.880,-115.050],[48.997,-114.886]]},
+ {name:'US 87', cls:'us', lbl:[2,5], pts:[
+   [47.494,-111.280],[47.390,-110.920],[47.150,-110.220],[47.000,-109.870],
+   [47.060,-109.430],[47.030,-108.800],[46.450,-108.540],[45.830,-108.470]]},
+ {name:'US 287', cls:'us', lbl:[4], pts:[
+   [46.320,-111.520],[46.170,-111.430],[45.890,-111.550],[45.700,-111.780],
+   [45.570,-111.690],[45.350,-111.730]]},
+ {name:'MT 200', cls:'mt', lbl:[3], pts:[
+   [47.270,-114.180],[47.310,-114.320],[47.390,-114.790],[47.460,-114.880],
+   [47.600,-115.350],[47.840,-115.610],[48.010,-115.770],[48.060,-116.030]]}
+];
+const hwyLayer = L.layerGroup().addTo(map);
+HIGHWAYS.forEach(h => {
+  const style =
+    h.cls === 'i'  ? {color:'#55606E', weight:2.6, opacity:.78} :
+    h.cls === 'us' ? {color:'#7E8794', weight:2.0, opacity:.72} :
+                     {color:'#98A0AC', weight:1.7, opacity:.65, dashArray:'7 5'};
+  L.polyline(h.pts, {...style, pane:'hwyPane', interactive:false}).addTo(hwyLayer);
+  h.lbl.forEach(ix => {
+    L.tooltip({permanent:true, direction:'center', className:'hwy-lbl ' + h.cls, pane:'hwyLblPane'})
+      .setLatLng(h.pts[ix]).setContent(h.name).addTo(hwyLayer);
+  });
+});
+
+/* ---------------- Heat layer ---------------- */
+const heat = L.heatLayer(
+  STORES.map(s => [s.lat, s.lng, 1.0]),
+  {
+    radius: 32, blur: 24, maxZoom: 10, minOpacity: 0.35,
+    gradient: {0.20:'#2c7fb8', 0.45:'#41b6c4', 0.65:'#fecc5c', 0.85:'#fd8d3c', 1.0:'#C8102E'}
+  }
+).addTo(map);
+
+/* ---------------- Pins + popups ---------------- */
+function stars(r){
+  if(!r) return '';
+  const full = Math.round(r);
+  return '&#9733;'.repeat(full) + '&#9734;'.repeat(5-full);
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+function popupHTML(s){
+  const name = 'Town Pump' + (s.n ? ' ' + s.n : '');
+  const tel = s.p ? `<div class="row"><span class="ic">&#9742;</span><a href="tel:+1${s.p.replace(/\D/g,'')}">${s.p}</a></div>` : '';
+  const rating = s.r ? `<div class="row"><span class="ic"></span><span><span class="stars">${stars(s.r)}</span> <b>${s.r.toFixed(1)}</b> <span class="rc">(${s.rc} Google reviews)</span></span></div>` : '';
+  const chips = (s.b ? `<span class="chip brand">${esc(s.b)}</span>` : '') +
+                (s.am||[]).map(a => `<span class="chip">${esc(a)}</span>`).join('');
+  const gq = encodeURIComponent('Town Pump ' + s.a);
+  return `<div class="pop">
+    <div class="head">
+      <div class="town">${esc(s.t)}, Montana</div>
+      <div class="nm">${esc(name)}</div>
+    </div>
+    <div class="body">
+      <div class="row"><span class="ic">&#128205;</span><span>${esc(s.a)}</span></div>
+      ${tel}
+      <div class="row"><span class="ic">&#128337;</span><span>${esc(s.h || 'Hours not listed')}</span></div>
+      ${rating}
+      ${chips ? `<div class="chips">${chips}</div>` : ''}
+      <a class="gmaps" href="https://www.google.com/maps/search/?api=1&query=${gq}" target="_blank" rel="noopener">Open in Google Maps &#8599;</a>
+    </div>
+  </div>`;
+}
+
+const pinLayer = L.layerGroup();
+STORES.forEach(s => {
+  L.circleMarker([s.lat, s.lng], {
+    radius: 6.5,
+    color: '#ffffff', weight: 1.6,
+    fillColor: '#C8102E', fillOpacity: 0.95
+  })
+  .bindPopup(popupHTML(s), {maxWidth: 280, closeButton: true})
+  .bindTooltip(`Town Pump — ${s.t}`, {direction:'top', offset:[0,-6]})
+  .addTo(pinLayer);
+});
+pinLayer.addTo(map);
+
+/* ---------------- Custom toggle control + legend ---------------- */
+const ctl = L.control({position:'topright'});
+ctl.onAdd = function(){
+  const div = L.DomUtil.create('div','tp-control');
+  div.innerHTML = `
+    <div class="ttl">Map layers</div>
+    <label><input type="checkbox" id="cbHeat" checked> Heatmap</label>
+    <label><input type="checkbox" id="cbPins" checked> Store pins</label>
+    <label><input type="checkbox" id="cbHwy" checked> Highways</label>
+    <div class="tp-legend">
+      <div class="bar"></div>
+      <div class="lbls"><span>Sparse</span><span>Dense</span></div>
+    </div>`;
+  L.DomEvent.disableClickPropagation(div);
+  return div;
+};
+ctl.addTo(map);
+
+document.getElementById('cbHeat').addEventListener('change', e =>
+  e.target.checked ? map.addLayer(heat) : map.removeLayer(heat));
+document.getElementById('cbPins').addEventListener('change', e =>
+  e.target.checked ? map.addLayer(pinLayer) : map.removeLayer(pinLayer));
+document.getElementById('cbHwy').addEventListener('change', e =>
+  e.target.checked ? map.addLayer(hwyLayer) : map.removeLayer(hwyLayer));
+
+/* ============================================================
+   Drop-a-pin distance finder
+   - Click anywhere: dashed crow-flies lines to the 5 nearest
+     stores, labeled with straight-line miles.
+   - Driving routes are fetched (free OSRM service) for the 3
+     nearest candidates; the fastest is drawn highway-style.
+   - Clear button removes everything and restores the MT view.
+   ============================================================ */
+const clearBtn = document.getElementById('clearBtn');
+let youMarker = null;
+const linkLayer  = L.layerGroup().addTo(map);  // crow-flies lines + labels
+const routeLayer = L.layerGroup().addTo(map);  // driving route
+
+const toRad = d => d * Math.PI / 180;
+function crowMiles(a, b){
+  const R = 3958.8; // earth radius, miles
+  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+  const h = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const fmtMi  = m => (m >= 10 ? Math.round(m) : m.toFixed(1)) + ' mi';
+const fmtMin = s => {
+  const m = Math.round(s / 60);
+  return m >= 60 ? Math.floor(m/60) + ' hr ' + (m % 60) + ' min' : m + ' min';
+};
+
+const youIcon = L.divIcon({className:'', html:'<div class="you-icon"></div>', iconSize:[18,18], iconAnchor:[9,9]});
+
+function clearUserPin(){
+  routeSeq++;                       // cancel any in-flight route fetches
+  if (youMarker){ map.removeLayer(youMarker); youMarker = null; }
+  linkLayer.clearLayers();
+  routeLayer.clearLayers();
+  clearBtn.hidden = true;
+  map.fitBounds(MT_BOUNDS);
+}
+clearBtn.addEventListener('click', clearUserPin);
+
+let routeSeq = 0;
+map.on('click', e => {
+  // replace any previous pin
+  if (youMarker){ map.removeLayer(youMarker); youMarker = null; }
+  linkLayer.clearLayers();
+  routeLayer.clearLayers();
+  const here = e.latlng;
+  const mySeq = ++routeSeq;
+
+  // rank every store by straight-line distance
+  const ranked = STORES.map(s => ({s, d: crowMiles(here, s)})).sort((a,b) => a.d - b.d);
+  const nearest = ranked[0];
+  const top5 = ranked.slice(0, 5);
+
+  // dashed crow-flies lines, nearest one in Town Pump red
+  top5.forEach((r, i) => {
+    L.polyline([here, [r.s.lat, r.s.lng]], {
+      color: i === 0 ? '#C8102E' : '#7a8087',
+      weight: i === 0 ? 2.5 : 1.5,
+      dashArray: '6 6',
+      opacity: i === 0 ? 0.95 : 0.6,
+      interactive: false
+    }).addTo(linkLayer);
+    L.tooltip({permanent:true, direction:'center', className:'dist-tip' + (i === 0 ? ' near' : '')})
+      .setLatLng([(here.lat + r.s.lat)/2, (here.lng + r.s.lng)/2])
+      .setContent(fmtMi(r.d))
+      .addTo(linkLayer);
+  });
+
+  // the dropped pin + its results popup
+  youMarker = L.marker(here, {icon: youIcon}).addTo(map);
+  youMarker.bindPopup(
+    `<div class="you-pop">
+       <div class="yh">Your pin</div>
+       Nearest Town Pump: <b>${nearest.s.t}</b><br>
+       ${fmtMi(nearest.d)} as the crow flies
+       <span class="route-info" id="routeInfo">Finding driving route&hellip;</span>
+     </div>`,
+    {closeButton: true}
+  ).openPopup();
+  clearBtn.hidden = false;
+
+  // frame the pin and its 5 lines
+  const fit = L.latLngBounds([here]);
+  top5.forEach(r => fit.extend([r.s.lat, r.s.lng]));
+  map.fitBounds(fit.pad(0.18));
+
+  // fetch driving routes to the 3 nearest candidates, keep the fastest
+  const cands = ranked.slice(0, 3);
+  Promise.all(cands.map(r =>
+    fetch(`https://router.project-osrm.org/route/v1/driving/${here.lng},${here.lat};${r.s.lng},${r.s.lat}?overview=full&geometries=geojson`)
+      .then(x => x.json())
+      .then(j => ({r, j}))
+      .catch(() => null)
+  )).then(results => {
+    if (mySeq !== routeSeq) return;   // user dropped a new pin or cleared
+    const info = document.getElementById('routeInfo');
+    const ok = results.filter(x => x && x.j && x.j.code === 'Ok' && x.j.routes && x.j.routes[0]);
+    if (!ok.length){
+      if (info) info.textContent = 'Driving route unavailable right now (routing service unreachable).';
+      return;
+    }
+    ok.sort((a,b) => a.j.routes[0].duration - b.j.routes[0].duration);
+    const best = ok[0], route = best.j.routes[0];
+    const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+
+    // highway-style route: dark casing with a yellow stripe
+    L.polyline(coords, {color:'#26282A', weight:8,   opacity:.85, interactive:false}).addTo(routeLayer);
+    L.polyline(coords, {color:'#FFC72C', weight:4.5, opacity:1,   interactive:false}).addTo(routeLayer);
+
+    const mi = route.distance / 1609.344;
+    if (info) info.innerHTML =
+      `<span class="route-swatch"></span>Best drive: <b>${best.r.s.t}</b> &mdash; ${fmtMi(mi)}, about ${fmtMin(route.duration)}`;
+
+    // reframe to include the route
+    const fit2 = L.latLngBounds(coords).extend(here);
+    top5.forEach(r => fit2.extend([r.s.lat, r.s.lng]));
+    map.fitBounds(fit2.pad(0.12));
+  });
+});
+</script>
+</body>
+</html>
