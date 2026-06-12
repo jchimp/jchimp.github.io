@@ -1,0 +1,12 @@
+/* -------------------------------------------------
+   Global site overrides (minimal)
+   File: docs/stylesheets/extra.css
+   ------------------------------------------------- */
+
+.md-main__inner {
+  margin-top: 0.5rem;
+}
+
+.md-typeset h1 {
+  margin-bottom: 0.75rem;
+}
