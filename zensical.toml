@@ -41,9 +41,8 @@ extra_css = [
 
 nav = [
     { "Home" = "index.md" },
-    { "How-To" = [
-        { "Overview"       = "how-to/README.md" },
-        { "Site Workflow"  = "how-to/site-workflow.md" },
+    { "Lab" = [
+        { "Overview"       = "lab/README.md" },
     ]},
     { "Projects" = [
         { "Overview"            = "projects/README.md" },
@@ -53,18 +52,18 @@ nav = [
         { "Key-Rex"             = "projects/key-rex.md" },
         { "Town Pump Locator"   = "projects/townpump-locator.md" },
     ]},
-    { "Notes" = [
-        { "Overview"          = "notes/README.md" },
-        { "Capture Template"  = "notes/capture-template.md" },
+    { "Gallery" = [
+        { "Overview"            = "gallery/README.md" },
+        { "Computer Hardware Chart"     = "gallery/computer-hardware-chart-2026.md" },
+        { "Characters to Electrons"     = "gallery/chars-to-electrons.md" },
     ]},
     { "References" = [
-        { "Overview"        = "references/README.md" },
+        { "Overview"         = "references/README.md" },
     ]},
-    { "Templates" = [
-        { "Post Template"     = "_templates/post-template.md" },
-        { "Project Template"  = "_templates/project-template.md" },
-        { "How-To Template"   = "_templates/how-to-template.md" },
+    { "Notes" = [
+        { "Overview"         = "notes/README.md" },
     ]},
+    { "About" = "about.md" },
 ]
 
 # ----------------------------------------------------------------------------
