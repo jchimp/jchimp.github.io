@@ -6,6 +6,8 @@ Things I have written.
 
 - **[Claude Code - Four terminals to one good folder](claude-code-four-terminals.md)** - Learning Claude code folders for more a better workflow. More power!
 
+- **[Nmap Scan Flags](nmap-flags.md)** - TEXT
+
 <!--
 To publish: add articles/<slug>.md, add a line here (newest on top),
 then commit + push. The site rebuilds and deploys automatically.

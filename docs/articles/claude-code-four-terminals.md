@@ -1,6 +1,6 @@
 # Claude Code - From four terminals to one good folder.
 
-Last Tuesday I had four terminals open. Three VS Code windows. Different Claude sessions in each — one pulling database schemas, one reading legacy repos to take notes, one summarizing those notes into instructions for an agent I'm building, and one I genuinely cannot account for. Probably losing.
+Last Tuesday I had four terminals open. Three VS Code windows. Different Claude sessions in each — one pulling database schemas, one reading legacy repos to take notes, one summarizing those notes into instructions for an agent I'm building, and one I genuinely cannot account for.
 
 I was alt-tabbing between them like a raccoon trying to remember which trash can had the good stuff. Copy-pasting prompts from a Notes file called `prompts_GOOD.md`. Re-explaining to each instance that yes, I'm on Windows, no, please don't put PowerShell paths in WSL commands, for the love of god.
 

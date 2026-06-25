@@ -2,7 +2,7 @@
 
 Everything in one place.
 
-- **[Claude Code - Four terminals to one good folder](claude-code-four-terminals.md)** - Learning Claude code folders for more a better workflow. More power!
+- **[Claude Code - Four terminals to one good folder](articles/claude-code-four-terminals.md)** - Learning Claude code folders for more a better workflow. More power!
 
 ---
 
