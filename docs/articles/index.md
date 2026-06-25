@@ -16,8 +16,3 @@ hide:
 - **[Claude Code Field Notes](claude-code-ref-notes.md)** - Text
 
 - **[Local LLM Guide](local-llm-field-notes.md)** - Text
-
-<!--
-To publish: add articles/<slug>.md, add a line here (newest on top),
-then commit + push. The site rebuilds and deploys automatically.
--->
