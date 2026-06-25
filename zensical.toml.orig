@@ -42,9 +42,9 @@ extra_css = [
 nav = [
     { "Home" = "index.md" },
     { "Articles" = "articles/index.md" },
-    #{ "Lab" = [
-    #    { "Overview"       = "lab/README.md" },
-    #]},
+    { "Lab" = [
+        { "Overview"       = "lab/README.md" },
+    ]},
     { "Projects" = [
         { "Overview"            = "projects/README.md" },
         { "Backup-SQLExpressDB" = "projects/backup-sqlexpressdb.md" },
@@ -97,11 +97,6 @@ features = [
     "content.tabs.link",
 ]
 
-# Fonts
-[project.theme.font]
-text = "Inter"
-code = "JetBrains Mono"   # swap to "Mononoki" only if self-hosted; it is not on Google Fonts
-
 # Site icon (Lucide set available by default in modern variant)
 #[project.theme.icon]
 #logo = "lucide/notebook-pen"
@@ -114,8 +109,8 @@ code = "JetBrains Mono"   # swap to "Mononoki" only if self-hosted; it is not on
 # Dark mode
 [[project.theme.palette]]
 scheme  = "slate"
-primary = "custom"
-accent  = "custom"
+primary = "indigo"
+accent  = "cyan"
 
 [project.theme.palette.toggle]
 icon = "lucide/sun"
@@ -124,8 +119,12 @@ name = "Switch to dark mode"
 # Light mode
 [[project.theme.palette]]
 scheme  = "default"
-primary = "custom"
-accent  = "custom"
+primary = "indigo"
+accent  = "cyan"
+
+[project.theme.palette.toggle]
+icon = "lucide/moon"
+name = "Switch to light mode"
 
 # ----------------------------------------------------------------------------
 #  Plugins
