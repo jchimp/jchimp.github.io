@@ -32,6 +32,8 @@ extra_css = [
     "stylesheets/homepage.css",
 ]
 
+
+
 # Custom JS (uncomment when needed)
 # extra_javascript = ["javascripts/extra.js"]
 
@@ -97,10 +99,15 @@ features = [
     "content.tabs.link",
 ]
 
+# Custom template overrides (relative to docs/)
+custom_dir = "overrides"
+
+
 # Fonts
 [project.theme.font]
 text = "Inter"
 code = "JetBrains Mono"   # swap to "Mononoki" only if self-hosted; it is not on Google Fonts
+
 
 # Site icon (Lucide set available by default in modern variant)
 #[project.theme.icon]

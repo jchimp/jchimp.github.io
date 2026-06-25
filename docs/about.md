@@ -1,3 +1,10 @@
+---
+title: About
+hide:
+  - navigation
+  - toc
+---
+
 # About
 
 Hi. I'm Jeremy, and I've spent about 30 years elbow-deep in IT and programming — long enough to have strong feelings about computers and zero shame about it. Hardware, software, systems, networks, the weird glue holding it all together: I love all of it. Honestly, good code reads like poetry to me, and I will not be apologizing for that sentence.

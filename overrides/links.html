@@ -1,0 +1,48 @@
+{# overrides/links.html ─ Link-tree style page #}
+{% extends "main.html" %}
+
+{# Hide the docs chrome: left nav and right TOC. #}
+{% block site_nav %}{% endblock %}
+
+{% block content %}
+<section class="page-links">
+
+  {# Optional: pull a title + tagline from frontmatter, with sane fallbacks. #}
+  <header class="page-links__header">
+    <h1>{{ page.meta.heading or page.title or config.site_name }}</h1>
+    {% if page.meta.tagline %}
+      <p class="page-links__tagline">{{ page.meta.tagline }}</p>
+    {% endif %}
+  </header>
+
+  {# Render the buttons from frontmatter so the markdown stays declarative.
+     Each item: { label, url, icon?, description?, external? } #}
+  {% if page.meta.links %}
+    <ul class="page-links__list">
+      {% for link in page.meta.links %}
+        <li class="page-links__item">
+          <a
+            class="page-links__btn"
+            href="{{ link.url }}"
+            {% if link.external %}target="_blank" rel="noopener"{% endif %}
+          >
+            {% if link.icon %}<span class="page-links__icon">{{ link.icon }}</span>{% endif %}
+            <span class="page-links__label">{{ link.label }}</span>
+            {% if link.description %}
+              <span class="page-links__desc">{{ link.description }}</span>
+            {% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {# Anything written in the markdown body is rendered here, below the buttons. #}
+  {% if page.content %}
+    <div class="page-links__body">
+      {{ page.content }}
+    </div>
+  {% endif %}
+
+</section>
+{% endblock %}

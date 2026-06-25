@@ -1,5 +1,7 @@
 ---
 title: Home
+hide:
+  - navigation
 ---
 
 <section class="home-hero" markdown>

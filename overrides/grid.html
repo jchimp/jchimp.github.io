@@ -1,0 +1,70 @@
+{# overrides/grid.html ─ Image / poster grid #}
+{% extends "main.html" %}
+
+{% block site_nav %}{% endblock %}
+
+{% block content %}
+<section class="grid-page">
+
+  <header class="grid-page__header">
+    <h1>{{ page.title }}</h1>
+    {% if page.meta.intro %}
+      <p class="grid-page__intro">{{ page.meta.intro }}</p>
+    {% endif %}
+  </header>
+
+  {# Optional tag filter UI — driven by frontmatter `tags`.
+     Hook these buttons up in extra.js if you want client-side filtering. #}
+  {% if page.meta.tags %}
+    <nav class="grid-page__filters" aria-label="Filter">
+      <button class="grid-page__filter is-active" data-tag="all">All</button>
+      {% for tag in page.meta.tags %}
+        <button class="grid-page__filter" data-tag="{{ tag }}">{{ tag }}</button>
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  {# Items from frontmatter.
+     Each item: { title, image, link?, caption?, tags?: [..], aspect? } #}
+  {% if page.meta.items %}
+    <ul class="grid-page__grid">
+      {% for item in page.meta.items %}
+        <li
+          class="grid-page__cell"
+          {% if item.tags %}data-tags="{{ item.tags | join(' ') }}"{% endif %}
+        >
+          {% if item.link %}
+            <a class="grid-page__link" href="{{ item.link }}">
+          {% endif %}
+
+          <figure class="grid-page__figure">
+            <img
+              class="grid-page__img"
+              src="{{ item.image }}"
+              alt="{{ item.title or '' }}"
+              {% if item.aspect %}style="aspect-ratio: {{ item.aspect }};"{% endif %}
+              loading="lazy"
+            >
+            {% if item.title or item.caption %}
+              <figcaption class="grid-page__caption">
+                {% if item.title %}<strong>{{ item.title }}</strong>{% endif %}
+                {% if item.caption %}<span>{{ item.caption }}</span>{% endif %}
+              </figcaption>
+            {% endif %}
+          </figure>
+
+          {% if item.link %}</a>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="grid-page__empty">No items yet.</p>
+  {% endif %}
+
+  {# Any markdown body renders below the grid. #}
+  {% if page.content %}
+    <div class="grid-page__body">{{ page.content }}</div>
+  {% endif %}
+
+</section>
+{% endblock %}

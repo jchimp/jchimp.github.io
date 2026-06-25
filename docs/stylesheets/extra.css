@@ -10,6 +10,26 @@
 .md-typeset h1 {
   margin-bottom: 0.75rem;
 }
+/*
+.md-main__inner:has(.article--no-nav) {
+  grid-template-columns: 1fr !important;
+  display: block;
+}
+*/
+
+/* Whenever an .article--no-nav exists on the page, widen the column it sits in */
+.md-main__inner:has(.article--no-nav) .md-content {
+  max-width: none;
+  flex: 1 1 auto;     /* in case the parent is flex */
+}
+
+/* And inside the article, keep prose readable */
+.article--no-nav .md-typeset,
+.article--no-nav > .article__body {
+  max-width: 70ch;
+  margin-inline: auto;
+}
+
 
 /* =====================================================================
    SLATE EMBER — Zensical (Material) custom colors

@@ -1,0 +1,78 @@
+{# overrides/article.html ─ Long-form article layout
+   Pairs with frontmatter:
+     hide:
+       - navigation        # required to drop the left sidebar
+   Keeps the right-side TOC by default.
+
+   The `article--no-nav` class is a hook for CSS to reclaim the
+   space freed by the hidden left sidebar. See extra.css. #}
+
+{% extends "main.html" %}
+
+{% block content %}
+<article class="article article--no-nav">
+
+  <header class="article__header">
+    <h1 class="article__title">{{ page.title }}</h1>
+
+    {% if page.meta.subtitle %}
+      <p class="article__subtitle">{{ page.meta.subtitle }}</p>
+    {% endif %}
+
+    <div class="article__meta">
+      {% if page.meta.date %}
+        <time class="article__date" datetime="{{ page.meta.date }}">
+          {{ page.meta.date }}
+        </time>
+      {% endif %}
+      {% if page.meta.author %}
+        <span class="article__author">by {{ page.meta.author }}</span>
+      {% endif %}
+      {% if page.meta.reading_time %}
+        <span class="article__reading-time">{{ page.meta.reading_time }}</span>
+      {% endif %}
+    </div>
+
+    {% if page.meta.tags %}
+      <ul class="article__tags">
+        {% for tag in page.meta.tags %}
+          <li class="article__tag">{{ tag }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if page.meta.cover %}
+      <figure class="article__cover">
+        <img src="{{ page.meta.cover }}" alt="{{ page.meta.cover_alt or '' }}">
+        {% if page.meta.cover_caption %}
+          <figcaption>{{ page.meta.cover_caption }}</figcaption>
+        {% endif %}
+      </figure>
+    {% endif %}
+  </header>
+
+  <div class="article__body">
+    {{ page.content }}
+  </div>
+
+  {# Prev / next links — only render if Zensical exposes them on the page.
+     If these come through blank in your build, just delete this nav block. #}
+  {% if page.previous_page or page.next_page %}
+    <nav class="article__pager" aria-label="Article pagination">
+      {% if page.previous_page %}
+        <a class="article__pager-prev" href="{{ page.previous_page.url }}">
+          <span class="article__pager-dir">← Previous</span>
+          <span class="article__pager-title">{{ page.previous_page.title }}</span>
+        </a>
+      {% endif %}
+      {% if page.next_page %}
+        <a class="article__pager-next" href="{{ page.next_page.url }}">
+          <span class="article__pager-dir">Next →</span>
+          <span class="article__pager-title">{{ page.next_page.title }}</span>
+        </a>
+      {% endif %}
+    </nav>
+  {% endif %}
+
+</article>
+{% endblock %}

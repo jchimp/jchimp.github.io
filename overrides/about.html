@@ -1,0 +1,60 @@
+{# overrides/about.html ─ Bio page with portrait + body #}
+{% extends "main.html" %}
+
+{% block site_nav %}{% endblock %}
+
+{% block content %}
+<article class="about">
+
+  <header class="about__header">
+    {% if page.meta.portrait %}
+      <img
+        class="about__portrait"
+        src="{{ page.meta.portrait }}"
+        alt="{{ page.meta.name or 'Portrait' }}"
+      >
+    {% endif %}
+    <div class="about__intro">
+      <h1>{{ page.meta.name or page.title }}</h1>
+      {% if page.meta.role %}
+        <p class="about__role">{{ page.meta.role }}</p>
+      {% endif %}
+      {% if page.meta.location %}
+        <p class="about__location">{{ page.meta.location }}</p>
+      {% endif %}
+    </div>
+  </header>
+
+  {# The Markdown body renders here — write the bio in prose. #}
+  <div class="about__body">
+    {{ page.content }}
+  </div>
+
+  {# Optional structured sections from frontmatter. #}
+  {% if page.meta.now %}
+    <section class="about__now">
+      <h2>What I'm doing now</h2>
+      <ul>
+        {% for item in page.meta.now %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if page.meta.contact %}
+    <section class="about__contact">
+      <h2>Get in touch</h2>
+      <ul>
+        {% for c in page.meta.contact %}
+          <li>
+            <a href="{{ c.url }}"
+               {% if c.external %}target="_blank" rel="noopener"{% endif %}>
+              {{ c.label }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+</article>
+{% endblock %}

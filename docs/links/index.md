@@ -1,3 +1,10 @@
+---
+title: Links
+hide:
+  - navigation
+  - toc
+---
+
 # Links
 
 Everything in one place.

@@ -1,0 +1,73 @@
+{# overrides/home.html ─ Landing page with hero + sections #}
+{% extends "main.html" %}
+
+{# Strip the sidebar nav so the homepage feels like a landing, not docs. #}
+{% block site_nav %}{% endblock %}
+
+{# The standard `hero` block in main.html — perfect for a big intro band. #}
+{% block hero %}
+  {% if page.meta.hero %}
+    <section class="hero">
+      <div class="hero__inner">
+        <h1 class="hero__title">{{ page.meta.hero.title }}</h1>
+        {% if page.meta.hero.subtitle %}
+          <p class="hero__subtitle">{{ page.meta.hero.subtitle }}</p>
+        {% endif %}
+        {% if page.meta.hero.cta %}
+          <a class="hero__cta" href="{{ page.meta.hero.cta.url }}">
+            {{ page.meta.hero.cta.label }}
+          </a>
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="home">
+
+  {# Body markdown renders here — use it for an intro paragraph. #}
+  {% if page.content %}
+    <section class="home__intro">{{ page.content }}</section>
+  {% endif %}
+
+  {# Featured cards from frontmatter.
+     Each item: { title, description, url, image? } #}
+  {% if page.meta.featured %}
+    <section class="home__featured">
+      <h2>Featured</h2>
+      <div class="home__cards">
+        {% for item in page.meta.featured %}
+          <a class="home__card" href="{{ item.url }}">
+            {% if item.image %}
+              <img class="home__card-img" src="{{ item.image }}" alt="">
+            {% endif %}
+            <h3 class="home__card-title">{{ item.title }}</h3>
+            {% if item.description %}
+              <p class="home__card-desc">{{ item.description }}</p>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {# Optional: recent articles list, also driven by frontmatter so you
+     have full control over what shows. #}
+  {% if page.meta.recent %}
+    <section class="home__recent">
+      <h2>Recent writing</h2>
+      <ul>
+        {% for post in page.meta.recent %}
+          <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+            {% if post.date %}<time>{{ post.date }}</time>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      <p><a href="articles/">All articles →</a></p>
+    </section>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,12 +1,21 @@
-# Articles
+---
+title: Articles
+hide:
+  - navigation
+#  - toc       # uncomment this to ALSO hide the right outline
+---
 
-Things I have written.
+# Articles
 
 ## 2026
 
 - **[Claude Code - Four terminals to one good folder](claude-code-four-terminals.md)** - Learning Claude code folders for more a better workflow. More power!
 
-- **[Nmap Scan Flags](nmap-flags.md)** - TEXT
+- **[Nmap Scanning](nmap-notes-reference.md)** - Text
+
+- **[Claude Code Field Notes](claude-code-ref-notes.md)** - Text
+
+- **[Local LLM Guide](local-llm-field-notes.md)** - Text
 
 <!--
 To publish: add articles/<slug>.md, add a line here (newest on top),

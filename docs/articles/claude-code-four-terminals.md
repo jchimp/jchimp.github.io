@@ -1,4 +1,11 @@
-# Claude Code - From four terminals to one good folder.
+---
+title: From four terminals to one good folder.
+hide:
+  - navigation
+#  - toc       # uncomment this to ALSO hide the right outline
+---
+
+# From four terminals to one good folder.
 
 Last Tuesday I had four terminals open. Three VS Code windows. Different Claude sessions in each — one pulling database schemas, one reading legacy repos to take notes, one summarizing those notes into instructions for an agent I'm building, and one I genuinely cannot account for.
 
@@ -24,6 +31,8 @@ Inside either, you drop:
 
 That's the whole game. Once these files exist you stop being the orchestrator and start being the person who designed the orchestrator.
 
+![cc-banner1](../images/cc-banner1.png)
+
 ## A minimal `~/.claude/CLAUDE.md`
 
 Drop this in your home directory. Edit to taste.
@@ -43,7 +52,9 @@ Drop this in your home directory. Edit to taste.
 - Match the existing code style. Your defaults are not my defaults.
 ```
 
-Now every project starts knowing who I am instead of me explaining it for the hundredth time.\
+Now every project starts knowing who I am instead of me explaining it for the hundredth time.
+
+![cc-commands](../images/claude-commands.png)
 
 ## A lab that isn't another to-do app
 

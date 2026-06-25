@@ -1,3 +1,10 @@
+---
+title: nmap 65,535 Ports and the Seven You'll Actually Scan
+hide:
+  - navigation
+#  - toc       # uncomment this to ALSO hide the right outline
+---
+
 # nmap: 65,535 Ports and the Seven You'll Actually Scan
 
 The nmap man page is enormous. It scrolls forever and I've never read the whole thing, and I'd bet money you haven't either. The good news is the daily reality is about seven flags doing nearly all the work, and the rest is stuff you'll look up once a decade, when you need it.
@@ -6,7 +13,7 @@ So here's the short list. The flags that earn their keep.
 
 Usual disclaimer, because someone always asks: scan your own stuff. A box you own, a VM on your bench, your homelab. Pointing this at machines you don't have permission to touch is how you end up having a very unfun conversations. Spin up a throwaway VM, give it an IP, aim there.
 
-![nmap-banner](../images/nmap_banner1.png)
+![nmap-banner](../images/nmap-banner1.png)
 
 ## Who's even home
 
@@ -97,18 +104,19 @@ SYN scan, version detection, default scripts, OS detection, every port, faster t
 
 You're not going to learn this from me, you're going to learn it by running it. First you need something to point it at. If you don't already have a spare box, an Ubuntu Server VM takes about five minutes:
 
+### Target Machine
 1. Grab the ISO. Pull the latest Ubuntu Server LTS from [ubuntu.com/download/server](https://ubuntu.com/download/server). The Server image, not Desktop — you don't need a GUI to get scanned.
 2. Make the VM. VirtualBox, VMware, Hyper-V, Proxmox, whatever you already run. New VM, point it at the ISO, give it 2 GB RAM and one CPU. It's a target, not a workstation.
 3. Set the network to **bridged**, not NAT. Bridged puts the VM on your actual LAN with its own IP so you can reach it from your host. NAT hides it behind the hypervisor and you'll spend twenty minutes wondering why nothing answers.
 4. Run through the installer, make a user, and — this is the point — tick **Install OpenSSH server** when it offers. Now you've got at least one open port to find. Bonus points for `sudo apt install apache2` afterward so there's more to discover.
 5. Log in and run `ip a` to grab the VM's address. That's your target.
 
-Now the actual loop:
-
-1. Find it: `nmap -sn <your-subnet>/24`
-2. Scan it: `nmap -sS -p- <vm-ip>`
-3. Fingerprint it: `nmap -sV -sC <vm-ip>`
-4. Look at what came back and ask the only question that matters: should that be open?
+### Scanning Process
+1. From another computer fire up a terminal.
+2. Find it: `nmap -sn <your-subnet>/24`
+3. Scan it: `nmap -sS -p- <vm-ip>`
+4. Fingerprint it: `nmap -sV -sC <vm-ip>`
+5. Look at what came back and ask the only question that matters: should that be open?
 
 That last step is the actual job. nmap is excellent at telling you what's there. Working out what *shouldn't* be there is the part that's on you.
 
