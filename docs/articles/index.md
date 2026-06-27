@@ -9,10 +9,8 @@ hide:
 
 ## 2026
 
-- **[Claude Code - Four terminals to one good folder](claude-code-four-terminals.md)** - Learning Claude code folders for more a better workflow. More power!
+- **[Nmap Scanning Flags](nmap-notes-reference.md)** - Notes on the nmap flags that actually come up in network admin and security work.
 
-- **[Nmap Scanning](nmap-notes-reference.md)** - Text
+- **[Claude Code Field Notes](claude-code-ref-notes.md)** - From four terminals to one good folder - notes from configuring Claude Code properly.
 
-- **[Claude Code Field Notes](claude-code-ref-notes.md)** - Text
-
-- **[Local LLM Guide](local-llm-field-notes.md)** - Text
+- **[Local LLM Guide](local-llm-field-notes.md)** - Picking and running local LLMs. Working notes, kept for reference.

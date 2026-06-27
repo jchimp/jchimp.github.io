@@ -60,9 +60,6 @@ nav = [
         { "Computer Hardware Chart"     = "gallery/computer-hardware-chart-2026.md" },
         { "Characters to Electrons"     = "gallery/chars-to-electrons.md" },
     ]},
-    { "References" = [
-        { "Overview"         = "references/README.md" },
-    ]},
     { "Links" = "links/index.md" },
     { "About" = "about.md" },
 ]
@@ -126,13 +123,17 @@ accent  = "custom"
 
 [project.theme.palette.toggle]
 icon = "lucide/sun"
-name = "Switch to dark mode"
+name = "Switch to light mode"
 
 # Light mode
 [[project.theme.palette]]
 scheme  = "default"
 primary = "custom"
 accent  = "custom"
+
+[project.theme.palette.toggle]
+icon = "lucide/moon"
+name = "Switch to dark mode"
 
 # ----------------------------------------------------------------------------
 #  Plugins

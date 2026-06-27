@@ -3,6 +3,28 @@
    File: docs/stylesheets/extra.css
    ------------------------------------------------- */
 
+/* Tight spaceing for mono font */
+h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
+
+/* 1 — load it (Google Fonts) */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&display=swap");
+
+/* .md-typeset h1 {
+  font-size: xx-large;
+} */
+
+/* 2 — headings only; body + code keep the theme defaults */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 900;
+  letter-spacing: -0.04em;   /* the tight tracking that gives the decks their look */
+}
+
 .md-main__inner {
   margin-top: 0.5rem;
 }

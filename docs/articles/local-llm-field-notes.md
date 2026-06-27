@@ -10,6 +10,7 @@ hide:
 Working notes, kept for reference. Current as of mid-2026. The model names die fast; the method does not.
 
 View the full page poster here: **POSTER**
+
 ## Selection rule
 
 Two attributes decide a local model before any benchmark does: the job it has to do, and whether it fits in VRAM. Capability scores rank models against each other in a vacuum; they do not say which one runs on the hardware on hand. Answer those two first, then read benchmarks to break ties.
