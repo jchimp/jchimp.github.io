@@ -3,11 +3,11 @@
    File: docs/stylesheets/extra.css
    ------------------------------------------------- */
 
-/* Tight spaceing for mono font */
-h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
-
 /* 1 — load it (Google Fonts) */
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&display=swap");
+
+/* Tight spaceing for mono font */
+h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
 
 /* .md-typeset h1 {
   font-size: xx-large;
