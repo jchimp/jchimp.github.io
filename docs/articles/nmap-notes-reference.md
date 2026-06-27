@@ -11,7 +11,7 @@ Notes on the nmap flags that actually come up in network admin and security work
 
 Examples assume a target at `192.168.1.50` on a `192.168.1.0/24` network. Swap in your own.
 
-![](../images/nmap-banner.png)
+<a href="../images/nmap-banner.png" target="_blank" rel="noopener"><img src="../images/nmap-banner.png" alt="" width="100%"></a>
 
 ## Host discovery
 
