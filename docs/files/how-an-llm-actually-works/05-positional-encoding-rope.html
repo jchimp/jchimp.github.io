@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where a token sits — positional encoding & RoPE</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+  :root{
+    --ground:#E9EDF2;--paper:#F3F6FA;--ink:#17243F;--mid:#566687;
+    --faint:#C9D2DF;--grid:#D7DEE8;--accent:#C2462A;--accent-soft:#F0DAD2;
+    --q:#C2462A;--k:#234D78;--v:#2C5A4A;
+    --mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;background:var(--ground);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:26px 26px;color:var(--ink);font-family:var(--mono);line-height:1.5;padding:22px 14px 60px;
+  }
+  .sheet{max-width:780px;margin:0 auto;}
+  .titlebar{border:1.5px solid var(--ink);background:var(--paper);padding:14px 16px;margin-bottom:24px;position:relative;}
+  .titlebar::before,.titlebar::after{content:"";position:absolute;width:9px;height:9px;border:1.5px solid var(--mid);}
+  .titlebar::before{top:-1.5px;left:-1.5px;border-right:none;border-bottom:none;}
+  .titlebar::after{bottom:-1.5px;right:-1.5px;border-left:none;border-top:none;}
+  .eyebrow{font-size:10.5px;letter-spacing:.22em;color:var(--mid);text-transform:uppercase;}
+  h1{font-size:18px;margin:6px 0 4px;font-weight:700;}
+  .sub{font-size:12px;color:var(--mid);margin:0;}
+
+  .blocklabel{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--ink);margin:30px 0 12px;display:flex;align-items:center;gap:9px;}
+  .blocklabel .tab{background:var(--ink);color:#fff;padding:2px 8px;font-size:10px;letter-spacing:.12em;}
+  .blocklabel.prob .tab{background:var(--accent);}
+  .blocklabel.abs .tab{background:var(--k);}
+  .blocklabel.rope .tab{background:var(--v);}
+
+  .note{font-size:12.5px;color:var(--mid);margin:0 0 14px;line-height:1.55;}
+  .note .em{color:var(--ink);}
+
+  .panel{border:1.4px solid var(--ink);background:var(--paper);padding:14px;}
+  .panel.soft{border-color:var(--mid);}
+
+  .mathbox{border:1.3px solid var(--faint);background:#fbfcfe;padding:12px 10px;margin:12px 0;overflow-x:auto;}
+  .mathbox .cap{font-size:10.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px;text-align:center;}
+  .mathbox.key{border:1.5px solid var(--accent);background:var(--paper);}
+  .mathbox.key .cap{color:var(--accent);font-weight:700;}
+  .katex{font-size:1.04em;}
+
+  /* permutation contrast */
+  .perm{display:grid;grid-template-columns:1fr;gap:10px;margin-top:6px;}
+  .perm .row{border:1.3px solid var(--faint);background:#fbfcfe;padding:10px 11px;}
+  .perm .row .lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:5px;}
+  .perm .seq .w{display:inline-block;padding:2px 6px;border:1.2px solid var(--faint);margin:2px 1px;background:var(--ground);border-radius:2px;font-size:12px;}
+  .perm .seq .w.s{border-color:var(--q);color:var(--q);background:var(--accent-soft);font-weight:700;}
+  .perm .seq .w.o{border-color:var(--k);color:var(--k);background:#d6e2ef;font-weight:700;}
+  .verdict{font-size:11.5px;margin-top:8px;color:var(--accent);font-weight:700;}
+
+  /* heatmap */
+  .heat{margin-top:6px;}
+  .heatwrap{overflow-x:auto;border:1.3px solid var(--ink);background:#fbfcfe;padding:10px;}
+  table.hm{border-collapse:collapse;margin:0 auto;}
+  table.hm td{width:15px;height:15px;padding:0;}
+  table.hm th{font-size:9px;color:var(--mid);font-weight:400;padding:2px 4px;text-align:right;white-space:nowrap;}
+  table.hm caption{font-size:10px;color:var(--mid);caption-side:bottom;padding-top:7px;letter-spacing:.08em;}
+  .heatkey{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--mid);margin-top:9px;justify-content:center;}
+  .heatkey .swatch{width:46px;height:11px;background:linear-gradient(90deg,#C2462A,#f3f6fa,#234D78);border:1px solid var(--faint);}
+
+  /* rope interactive */
+  .ropewrap{display:grid;grid-template-columns:1fr;gap:14px;align-items:center;}
+  .clock{border:1.3px solid var(--ink);background:#fbfcfe;padding:8px;}
+  .clock svg{display:block;width:100%;height:auto;}
+  .ctrl label{font-size:11px;color:var(--mid);display:block;margin-bottom:6px;}
+  .ctrl input[type=range]{width:100%;accent-color:var(--v);}
+  .freqbtns{display:flex;gap:8px;margin:12px 0 10px;}
+  .btn{font-family:var(--mono);font-size:11.5px;border:1.4px solid var(--ink);background:#fbfcfe;color:var(--ink);padding:6px 12px;cursor:pointer;font-weight:700;}
+  .btn[aria-pressed="true"]{background:var(--v);color:#fff;border-color:var(--v);}
+  .btn:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;}
+  .stat{font-size:11.5px;color:var(--mid);margin-top:4px;line-height:1.7;}
+  .stat b{color:var(--ink);}
+  .stat .gap{color:var(--accent);font-weight:700;}
+  .readout{font-size:11.5px;color:var(--mid);border-top:1.2px dashed var(--faint);margin-top:12px;padding-top:11px;line-height:1.55;}
+  .readout .em{color:var(--ink);}
+
+  .cardrow{display:grid;grid-template-columns:1fr;gap:11px;margin-top:6px;}
+  .mc{border:1.3px solid var(--faint);background:#fbfcfe;padding:11px 12px;}
+  .mc h4{margin:0 0 4px;font-size:12px;font-weight:700;}
+  .mc.fast h4{color:var(--q);}
+  .mc.slow h4{color:var(--k);}
+  .mc p{margin:0;font-size:11.5px;color:var(--mid);line-height:1.5;}
+
+  .takeaway{margin-top:28px;border:1.5px solid var(--accent);background:var(--paper);}
+  .takeaway .bar2{background:var(--accent);color:#fff;padding:8px 13px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;}
+  .takeaway .body{padding:13px 14px;}
+  .takeaway p{margin:0 0 9px;font-size:12.5px;line-height:1.55;}
+  .takeaway p:last-child{margin:0;}
+  .takeaway .key{color:var(--accent);font-weight:700;}
+  .foot{margin-top:24px;font-size:10.5px;color:var(--mid);text-align:center;}
+
+  @media (min-width:600px){
+    .perm{grid-template-columns:1fr 1fr;}
+    .ropewrap{grid-template-columns:1fr 1fr;}
+    .cardrow{grid-template-columns:1fr 1fr;}
+  }
+  /* ---- breadcrumb nav (reference set) ---- */
+  .breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+  .crumb{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;min-height:46px;padding:5px 8px;border:1.4px solid var(--ink);background:var(--paper);text-decoration:none;color:var(--ink);transition:transform .12s ease,border-color .12s ease,background .12s ease;}
+  .crumb .n{font-size:13px;font-weight:700;line-height:1;}
+  .crumb .c{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-top:3px;}
+  .crumb.home .n{font-size:16px;}
+  .crumb:hover,.crumb:focus-visible{border-color:var(--accent);background:#fff;transform:translateY(-2px);outline:none;}
+  .crumb:hover .c,.crumb:focus-visible .c{color:var(--accent);}
+  .crumb.active{background:var(--accent);border-color:var(--accent);cursor:default;}
+  .crumb.active .n{color:#fff;}
+  .crumb.active .c{color:var(--accent-soft);}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <nav class="breadcrumbs" aria-label="Reference set">
+    <a class="crumb home" href="index.html" aria-label="Dashboard hub"><span class="n">⌂</span><span class="c">hub</span></a>
+    <a class="crumb" href="01-two-machine-overview.html" aria-label="01 — The two-machine overview"><span class="n">01</span><span class="c">map</span></a>
+    <a class="crumb" href="02-post-training-a4.html" aria-label="02 — Post-training"><span class="n">02</span><span class="c">a4</span></a>
+    <a class="crumb" href="03-b5-tool-loop.html" aria-label="03 — The two loops"><span class="n">03</span><span class="c">b5</span></a>
+    <a class="crumb" href="04-attention-forward-pass.html" aria-label="04 — Attention and the forward pass"><span class="n">04</span><span class="c">fwd</span></a>
+    <span class="crumb active" aria-current="page" aria-label="05 — Position and RoPE (current)"><span class="n">05</span><span class="c">pos</span></span>
+  </nav>
+
+  <div class="titlebar">
+    <div class="eyebrow">Schematic · the one missing ingredient</div>
+    <h1>Where a token sits</h1>
+    <p class="sub">Attention can tell you which tokens relate — but on its own, it can't tell you their order. Position has to be added. The elegant way bakes it into the math itself.</p>
+  </div>
+
+  <!-- THE PROBLEM -->
+  <div class="blocklabel prob"><span class="tab">problem</span> Attention is blind to order</div>
+  <p class="note">The Query·Key·Value math treats the context as a <span class="em">bag</span> of tokens. Shuffle them and attention computes the same relationships, just rearranged — it's <span class="em">permutation-invariant</span>. Permute the input, you simply permute the output:</p>
+  <div class="mathbox"><div class="cap">permutation invariance</div><div id="eq-perm">Attn(πX) = π · Attn(X)</div></div>
+  <div class="panel soft">
+    <div class="perm">
+      <div class="row"><div class="lbl">ordering A</div><div class="seq"><span class="w s">the</span><span class="w">dog</span><span class="w">bit</span><span class="w">the</span><span class="w o">man</span></div></div>
+      <div class="row"><div class="lbl">ordering B</div><div class="seq"><span class="w o">the</span><span class="w">man</span><span class="w">bit</span><span class="w">the</span><span class="w s">dog</span></div></div>
+    </div>
+    <div class="verdict">Same tokens, opposite meaning. Without position, the model can't tell these apart.</div>
+  </div>
+
+  <!-- ABSOLUTE -->
+  <div class="blocklabel abs"><span class="tab">v1 · 2017</span> Absolute — stamp each slot with a wave fingerprint</div>
+  <p class="note">The original fix: before layer 1, <span class="em">add</span> a position-dependent vector to each token. Each dimension is a sine or cosine at a different frequency, so every position gets a unique "barcode" the model learns to read.</p>
+  <div class="mathbox"><div class="cap">sinusoidal positional encoding</div><div id="eq-sin">PE(pos,2i)=sin(pos / 10000^(2i/d)),  PE(pos,2i+1)=cos(pos / 10000^(2i/d))</div></div>
+  <div class="heat">
+    <div class="heatwrap"><div id="heatmap"></div></div>
+    <div class="heatkey"><span>−1</span><span class="swatch"></span><span>+1</span><span style="margin-left:10px">rows = position · columns = dimension</span></div>
+  </div>
+  <p class="note" style="margin-top:13px;">Read a single row and you get that position's fingerprint. It works — but it's <span class="em">absolute</span>: it labels slot 5 and slot 105, when what attention usually wants is the <span class="em">distance between</span> two tokens. The model has to work that out, and it generalizes poorly past lengths it trained on.</p>
+
+  <!-- ROPE -->
+  <div class="blocklabel rope"><span class="tab">v2 · RoPE</span> Rotary — encode position as rotation</div>
+  <p class="note">The modern trick doesn't add anything. It <span class="em">rotates</span> each Query and Key by an angle proportional to its position. Treat dimensions in pairs as points on a circle, and spin each pair by <span class="em">position × frequency</span>:</p>
+  <div class="mathbox"><div class="cap">rotate the query at m, the key at n</div><div id="eq-rot">q̃ₘ = R(mθ)·q,   k̃ₙ = R(nθ)·k,   R(θ)=[[cosθ,−sinθ],[sinθ,cosθ]]</div></div>
+
+  <p class="note">Now the payoff. Take the dot product of a rotated query at position <b>m</b> with a rotated key at position <b>n</b>. The two rotations combine — and the absolute positions <span class="em">cancel</span>, leaving only their difference:</p>
+  <div class="mathbox key"><div class="cap">★ the whole point</div><div id="eq-rel">⟨R(mθ)q, R(nθ)k⟩ = qᵀ R((n−m)θ) k</div></div>
+  <p class="note" style="margin-top:13px;">The attention score depends only on <span class="em">(n − m)</span> — the gap between the tokens, never where they sit absolutely. Relative position falls out for free, at <span class="em">every layer</span>, with <span class="em">zero added parameters</span>.</p>
+
+  <!-- INTERACTIVE -->
+  <div class="blocklabel"><span class="tab" style="background:var(--mid)">try it</span> Only the gap turns the dial</div>
+  <p class="note">Two tokens, a query and a key. Drag the slider to change the <span class="em">distance</span> between them. The query arrow stays put; the key arrow rotates by gap × θ. The relevance score tracks the angle between them — and nothing else.</p>
+
+  <div class="panel">
+    <div class="freqbtns">
+      <button class="btn" id="f-fast" aria-pressed="true">low dim · fast spin</button>
+      <button class="btn" id="f-slow" aria-pressed="false">high dim · slow spin</button>
+    </div>
+    <div class="ropewrap">
+      <div class="clock">
+        <svg viewBox="0 0 200 200" id="clocksvg" role="img" aria-label="Two rotating vectors on a circle">
+          <circle cx="100" cy="100" r="78" fill="none" stroke="#C9D2DF" stroke-width="1.2"/>
+          <line x1="22" y1="100" x2="178" y2="100" stroke="#E1E7EF" stroke-width="1"/>
+          <line x1="100" y1="22" x2="100" y2="178" stroke="#E1E7EF" stroke-width="1"/>
+          <path id="arc" fill="rgba(194,70,42,.14)" stroke="none"></path>
+          <line id="qarrow" x1="100" y1="100" x2="178" y2="100" stroke="#C2462A" stroke-width="2.6"/>
+          <line id="karrow" x1="100" y1="100" x2="178" y2="100" stroke="#234D78" stroke-width="2.6"/>
+          <circle cx="100" cy="100" r="3.4" fill="#17243F"/>
+          <text id="qlab" x="0" y="0" font-size="11" font-family="monospace" fill="#C2462A" font-weight="700">q (m)</text>
+          <text id="klab" x="0" y="0" font-size="11" font-family="monospace" fill="#234D78" font-weight="700">k (n)</text>
+        </svg>
+      </div>
+      <div class="ctrl">
+        <label for="gap">distance&nbsp;&nbsp;n − m = <b id="gapval" style="color:var(--accent)">0</b> tokens</label>
+        <input type="range" id="gap" min="0" max="16" step="1" value="0">
+        <div class="stat">
+          gap angle <b id="angval">0°</b> &nbsp;=&nbsp; <span class="gap">(n−m)</span> × θ<br>
+          relevance ∝ cos(gap) = <b id="cosval">1.00</b>
+        </div>
+      </div>
+    </div>
+    <div class="readout" id="rope-read"><span class="em">Watch:</span> the absolute positions of the two tokens never appear. Slide to any distance — only the difference sets the angle, and the angle sets the score. That's relative position, built straight into the geometry.</div>
+  </div>
+
+  <div class="cardrow" style="margin-top:14px;">
+    <div class="mc fast"><h4>Low dimensions — fast spin</h4><p>Rotate quickly per step, so they resolve <span style="color:var(--ink)">fine, local</span> distance — neighbors and short phrases.</p></div>
+    <div class="mc slow"><h4>High dimensions — slow spin</h4><p>Rotate slowly, so they stay distinct over <span style="color:var(--ink)">long</span> ranges — relationships thousands of tokens apart.</p></div>
+  </div>
+
+  <!-- TAKEAWAY -->
+  <div class="takeaway">
+    <div class="bar2">Why it matters downstream</div>
+    <div class="body">
+      <p>Because RoPE only cares about <span class="key">relative</span> distance and uses a spread of frequencies, you can <span class="key">stretch the context window</span> after training by slowing the rotations (the idea behind NTK / YaRN scaling). That's a big part of how models grew from a few thousand tokens to hundreds of thousands.</p>
+      <p>It also closes the loop on the last diagram: attention finds <em>which</em> tokens matter; position tells it <em>where they are relative to each other</em>. Together they're why "the dog bit the man" and "the man bit the dog" finally read differently.</p>
+    </div>
+  </div>
+
+  <p class="foot">Equations are the standard formulation; frequencies and the demo's angles are illustrative, not Claude's actual dimensions.</p>
+
+</div>
+
+<script>
+  // ---------- KaTeX equations (graceful fallback to plain text already in DOM) ----------
+  function renderMath(){
+    if(typeof katex === "undefined") return;
+    const eqs = [
+      ["eq-perm", "\\mathrm{Attn}(\\pi X) \\;=\\; \\pi\\,\\mathrm{Attn}(X)"],
+      ["eq-sin",  "PE_{(pos,\\,2i)}=\\sin\\!\\Big(\\tfrac{pos}{10000^{2i/d}}\\Big)\\qquad PE_{(pos,\\,2i+1)}=\\cos\\!\\Big(\\tfrac{pos}{10000^{2i/d}}\\Big)"],
+      ["eq-rot",  "\\tilde q_m = R_{m\\theta}\\,q,\\quad \\tilde k_n = R_{n\\theta}\\,k,\\quad R_\\theta=\\begin{pmatrix}\\cos\\theta & -\\sin\\theta\\\\[2pt]\\sin\\theta & \\cos\\theta\\end{pmatrix}"],
+      ["eq-rel",  "\\big\\langle R_{m\\theta}\\,q,\\; R_{n\\theta}\\,k\\big\\rangle \\;=\\; q^{\\top} R_{m\\theta}^{\\top} R_{n\\theta}\\,k \\;=\\; q^{\\top} R_{(n-m)\\theta}\\,k"]
+    ];
+    eqs.forEach(([id,tex])=>{
+      const el = document.getElementById(id);
+      if(el){ try{ katex.render(tex, el, {displayMode:true, throwOnError:false}); }catch(e){} }
+    });
+  }
+  if(document.readyState!=="loading"){ setTimeout(renderMath,0); }
+  window.addEventListener("load", renderMath);
+
+  // ---------- sinusoidal heatmap ----------
+  (function(){
+    const POS=16, D=16;
+    function lerp(a,b,t){return a+(b-a)*t;}
+    function color(v){ // v in [-1,1] -> accent (neg) .. paper .. blue (pos)
+      const t=(v+1)/2;
+      let r,g,b;
+      if(t<0.5){ const u=t/0.5; r=lerp(194,243,u); g=lerp(70,246,u); b=lerp(42,250,u); }
+      else { const u=(t-0.5)/0.5; r=lerp(243,35,u); g=lerp(246,77,u); b=lerp(250,120,u); }
+      return "rgb("+Math.round(r)+","+Math.round(g)+","+Math.round(b)+")";
+    }
+    let html='<table class="hm"><caption>each row is one position\'s fingerprint</caption>';
+    for(let pos=0;pos<POS;pos++){
+      html+='<tr><th>pos '+pos+'</th>';
+      for(let dim=0;dim<D;dim++){
+        const i=Math.floor(dim/2);
+        const freq=1/Math.pow(10000,(2*i)/D);
+        const val=(dim%2===0)?Math.sin(pos*freq):Math.cos(pos*freq);
+        html+='<td style="background:'+color(val)+'"></td>';
+      }
+      html+='</tr>';
+    }
+    html+='</table>';
+    document.getElementById("heatmap").innerHTML=html;
+  })();
+
+  // ---------- RoPE interactive clock ----------
+  (function(){
+    const cx=100, cy=100, R=78;
+    const THETA={fast:0.62, slow:0.13};
+    let freq="fast";
+    const gap=document.getElementById("gap");
+
+    function endpoint(angle){ // angle in radians, 0 = +x (right); screen y is down so negate
+      return [cx+R*Math.cos(angle), cy-R*Math.sin(angle)];
+    }
+    function describeArc(a0,a1){
+      // filled wedge from angle a0 to a1 (radians, ccw)
+      const [x0,y0]=endpoint(a0), [x1,y1]=endpoint(a1);
+      let delta=a1-a0; const large=Math.abs(delta)>Math.PI?1:0;
+      const sweep=delta<0?1:0;
+      return `M ${cx} ${cy} L ${x0.toFixed(1)} ${y0.toFixed(1)} A ${R} ${R} 0 ${large} ${sweep} ${x1.toFixed(1)} ${y1.toFixed(1)} Z`;
+    }
+    function update(){
+      const g=parseInt(gap.value,10);
+      const th=THETA[freq];
+      const qAng=0;                 // query fixed at +x
+      const kAng=g*th;              // key rotated by gap*theta
+      const [qx,qy]=endpoint(qAng);
+      const [kx,ky]=endpoint(kAng);
+      document.getElementById("qarrow").setAttribute("x2",qx);
+      document.getElementById("qarrow").setAttribute("y2",qy);
+      document.getElementById("karrow").setAttribute("x2",kx);
+      document.getElementById("karrow").setAttribute("y2",ky);
+      // labels just beyond the tips
+      const [qlx,qly]=endpoint(qAng); const [klx,kly]=endpoint(kAng);
+      const ql=document.getElementById("qlab"); ql.setAttribute("x",cx+(R+10)*Math.cos(qAng)-8); ql.setAttribute("y",cy-(R+10)*Math.sin(qAng)+4);
+      const kl=document.getElementById("klab"); kl.setAttribute("x",cx+(R+12)*Math.cos(kAng)-8); kl.setAttribute("y",cy-(R+12)*Math.sin(kAng)+4);
+      // arc
+      document.getElementById("arc").setAttribute("d", g===0?"":describeArc(qAng,kAng));
+      // stats
+      let deg=(kAng*180/Math.PI)%360; if(deg<0)deg+=360;
+      document.getElementById("gapval").textContent=g;
+      document.getElementById("angval").textContent=Math.round(deg)+"\u00B0";
+      document.getElementById("cosval").textContent=Math.cos(kAng).toFixed(2);
+    }
+    function setFreq(f){
+      freq=f;
+      document.getElementById("f-fast").setAttribute("aria-pressed", f==="fast");
+      document.getElementById("f-slow").setAttribute("aria-pressed", f==="slow");
+      update();
+    }
+    gap.addEventListener("input",update);
+    document.getElementById("f-fast").addEventListener("click",()=>setFreq("fast"));
+    document.getElementById("f-slow").addEventListener("click",()=>setFreq("slow"));
+    update();
+  })();
+</script>
+</body>
+</html>

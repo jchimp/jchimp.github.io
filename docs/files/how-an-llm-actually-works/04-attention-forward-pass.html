@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inside model.forward() — attention</title>
+<style>
+  :root{
+    --ground:#E9EDF2;--paper:#F3F6FA;--ink:#17243F;--mid:#566687;
+    --faint:#C9D2DF;--grid:#D7DEE8;--accent:#C2462A;--accent-soft:#F0DAD2;
+    --q:#C2462A;--k:#234D78;--v:#2C5A4A;
+    --qs:#F0DAD2;--ks:#D6E2EF;--vs:#D5E5DD;
+    --mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;background:var(--ground);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:26px 26px;color:var(--ink);font-family:var(--mono);line-height:1.5;padding:22px 14px 60px;
+  }
+  .sheet{max-width:780px;margin:0 auto;}
+  .titlebar{border:1.5px solid var(--ink);background:var(--paper);padding:14px 16px;margin-bottom:24px;position:relative;}
+  .titlebar::before,.titlebar::after{content:"";position:absolute;width:9px;height:9px;border:1.5px solid var(--mid);}
+  .titlebar::before{top:-1.5px;left:-1.5px;border-right:none;border-bottom:none;}
+  .titlebar::after{bottom:-1.5px;right:-1.5px;border-left:none;border-top:none;}
+  .eyebrow{font-size:10.5px;letter-spacing:.22em;color:var(--mid);text-transform:uppercase;}
+  h1{font-size:18px;margin:6px 0 4px;font-weight:700;}
+  .sub{font-size:12px;color:var(--mid);margin:0;}
+
+  .blocklabel{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--ink);margin:30px 0 12px;display:flex;align-items:center;gap:9px;}
+  .blocklabel .tab{background:var(--ink);color:#fff;padding:2px 8px;font-size:10px;letter-spacing:.12em;}
+  .note{font-size:12.5px;color:var(--mid);margin:0 0 14px;line-height:1.55;}
+  .note .em{color:var(--ink);}
+
+  /* stack */
+  .stack{border:1.4px solid var(--mid);background:var(--paper);padding:16px 14px;}
+  .srow{border:1.3px solid var(--ink);background:#fbfcfe;padding:9px 11px;font-size:12px;}
+  .srow .t{font-weight:700;display:block;margin-bottom:1px;}
+  .srow .d{font-size:11px;color:var(--mid);}
+  .sarrow{height:18px;display:flex;align-items:center;justify-content:center;}
+  .sarrow svg{display:block;}
+  .layerbox{border:1.6px solid var(--accent);background:var(--accent-soft);padding:9px 10px 11px;position:relative;}
+  .layerbox .xn{position:absolute;top:-9px;right:10px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:.1em;padding:1px 7px;}
+  .layerbox .sub2{border:1.2px solid var(--ink);background:#fbfcfe;padding:7px 9px;font-size:11.5px;margin-top:7px;}
+  .layerbox .sub2:first-of-type{margin-top:4px;}
+  .layerbox .sub2 b{font-weight:700;}
+  .layerbox .sub2 .d{display:block;font-size:10.5px;color:var(--mid);margin-top:1px;}
+
+  /* QKV roles */
+  .qkv{display:grid;grid-template-columns:1fr;gap:9px;margin:4px 0 2px;}
+  .role{border:1.4px solid var(--ink);padding:10px 12px;background:#fbfcfe;border-left-width:5px;}
+  .role.q{border-left-color:var(--q);}
+  .role.k{border-left-color:var(--k);}
+  .role.v{border-left-color:var(--v);}
+  .role .name{font-weight:700;font-size:13px;}
+  .role.q .name{color:var(--q);}
+  .role.k .name{color:var(--k);}
+  .role.v .name{color:var(--v);}
+  .role .ask{font-size:11.5px;color:var(--mid);margin-top:2px;}
+
+  /* interactive attention demo */
+  .demo{border:1.5px solid var(--ink);background:var(--paper);padding:16px 14px;}
+  .demo .sentence{font-size:13.5px;line-height:2;margin-bottom:6px;}
+  .tok{padding:2px 6px;border:1.2px solid var(--faint);background:#fbfcfe;display:inline-block;margin:2px 1px;border-radius:2px;}
+  .tok.focal{border-color:var(--q);background:var(--qs);font-weight:700;color:var(--q);}
+  .tok.win{border-color:var(--k);background:var(--ks);font-weight:700;color:var(--k);}
+  .blank{color:var(--accent);font-weight:700;}
+  .ctrls{display:flex;gap:8px;margin:10px 0 16px;flex-wrap:wrap;}
+  .btn{font-family:var(--mono);font-size:12px;border:1.4px solid var(--ink);background:#fbfcfe;color:var(--ink);padding:7px 13px;cursor:pointer;font-weight:700;letter-spacing:.02em;}
+  .btn[aria-pressed="true"]{background:var(--ink);color:#fff;}
+  .btn:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;}
+  .qlabel{font-size:11px;color:var(--mid);margin-bottom:10px;}
+  .qlabel b{color:var(--q);}
+  .bars{display:flex;flex-direction:column;gap:7px;}
+  .bar{display:grid;grid-template-columns:78px 1fr 42px;align-items:center;gap:8px;font-size:11.5px;}
+  .bar .lab{text-align:right;color:var(--ink);}
+  .bar .track{height:16px;background:var(--ground);border:1px solid var(--faint);position:relative;overflow:hidden;}
+  .bar .fill{height:100%;background:var(--k);width:0;transition:width .55s cubic-bezier(.2,.7,.3,1);}
+  .bar .pct{color:var(--mid);font-size:11px;text-align:right;}
+  .bar.top .fill{background:var(--q);}
+  .bar.top .lab{font-weight:700;color:var(--q);}
+  .demo .read{font-size:11.5px;color:var(--mid);margin-top:14px;border-top:1.2px dashed var(--faint);padding-top:11px;line-height:1.55;}
+  .demo .read .em{color:var(--ink);}
+
+  .twocol{display:grid;grid-template-columns:1fr;gap:12px;}
+  .card{border:1.4px solid var(--mid);background:var(--paper);padding:12px 13px;}
+  .card h3{margin:0 0 5px;font-size:13px;font-weight:700;}
+  .card.mask h3{color:var(--k);}
+  .card.heads h3{color:var(--v);}
+  .card p{margin:0;font-size:11.8px;color:var(--mid);line-height:1.55;}
+  .card p .em{color:var(--ink);}
+
+  .takeaway{margin-top:28px;border:1.5px solid var(--accent);background:var(--paper);}
+  .takeaway .bar2{background:var(--accent);color:#fff;padding:8px 13px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;}
+  .takeaway .body{padding:13px 14px;}
+  .takeaway p{margin:0 0 9px;font-size:12.5px;line-height:1.55;}
+  .takeaway p:last-child{margin:0;}
+  .takeaway .key{color:var(--accent);font-weight:700;}
+  .foot{margin-top:24px;font-size:10.5px;color:var(--mid);text-align:center;}
+
+  @media (min-width:600px){
+    .qkv{grid-template-columns:1fr 1fr 1fr;}
+    .twocol{grid-template-columns:1fr 1fr;}
+  }
+  /* ---- breadcrumb nav (reference set) ---- */
+  .breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+  .crumb{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;min-height:46px;padding:5px 8px;border:1.4px solid var(--ink);background:var(--paper);text-decoration:none;color:var(--ink);transition:transform .12s ease,border-color .12s ease,background .12s ease;}
+  .crumb .n{font-size:13px;font-weight:700;line-height:1;}
+  .crumb .c{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-top:3px;}
+  .crumb.home .n{font-size:16px;}
+  .crumb:hover,.crumb:focus-visible{border-color:var(--accent);background:#fff;transform:translateY(-2px);outline:none;}
+  .crumb:hover .c,.crumb:focus-visible .c{color:var(--accent);}
+  .crumb.active{background:var(--accent);border-color:var(--accent);cursor:default;}
+  .crumb.active .n{color:#fff;}
+  .crumb.active .c{color:var(--accent-soft);}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <nav class="breadcrumbs" aria-label="Reference set">
+    <a class="crumb home" href="index.html" aria-label="Dashboard hub"><span class="n">⌂</span><span class="c">hub</span></a>
+    <a class="crumb" href="01-two-machine-overview.html" aria-label="01 — The two-machine overview"><span class="n">01</span><span class="c">map</span></a>
+    <a class="crumb" href="02-post-training-a4.html" aria-label="02 — Post-training"><span class="n">02</span><span class="c">a4</span></a>
+    <a class="crumb" href="03-b5-tool-loop.html" aria-label="03 — The two loops"><span class="n">03</span><span class="c">b5</span></a>
+    <span class="crumb active" aria-current="page" aria-label="04 — Attention and the forward pass (current)"><span class="n">04</span><span class="c">fwd</span></span>
+    <a class="crumb" href="05-positional-encoding-rope.html" aria-label="05 — Position and RoPE"><span class="n">05</span><span class="c">pos</span></a>
+  </nav>
+
+  <div class="titlebar">
+    <div class="eyebrow">Schematic · inside model.forward()</div>
+    <h1>How a token hunts for context</h1>
+    <p class="sub">Attention is the mechanism. Each token asks a question, every other token answers, and the strongest answers get pulled in. That's the "hunt."</p>
+  </div>
+
+  <!-- STACK -->
+  <div class="blocklabel"><span class="tab">map</span> One forward pass, top to bottom</div>
+  <p class="note">A token's vector flows up a tall stack of identical layers. Two moves alternate: <span class="em">attention mixes information between tokens</span>, then an <span class="em">MLP transforms it at each token</span>. Repeat dozens of times.</p>
+  <div class="stack">
+    <div class="srow"><span class="t">token IDs</span><span class="d">integers from the tokenizer (the whole context)</span></div>
+    <div class="sarrow"><svg width="13" height="18"><line x1="6.5" y1="0" x2="6.5" y2="12" stroke="#17243F" stroke-width="1.3"/><path d="M2.5 9 L6.5 16 L10.5 9" fill="none" stroke="#17243F" stroke-width="1.3"/></svg></div>
+    <div class="srow"><span class="t">embed + position</span><span class="d">each ID → a vector that encodes <em>what</em> the token is and <em>where</em> it sits</span></div>
+    <div class="sarrow"><svg width="13" height="18"><line x1="6.5" y1="0" x2="6.5" y2="12" stroke="#17243F" stroke-width="1.3"/><path d="M2.5 9 L6.5 16 L10.5 9" fill="none" stroke="#17243F" stroke-width="1.3"/></svg></div>
+    <div class="layerbox">
+      <span class="xn">× N layers</span>
+      <div class="sub2"><b>Self-attention</b><span class="d">every token gathers from the tokens it finds relevant — info moves <em>across</em> positions</span></div>
+      <div class="sub2"><b>MLP / feed-forward</b><span class="d">each token's vector is reshaped on its own — computation <em>at</em> a position</span></div>
+    </div>
+    <div class="sarrow"><svg width="13" height="18"><line x1="6.5" y1="0" x2="6.5" y2="12" stroke="#17243F" stroke-width="1.3"/><path d="M2.5 9 L6.5 16 L10.5 9" fill="none" stroke="#17243F" stroke-width="1.3"/></svg></div>
+    <div class="srow"><span class="t">unembed → logits</span><span class="d">the last position's vector → a probability over the whole vocabulary → <em>sample()</em> in B6</span></div>
+  </div>
+
+  <!-- QKV -->
+  <div class="blocklabel"><span class="tab" style="background:var(--q)">attention</span> The three vectors every token computes</div>
+  <p class="note">Inside an attention layer, three small weight matrices turn each token's vector into three new ones. The names are jargon; the roles are simple.</p>
+  <div class="qkv">
+    <div class="role q"><div class="name">Query (Q)</div><div class="ask">"What am I looking for?"</div></div>
+    <div class="role k"><div class="name">Key (K)</div><div class="ask">"What do I offer / what am I about?"</div></div>
+    <div class="role v"><div class="name">Value (V)</div><div class="ask">"The info I'll actually hand over."</div></div>
+  </div>
+  <p class="note" style="margin-top:13px;">The hunt: take one token's <b style="color:var(--q)">Query</b> and dot-product it against <b style="color:var(--k)">every Key</b> in the context. High score = high relevance. Softmax turns the scores into weights that sum to 1, and the token's output is the <b style="color:var(--v)">weighted sum of all the Values</b> — mostly grabbing from whatever scored highest.</p>
+
+  <!-- INTERACTIVE DEMO -->
+  <div class="blocklabel"><span class="tab" style="background:var(--mid)">try it</span> Watch "it" hunt</div>
+  <p class="note">The pronoun <span class="blank">it</span> needs to know what it refers to. Change the last word and watch where <b style="color:var(--q)">it</b>'s attention goes. Same sentence, one word different — completely different target.</p>
+
+  <div class="demo">
+    <div class="sentence" id="sentence"></div>
+    <div class="ctrls">
+      <button class="btn" id="b-tired" aria-pressed="true">…too&nbsp;tired</button>
+      <button class="btn" id="b-wide" aria-pressed="false">…too&nbsp;wide</button>
+    </div>
+    <div class="qlabel">Attention weights from the <b>Query</b> at token <b>"it"</b>, over earlier tokens:</div>
+    <div class="bars" id="bars"></div>
+    <div class="read" id="readout"></div>
+  </div>
+
+  <!-- MASK + HEADS -->
+  <div class="blocklabel"><span class="tab">two more facts</span> that make it work</div>
+  <div class="twocol">
+    <div class="card mask">
+      <h3>Causal mask — only look back</h3>
+      <p>When generating, a token may attend to itself and <span class="em">earlier</span> tokens only, never future ones — you can't read words you haven't written. Side effect: a past token's K and V never change, so you <span class="em">cache them</span>. That cache is the KV cache from the inner loop.</p>
+    </div>
+    <div class="card heads">
+      <h3>Multi-head — many lenses at once</h3>
+      <p>It isn't one Q/K/V comparison but <span class="em">many in parallel</span>, each with its own learned matrices. One head may track grammar, another what a pronoun refers to, another the topic 1,000 tokens back. They run together and combine — many kinds of relevance, simultaneously.</p>
+    </div>
+  </div>
+
+  <!-- TAKEAWAY -->
+  <div class="takeaway">
+    <div class="bar2">Why this is the whole reason context works</div>
+    <div class="body">
+      <p>Attention lets <span class="key">any token pull directly from any other token</span> in the window, in one step, no matter how far apart. That's how the model links a pronoun to a noun, uses a fact from the system prompt, or reads a tool result you injected — all the same gather.</p>
+      <p>The <span class="key">context window</span> is just how many tokens can sit in this comparison at once. "Running out of context" = the hunt can't reach past the edge. Cost grows with the square of length, which is why bigger windows are hard.</p>
+      <p>And "reasoning"? Stack this gather-and-transform dozens of layers deep, then have the model <span class="key">generate its own intermediate tokens</span> first — each new thinking token becomes more context the next hunt can attend to. Reasoning is the model building its own trail of breadcrumbs to attend back to.</p>
+    </div>
+  </div>
+
+  <p class="foot">Weights in the demo are illustrative. Real attention is subword-token level across many heads; exact layer/head counts for Claude aren't public.</p>
+
+</div>
+
+<script>
+  const TOKENS = ["animal","cross","street","because","was","too"];
+  const DATA = {
+    tired: { blank:"tired", win:"animal",
+      w:{ animal:0.61, street:0.06, cross:0.05, because:0.07, was:0.10, too:0.04 },
+      read:'"tired" describes a living thing — so <span class="em">it</span> hunts back and locks onto <span class="em">animal</span>. The model now treats "it" as the animal.' },
+    wide: { blank:"wide", win:"street",
+      w:{ animal:0.07, street:0.59, cross:0.05, because:0.06, was:0.09, too:0.04 },
+      read:'Swap to "wide" and the hunt shifts — streets are wide, animals aren\'t. <span class="em">it</span> now points at <span class="em">street</span>. One word flipped the entire reference.' }
+  };
+  let state = "tired";
+
+  function renderSentence(){
+    const b = DATA[state].blank;
+    const win = DATA[state].win;
+    const seq = ["The","animal","didn't","cross","the","street","because","it","was","too",b];
+    const html = seq.map(t=>{
+      if(t==="it") return '<span class="tok focal">it</span>';
+      if(t===win)  return '<span class="tok win">'+t+'</span>';
+      if(t===b)    return '<span class="tok"><span class="blank">'+t+'</span></span>';
+      return '<span class="tok">'+t+'</span>';
+    }).join(" ");
+    document.getElementById("sentence").innerHTML = html;
+  }
+
+  function renderBars(){
+    const w = DATA[state].w;
+    const max = Math.max(...Object.values(w));
+    const rows = TOKENS.map(t=>{
+      const val = w[t];
+      const isTop = t===DATA[state].win;
+      const pct = Math.round(val*100);
+      const width = Math.round((val/max)*100);
+      return '<div class="bar'+(isTop?' top':'')+'">'+
+               '<div class="lab">'+t+'</div>'+
+               '<div class="track"><div class="fill" style="width:'+width+'%"></div></div>'+
+               '<div class="pct">'+pct+'%</div>'+
+             '</div>';
+    }).join("");
+    document.getElementById("bars").innerHTML = rows;
+    document.getElementById("readout").innerHTML = DATA[state].read;
+  }
+
+  function setState(s){
+    state = s;
+    document.getElementById("b-tired").setAttribute("aria-pressed", s==="tired");
+    document.getElementById("b-wide").setAttribute("aria-pressed", s==="wide");
+    renderSentence();
+    // force reflow so the width transition re-triggers
+    const bars = document.getElementById("bars");
+    bars.querySelectorAll(".fill").forEach(f=>f.style.width="0");
+    requestAnimationFrame(()=>renderBars());
+  }
+
+  document.getElementById("b-tired").addEventListener("click",()=>setState("tired"));
+  document.getElementById("b-wide").addEventListener("click",()=>setState("wide"));
+  renderSentence();
+  renderBars();
+</script>
+</body>
+</html>

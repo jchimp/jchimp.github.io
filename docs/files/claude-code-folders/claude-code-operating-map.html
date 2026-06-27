@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — Operating Map</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+
+:root{
+  --vellum:#F1F0E9;
+  --vellum-2:#EAE9E0;
+  --panel:#FAF9F4;
+  --ink:#1C2B33;
+  --ink-soft:#4B5A62;
+  --ink-faint:#8A958B;
+  --teal:#0E8C86;
+  --teal-deep:#0A6E69;
+  --amber:#BC6A1A;
+  --amber-soft:#E8C79A;
+  --rule:rgba(28,43,51,0.16);
+  --rule-soft:rgba(28,43,51,0.09);
+  --grid:rgba(28,43,51,0.045);
+  --haiku:#9AA89C;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 26px 26px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 26px 26px,
+    var(--vellum);
+  color:var(--ink);
+  font-family:'Inter', system-ui, -apple-system, sans-serif;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+
+.cc-sheet{
+  max-width:1340px;
+  margin:0 auto;
+  padding:34px 30px 48px;
+}
+
+/* ---------- masthead ---------- */
+.cc-mast{
+  border:1.5px solid var(--ink);
+  background:var(--panel);
+  padding:22px 26px 20px;
+  position:relative;
+}
+.cc-mast::after{
+  content:"";position:absolute;inset:5px;border:1px solid var(--rule-soft);pointer-events:none;
+}
+.cc-eyebrow{
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--teal-deep);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.cc-eyebrow .r{color:var(--amber);}
+.cc-title{
+  font-family:'Space Grotesk', sans-serif;
+  font-weight:700;
+  font-size:clamp(34px,5.4vw,62px);
+  line-height:.96;letter-spacing:-.015em;
+  margin:12px 0 6px;
+}
+.cc-title b{color:var(--teal);font-weight:700;}
+.cc-thesis{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:clamp(15px,1.9vw,20px);
+  color:var(--ink-soft);font-weight:500;max-width:62ch;
+}
+.cc-thesis u{text-decoration:none;color:var(--ink);border-bottom:2px solid var(--amber-soft);}
+
+/* ---------- grid scaffold ---------- */
+.cc-row{display:grid;gap:16px;margin-top:16px;}
+.cc-row-3{grid-template-columns:1fr 1fr 1fr;}
+.cc-row-2{grid-template-columns:1.5fr 1fr;}
+
+.cc-card{
+  border:1.5px solid var(--ink);
+  background:var(--panel);
+  padding:16px 17px 18px;
+  position:relative;
+}
+.cc-card > h2{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  margin:0 0 4px;color:var(--ink);
+  display:flex;align-items:baseline;gap:9px;
+}
+.cc-card > h2 .num{color:var(--teal);font-size:11px;}
+.cc-card > .cc-sub{
+  font-size:12.5px;color:var(--ink-soft);margin:0 0 13px;
+}
+
+/* ---------- config layers ---------- */
+.cc-layers{display:flex;flex-direction:column;gap:0;}
+.cc-layer{
+  border:1.25px solid var(--rule);
+  border-left:4px solid var(--teal);
+  background:var(--vellum);
+  padding:7px 10px;margin-bottom:6px;
+}
+.cc-layer.enf{border-left-color:var(--amber);}
+.cc-layer .ll{font-family:'JetBrains Mono', monospace;font-size:11px;font-weight:700;}
+.cc-layer .ld{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+.cc-layer .tag{float:right;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:var(--ink-faint);text-transform:uppercase;}
+.cc-split{
+  display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px;
+}
+.cc-split .b{border:1px solid var(--rule);padding:8px 9px;background:var(--vellum);}
+.cc-split .b .h{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;}
+.cc-split .b.g .h{color:var(--teal-deep);}
+.cc-split .b.e .h{color:var(--amber);}
+.cc-split .b p{margin:3px 0 0;font-size:11px;color:var(--ink-soft);line-height:1.4;}
+
+/* ---------- reach-for decision ---------- */
+.cc-reach{display:flex;flex-direction:column;gap:9px;}
+.cc-reach .opt{
+  border:1.25px solid var(--rule);background:var(--vellum);
+  padding:9px 11px;position:relative;
+}
+.cc-reach .opt .q{font-size:11px;color:var(--ink-soft);}
+.cc-reach .opt .a{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--teal-deep);
+  margin-top:2px;display:flex;align-items:center;gap:7px;
+}
+.cc-reach .opt .a .arr{color:var(--amber);}
+.cc-reach .opt .loc{
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);margin-top:3px;
+}
+
+/* ---------- model routing ---------- */
+.cc-models{display:flex;flex-direction:column;gap:7px;}
+.cc-model{
+  display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;
+  border:1.25px solid var(--rule);background:var(--vellum);padding:7px 10px;
+}
+.cc-chip{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  padding:3px 8px;border-radius:2px;white-space:nowrap;min-width:74px;text-align:center;
+  border:1.25px solid var(--ink);
+}
+.cc-chip.s{background:var(--teal);color:#fff;border-color:var(--teal-deep);}
+.cc-chip.o{background:var(--amber);color:#fff;border-color:#9a560f;}
+.cc-chip.h{background:transparent;color:var(--ink-soft);border-color:var(--haiku);}
+.cc-chip.p{background:linear-gradient(105deg,var(--amber) 0 48%,var(--teal) 52% 100%);color:#fff;border-color:var(--ink);}
+.cc-model .mt{font-size:11.5px;color:var(--ink-soft);line-height:1.35;}
+.cc-model .mt b{color:var(--ink);font-weight:600;}
+.cc-controls{
+  margin-top:11px;border-top:1px dashed var(--rule);padding-top:9px;
+}
+.cc-controls .ct{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px;}
+.cc-controls ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;}
+.cc-controls li{font-size:11px;color:var(--ink-soft);}
+.cc-controls code{font-family:'JetBrains Mono',monospace;font-size:10.5px;background:var(--vellum-2);padding:1px 5px;border-radius:2px;color:var(--ink);}
+
+/* ---------- pipeline section ---------- */
+.cc-pipes{margin-top:16px;border:1.5px solid var(--ink);background:var(--panel);padding:18px 20px 22px;}
+.cc-pipes-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;border-bottom:1.5px solid var(--ink);padding-bottom:11px;margin-bottom:6px;}
+.cc-pipes-head h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;margin:0;letter-spacing:-.01em;}
+.cc-pipes-head h2 span{color:var(--teal);}
+.cc-legend{display:flex;gap:16px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-soft);align-items:center;}
+.cc-legend .li{display:flex;align-items:center;gap:6px;}
+.cc-legend .sw{width:20px;height:13px;border:1.5px solid var(--ink);background:#fff;}
+.cc-legend .sw.dash{border-style:dashed;}
+.cc-legend .dot{width:11px;height:11px;border-radius:2px;border:1.25px solid var(--ink);}
+.cc-legend .dot.s{background:var(--teal);}
+.cc-legend .dot.o{background:var(--amber);}
+
+.cc-pipe{padding:15px 0 6px;border-bottom:1px dashed var(--rule);}
+.cc-pipe:last-child{border-bottom:none;}
+.cc-pipe .ph{display:flex;align-items:baseline;gap:11px;margin-bottom:9px;}
+.cc-pipe .ph .pn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--ink);padding:2px 7px;border-radius:2px;}
+.cc-pipe .ph .pt{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;}
+.cc-pipe .ph .pt em{font-style:normal;color:var(--teal-deep);}
+.cc-pipe .ph .pd{font-size:11.5px;color:var(--ink-soft);margin-left:auto;text-align:right;max-width:40ch;}
+.cc-pipe.hero{background:linear-gradient(180deg,rgba(14,140,134,.05),transparent);margin:0 -20px;padding:16px 20px 10px;}
+.cc-pipe svg{width:100%;height:auto;display:block;}
+
+/* ---------- bottom row ---------- */
+.cc-bottom{display:grid;grid-template-columns:1.85fr 1fr;gap:16px;margin-top:16px;}
+.cc-ref h2{margin-bottom:11px;}
+.cc-refgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;}
+.cc-refcol .rh{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--rule);padding-bottom:4px;margin-bottom:7px;}
+.cc-refcol dl{margin:0;display:flex;flex-direction:column;gap:6px;}
+.cc-refcol .ri{display:flex;flex-direction:column;}
+.cc-refcol code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--ink);}
+.cc-refcol .rd{font-size:10.5px;color:var(--ink-soft);line-height:1.3;}
+
+.cc-habit{
+  border:1.5px solid var(--ink);background:var(--ink);color:var(--vellum);
+  padding:18px 20px;display:flex;flex-direction:column;justify-content:center;
+}
+.cc-habit .he{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber-soft);}
+.cc-habit .hbig{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(20px,2.6vw,27px);line-height:1.05;margin:10px 0 8px;letter-spacing:-.01em;}
+.cc-habit .hbig b{color:var(--teal);}
+.cc-habit p{margin:0;font-size:12px;color:rgba(241,240,233,.72);line-height:1.45;}
+
+.cc-foot{margin-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);}
+
+/* ---------- responsive ---------- */
+@media (max-width:920px){
+  .cc-row-3,.cc-row-2,.cc-bottom{grid-template-columns:1fr;}
+  .cc-refgrid{grid-template-columns:1fr;}
+  .cc-pipe .ph .pd{display:none;}
+}
+@media (prefers-reduced-motion:no-preference){
+  .cc-card,.cc-pipes,.cc-mast{animation:cc-in .5s ease both;}
+  @keyframes cc-in{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+}
+
+/* ---------- print ---------- */
+@media print{
+  @page{size:landscape;margin:10mm;}
+  body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .cc-sheet{max-width:none;padding:0;}
+  .cc-card,.cc-pipes,.cc-mast,.cc-habit{break-inside:avoid;}
+  .cc-pipe{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+<div class="cc-sheet">
+
+  <!-- MASTHEAD -->
+  <header class="cc-mast">
+    <div class="cc-eyebrow">
+      <span>Field Reference · Terminal + VS Code</span>
+      <span class="r">Sysadmin · Data Eng · Coding</span>
+    </div>
+    <h1 class="cc-title">Claude Code<br><b>Operating Map</b></h1>
+    <p class="cc-thesis">It's configured by <u>files on disk</u>, not by remembering good sessions. Learn the layers — instructions, packaging, model, pipeline — and the rest is just filling them in.</p>
+  </header>
+
+  <!-- TOP ROW: 3 decision panels -->
+  <div class="cc-row cc-row-3">
+
+    <!-- CONFIG LAYERS -->
+    <section class="cc-card">
+      <h2><span class="num">01</span> Config Layers</h2>
+      <p class="cc-sub">More specific wins. Loaded fresh every session.</p>
+      <div class="cc-layers">
+        <div class="cc-layer enf"><span class="tag">enforced</span><div class="ll">Managed policy</div><div class="ld">Org-wide. Overrides everything.</div></div>
+        <div class="cc-layer"><span class="tag">you · global</span><div class="ll">~/.claude/</div><div class="ld">Your defaults, every project.</div></div>
+        <div class="cc-layer"><span class="tag">team · git</span><div class="ll">&lt;repo&gt;/.claude/</div><div class="ld">Project config, committed.</div></div>
+        <div class="cc-layer"><span class="tag">you · local</span><div class="ll">*.local.json / CLAUDE.local.md</div><div class="ld">Just you, gitignored.</div></div>
+      </div>
+      <div class="cc-split">
+        <div class="b g"><div class="h">CLAUDE.md</div><p>Guidance Claude <i>tries</i> to follow. Context, not law.</p></div>
+        <div class="b e"><div class="h">settings.json</div><p>Hard knobs: permissions, model, hooks. Actually gates tools.</p></div>
+      </div>
+    </section>
+
+    <!-- REACH FOR -->
+    <section class="cc-card">
+      <h2><span class="num">02</span> Which Tool?</h2>
+      <p class="cc-sub">Three ways to package repeated work.</p>
+      <div class="cc-reach">
+        <div class="opt">
+          <div class="q">Reuse the same prompt, maybe with an arg?</div>
+          <div class="a"><span class="arr">→</span> slash command</div>
+          <div class="loc">.claude/commands/&lt;name&gt;.md</div>
+        </div>
+        <div class="opt">
+          <div class="q">A real procedure — logic, inputs, helper files?</div>
+          <div class="a"><span class="arr">→</span> skill</div>
+          <div class="loc">.claude/skills/&lt;name&gt;/SKILL.md</div>
+        </div>
+        <div class="opt">
+          <div class="q">Needs its own context so it won't flood the thread?</div>
+          <div class="a"><span class="arr">→</span> subagent</div>
+          <div class="loc">.claude/agents/&lt;name&gt;.md</div>
+        </div>
+      </div>
+      <p style="margin:11px 0 0;font-size:11px;color:var(--ink-soft);font-family:'JetBrains Mono',monospace;">command = saved prompt<br>skill = saved procedure<br>subagent = saved worker w/ its own brain-space</p>
+    </section>
+
+    <!-- MODEL ROUTING -->
+    <section class="cc-card">
+      <h2><span class="num">03</span> Model Routing</h2>
+      <p class="cc-sub">Default down, escalate on purpose.</p>
+      <div class="cc-models">
+        <div class="cc-model"><span class="cc-chip s">sonnet</span><span class="mt"><b>Default · ~90%.</b> The workhorse.</span></div>
+        <div class="cc-model"><span class="cc-chip o">opus</span><span class="mt"><b>Walls.</b> Architecture, subtle bugs, multi-input synthesis.</span></div>
+        <div class="cc-model"><span class="cc-chip h">haiku</span><span class="mt"><b>Mechanical.</b> Bulk renames, formatting, speed.</span></div>
+        <div class="cc-model"><span class="cc-chip p">opusplan</span><span class="mt"><b>Opus plans, Sonnet builds.</b> Good session default.</span></div>
+      </div>
+      <div class="cc-controls">
+        <div class="ct">Four control points</div>
+        <ul>
+          <li>Live · <code>/model opus</code></li>
+          <li>Launch · <code>claude --model sonnet</code></li>
+          <li>Default · <code>model</code> in settings.json</li>
+          <li>Per-agent · <code>model:</code> in frontmatter</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- PIPELINE SCHEMATICS (HERO) -->
+  <section class="cc-pipes">
+    <div class="cc-pipes-head">
+      <h2>Pipeline <span>Schematics</span></h2>
+      <div class="cc-legend">
+        <div class="li"><span class="sw"></span> main context</div>
+        <div class="li"><span class="sw dash"></span> isolated (subagent)</div>
+        <div class="li"><span class="dot s"></span> Sonnet/Haiku</div>
+        <div class="li"><span class="dot o"></span> Opus</div>
+      </div>
+    </div>
+
+    <!-- P1 -->
+    <div class="cc-pipe">
+      <div class="ph"><span class="pn">01</span><span class="pt">The <em>edit loop</em></span><span class="pd">Everyday pair-programming. One session, diffs reviewed in the editor.</span></div>
+      <svg viewBox="0 0 1180 108" role="img" aria-label="Edit loop schematic">
+        <defs>
+          <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1C2B33"/></marker>
+          <marker id="ar-amber" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#BC6A1A"/></marker>
+        </defs>
+        <!-- ITERATE arc — runs above the boxes -->
+        <path d="M917,46 L917,14 L81,14 L81,46" fill="none" stroke="#BC6A1A" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#ar-amber)"/>
+        <text x="500" y="11" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#BC6A1A" letter-spacing="0.1em">ITERATE</text>
+        <!-- you -->
+        <rect x="6" y="46" width="150" height="40" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="81" y="71" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#1C2B33">You</text>
+        <line x1="156" y1="66" x2="232" y2="66" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <!-- main session -->
+        <rect x="238" y="38" width="250" height="56" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <rect x="238" y="38" width="6" height="56" fill="#0E8C86"/>
+        <text x="368" y="62" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#1C2B33">Main session</text>
+        <text x="368" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="#4B5A62">reads · plans · edits</text>
+        <line x1="488" y1="66" x2="564" y2="66" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <!-- diff -->
+        <rect x="570" y="46" width="190" height="40" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="665" y="64" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#1C2B33">Inline diff</text>
+        <text x="665" y="78" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4B5A62">accept / reject</text>
+        <line x1="760" y1="66" x2="836" y2="66" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <!-- shipped -->
+        <rect x="842" y="46" width="150" height="40" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="917" y="71" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0A6E69">change</text>
+      </svg>
+    </div>
+
+    <!-- P2 -->
+    <div class="cc-pipe">
+      <div class="ph"><span class="pn">02</span><span class="pt">Built-ins: <em>Explore → Plan → Execute</em></span><span class="pd">Heavy searching stays in isolated context. Plan mode shows the plan before anything is touched.</span></div>
+      <svg viewBox="0 0 1180 96" role="img" aria-label="Explore plan execute schematic">
+        <rect x="6" y="30" width="180" height="44" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <rect x="6" y="30" width="6" height="44" fill="#0E8C86"/>
+        <text x="100" y="50" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#1C2B33">Main session</text>
+        <text x="100" y="65" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4B5A62">opusplan</text>
+        <line x1="186" y1="52" x2="262" y2="52" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <!-- explore (dashed) -->
+        <rect x="268" y="28" width="210" height="48" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <rect x="268" y="28" width="6" height="48" fill="#0E8C86"/>
+        <text x="376" y="49" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#1C2B33">Explore</text>
+        <text x="376" y="64" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">read-only · returns summary</text>
+        <line x1="478" y1="52" x2="554" y2="52" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <!-- plan (dashed) -->
+        <rect x="560" y="28" width="190" height="48" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <rect x="560" y="28" width="6" height="48" fill="#BC6A1A"/>
+        <text x="657" y="49" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#1C2B33">Plan</text>
+        <text x="657" y="64" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">you approve first</text>
+        <line x1="750" y1="52" x2="826" y2="52" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <!-- execute -->
+        <rect x="832" y="30" width="200" height="44" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <rect x="832" y="30" width="6" height="44" fill="#0E8C86"/>
+        <text x="932" y="50" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#1C2B33">Execute</text>
+        <text x="932" y="65" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">Sonnet · diffs</text>
+        <text x="376" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8A958B" letter-spacing="0.1em">— own context window —</text>
+      </svg>
+    </div>
+
+    <!-- P3 HERO -->
+    <div class="cc-pipe hero">
+      <div class="ph"><span class="pn">03</span><span class="pt">Your capstone: <em>multi-repo → synthesis</em></span><span class="pd">Fan workers out in parallel, each in isolated context. Cheap where it can be, smart where it must be.</span></div>
+      <svg viewBox="0 0 1180 232" role="img" aria-label="Multi-repo synthesis pipeline schematic">
+        <!-- start -->
+        <rect x="6" y="92" width="172" height="50" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="92" y="112" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="#1C2B33">/add-dir × N</text>
+        <text x="92" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#4B5A62">repos into session</text>
+
+        <!-- fan-out lines to 3 summarizers -->
+        <path d="M178,117 C220,117 220,42 262,42" fill="none" stroke="#1C2B33" stroke-width="1.4" marker-end="url(#ar)"/>
+        <path d="M178,117 L262,117" fill="none" stroke="#1C2B33" stroke-width="1.4" marker-end="url(#ar)"/>
+        <path d="M178,117 C220,117 220,192 262,192" fill="none" stroke="#1C2B33" stroke-width="1.4" marker-end="url(#ar)"/>
+
+        <!-- 3 parallel summarizers (dashed, teal) -->
+        <g>
+          <rect x="268" y="20" width="244" height="44" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <rect x="268" y="20" width="6" height="44" fill="#0E8C86"/>
+          <text x="394" y="39" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="#1C2B33">repo-summarizer</text>
+          <text x="394" y="54" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">Sonnet · read-only</text>
+        </g>
+        <g>
+          <rect x="268" y="95" width="244" height="44" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <rect x="268" y="95" width="6" height="44" fill="#0E8C86"/>
+          <text x="394" y="114" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="#1C2B33">repo-summarizer</text>
+          <text x="394" y="129" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">Sonnet · read-only</text>
+        </g>
+        <g>
+          <rect x="268" y="170" width="244" height="44" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <rect x="268" y="170" width="6" height="44" fill="#0E8C86"/>
+          <text x="394" y="189" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="#1C2B33">repo-summarizer</text>
+          <text x="394" y="204" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">Sonnet · read-only</text>
+        </g>
+        <text x="394" y="228" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8A958B" letter-spacing="0.12em">PARALLEL · ISOLATED CONTEXTS</text>
+
+        <!-- converge to summaries -->
+        <path d="M512,42 C556,42 556,117 600,117" fill="none" stroke="#1C2B33" stroke-width="1.4" marker-end="url(#ar)"/>
+        <path d="M512,117 L600,117" fill="none" stroke="#1C2B33" stroke-width="1.4" marker-end="url(#ar)"/>
+        <path d="M512,192 C556,192 556,117 600,117" fill="none" stroke="#1C2B33" stroke-width="1.4" marker-end="url(#ar)"/>
+
+        <!-- summaries store -->
+        <rect x="606" y="90" width="150" height="54" rx="4" fill="#EAE9E0" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="681" y="112" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#1C2B33">summaries/</text>
+        <text x="681" y="127" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">*.md collected</text>
+        <line x1="756" y1="117" x2="832" y2="117" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- instruction-writer (dashed, amber = Opus) -->
+        <rect x="838" y="93" width="178" height="48" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <rect x="838" y="93" width="6" height="48" fill="#BC6A1A"/>
+        <text x="930" y="113" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#1C2B33">instruction-writer</text>
+        <text x="930" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#BC6A1A">Opus · synthesis</text>
+        <line x1="1016" y1="117" x2="1066" y2="117" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- output -->
+        <rect x="1072" y="86" width="102" height="62" rx="4" fill="#1C2B33" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="1123" y="108" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" font-weight="700" fill="#fff">agent</text>
+        <text x="1123" y="123" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" font-weight="700" fill="#fff">spec.md</text>
+        <text x="1123" y="138" text-anchor="middle" font-family="Inter, sans-serif" font-size="8.5" fill="#E8C79A">→ Copilot Studio</text>
+      </svg>
+    </div>
+
+    <!-- P4 -->
+    <div class="cc-pipe">
+      <div class="ph"><span class="pn">04</span><span class="pt">Headless: <em>Claude as a unix citizen</em></span><span class="pd">Non-interactive. Pipe it, parse it, cron it. The bridge from editor to pipeline.</span></div>
+      <svg viewBox="0 0 1180 88" role="img" aria-label="Headless pipe schematic">
+        <rect x="6" y="26" width="170" height="44" rx="4" fill="#EAE9E0" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="91" y="45" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="#1C2B33">stdin / log</text>
+        <text x="91" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">cat firewall.log |</text>
+        <line x1="176" y1="48" x2="252" y2="48" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <rect x="258" y="24" width="230" height="48" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <rect x="258" y="24" width="6" height="48" fill="#0E8C86"/>
+        <text x="378" y="44" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12.5" font-weight="700" fill="#1C2B33">claude -p "…"</text>
+        <text x="378" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">--print · no session</text>
+        <line x1="488" y1="48" x2="564" y2="48" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <rect x="570" y="26" width="220" height="44" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5"/>
+        <text x="680" y="45" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#1C2B33">stdout</text>
+        <text x="680" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">--output-format json</text>
+        <line x1="790" y1="48" x2="866" y2="48" stroke="#1C2B33" stroke-width="1.5" marker-end="url(#ar)"/>
+        <rect x="872" y="26" width="302" height="44" rx="4" fill="#fff" stroke="#1C2B33" stroke-width="1.5" stroke-dasharray="0"/>
+        <text x="1023" y="45" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#0A6E69">| jq  ·  &gt; file  ·  cron</text>
+        <text x="1023" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#4B5A62">downstream / scheduled</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- BOTTOM: reference + habit -->
+  <div class="cc-bottom">
+    <section class="cc-card cc-ref">
+      <h2><span class="num">04</span> Command &amp; Shortcut Reference</h2>
+      <div class="cc-refgrid">
+        <div class="cc-refcol">
+          <div class="rh">In-session /</div>
+          <dl>
+            <div class="ri"><code>/init</code><span class="rd">bootstrap project CLAUDE.md</span></div>
+            <div class="ri"><code>/memory</code><span class="rd">what's actually loaded (debug here)</span></div>
+            <div class="ri"><code>/model</code><span class="rd">switch model live</span></div>
+            <div class="ri"><code>/agents</code><span class="rd">build/manage subagents</span></div>
+            <div class="ri"><code>/add-dir</code><span class="rd">pull another repo into context</span></div>
+            <div class="ri"><code>/ide</code><span class="rd">connect terminal to VS Code</span></div>
+            <div class="ri"><code>/rewind</code><span class="rd">roll back Claude's edits</span></div>
+            <div class="ri"><code>/compact · /clear</code><span class="rd">summarize · reset context</span></div>
+          </dl>
+        </div>
+        <div class="cc-refcol">
+          <div class="rh">Keys (VS Code)</div>
+          <dl>
+            <div class="ri"><code>Shift+Tab</code><span class="rd">cycle Default → Auto-Accept → Plan</span></div>
+            <div class="ri"><code>Ctrl+Esc</code><span class="rd">open extension panel</span></div>
+            <div class="ri"><code>Ctrl+`</code><span class="rd">integrated terminal → run claude</span></div>
+            <div class="ri"><code>Alt+K</code><span class="rd">insert @file#lines from selection</span></div>
+            <div class="ri"><code>Ctrl+B</code><span class="rd">background a running task</span></div>
+            <div class="ri"><code>@terminal:name</code><span class="rd">let Claude read terminal output</span></div>
+          </dl>
+        </div>
+        <div class="cc-refcol">
+          <div class="rh">CLI flags</div>
+          <dl>
+            <div class="ri"><code>claude</code><span class="rd">start in the current folder</span></div>
+            <div class="ri"><code>--model &lt;alias&gt;</code><span class="rd">opus · sonnet · haiku · opusplan</span></div>
+            <div class="ri"><code>-p "…"</code><span class="rd">headless / print mode</span></div>
+            <div class="ri"><code>--output-format json</code><span class="rd">parseable output</span></div>
+            <div class="ri"><code>--resume</code><span class="rd">reopen a past conversation</span></div>
+            <div class="ri"><code>--add-dir</code><span class="rd">extra working dirs</span></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <aside class="cc-habit">
+      <div class="he">The one habit</div>
+      <div class="hbig">If you typed it <b>twice</b>, put it in a <b>file</b>.</div>
+      <p>A CLAUDE.md line, a /command, a skill, or a subagent. That reflex — not any single feature — is what separates <i>using</i> Claude Code from <i>operating</i> it.</p>
+    </aside>
+  </div>
+
+  <div class="cc-foot">
+    <span>Claude Code Operating Map</span>
+    <span>Aliases track the latest tier · pin full names to freeze a version</span>
+  </div>
+
+</div>
+</body>
+</html>
