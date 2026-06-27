@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From characters to electrons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0D12; --panel:#121722; --panel2:#0E1218; --ink:#E8EBF2; --mut:#8B94A7;
+  --line:rgba(232,235,242,.09); --line2:rgba(232,235,242,.18);
+  --amber:#F2A03D; --teal:#5DCAA5; --purple:#AFA9EC; --coral:#F0997B; --slate:#5A6172;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "IBM Plex Sans",system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.rail{position:fixed;left:20px;top:0;bottom:0;width:2px;background:var(--line);z-index:5}
+.rail i{position:absolute;left:-3px;top:0;width:8px;height:46px;border-radius:4px;background:var(--amber);opacity:0}
+.eyebrow{font:500 12px/1 "IBM Plex Mono",monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin:0 0 18px}
+h1{font-family:"Saira Condensed",sans-serif;font-weight:700;font-size:clamp(48px,7.4vw,86px);line-height:.96;letter-spacing:.01em;text-transform:uppercase;margin:0 0 22px}
+h2{font-family:"Saira Condensed",sans-serif;font-weight:600;font-size:clamp(30px,4vw,44px);line-height:1.02;letter-spacing:.015em;text-transform:uppercase;margin:0 0 14px}
+.sub{color:var(--mut);max-width:600px;font-size:17px;margin:0}
+.lede{color:var(--mut);max-width:660px;margin:0 0 36px}
+header.hero{padding:110px 0 78px}
+.hero-grid{display:grid;grid-template-columns:1.45fr .55fr;gap:48px;align-items:end}
+.index{font-family:"IBM Plex Mono",monospace;font-size:13px}
+.index a{display:flex;justify-content:space-between;gap:18px;color:var(--mut);text-decoration:none;padding:9px 2px;border-bottom:1px solid var(--line)}
+.index a:hover{color:var(--amber)}
+.index a span:first-child{color:var(--ink)}
+.index a:hover span:first-child{color:var(--amber)}
+.hero-trace{margin:34px 0 0;max-width:840px}
+section{padding:86px 0;border-top:1px solid var(--line)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}
+.mono{font-family:"IBM Plex Mono",monospace}
+pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px 18px;font:400 13.5px/1.65 "IBM Plex Mono",monospace;overflow:auto;margin:0;color:var(--ink)}
+.kw{color:var(--coral)} .ty{color:var(--teal)} .cm{color:var(--slate)} .num{color:var(--amber)}
+button{font:500 13px "IBM Plex Mono",monospace;color:var(--ink);background:transparent;border:1px solid var(--line2);border-radius:8px;padding:9px 14px;cursor:pointer}
+button:hover{border-color:var(--amber)}
+button.active{background:var(--amber);border-color:var(--amber);color:#0A0D12}
+.chin{width:68px;text-align:center;font:18px "IBM Plex Mono",monospace;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:9px 6px}
+input[type=range]{accent-color:var(--amber);width:100%}
+label{font-size:14px;color:var(--mut)}
+.chainline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:"IBM Plex Mono",monospace;margin:22px 0 8px}
+.chainline .big{font-size:26px;font-weight:500}
+.chainline .dim{color:var(--slate)}
+.bits{display:flex;flex-wrap:wrap;gap:8px 12px;margin:26px 0 16px}
+.bg-f{display:flex;gap:2px;transition:opacity .15s}
+.bit{width:26px;height:36px;border-radius:5px;display:flex;align-items:center;justify-content:center;font:500 13px "IBM Plex Mono",monospace}
+.f-op .bit{background:rgba(242,160,61,.13);color:var(--amber)}
+.f-rm .bit{background:rgba(93,202,165,.13);color:var(--teal)}
+.f-sh .bit{background:rgba(90,97,114,.2);color:#9AA3B5}
+.f-rn .bit{background:rgba(175,169,236,.13);color:var(--purple)}
+.f-rd .bit{background:rgba(240,153,123,.15);color:var(--coral)}
+.bits[data-hl="op"] .bg-f:not(.f-op),.bits[data-hl="rm"] .bg-f:not(.f-rm),.bits[data-hl="sh"] .bg-f:not(.f-sh),.bits[data-hl="rn"] .bg-f:not(.f-rn),.bits[data-hl="rd"] .bg-f:not(.f-rd){opacity:.22}
+.leg{display:flex;flex-wrap:wrap;gap:10px}
+.leg span{font:12.5px "IBM Plex Mono",monospace;padding:6px 10px;border:1px solid var(--line);border-radius:7px;color:var(--mut)}
+.leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px}
+.flow{display:grid;grid-template-columns:1fr 58px 1fr 58px 1fr;gap:14px;align-items:stretch}
+.flow .arr{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--slate);font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;gap:4px;text-align:center}
+.cardlab{font:500 11px "IBM Plex Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.cap{font-size:13.5px;color:var(--mut);margin:10px 0 0}
+.cg line{stroke:var(--slate);stroke-width:1;opacity:.45}
+.cg text{fill:var(--mut)}
+.cg.lit line{stroke:var(--amber);stroke-width:2.5;opacity:1}
+.cg.lit text{fill:var(--amber)}
+.b-op{color:var(--amber)} .b-rm{color:var(--teal)} .b-sh{color:#9AA3B5} .b-rn{color:var(--purple)} .b-rd{color:var(--coral)}
+.die-grid{display:grid;grid-template-columns:440px 1fr;gap:44px;align-items:center}
+#layer-info{min-height:96px;color:var(--mut);font-size:15px}
+#layer-info b{color:var(--ink);font-weight:500}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fact .n{font-family:"Saira Condensed",sans-serif;font-size:42px;font-weight:600;color:var(--amber);line-height:1}
+.fact p{color:var(--mut);font-size:14px;margin:10px 0 0}
+.coda{font-family:"IBM Plex Mono",monospace;color:var(--mut);font-size:14px;border-left:2px solid var(--amber);padding:4px 0 4px 18px;margin:48px 0 0;max-width:640px}
+footer{padding:64px 0 90px;border-top:1px solid var(--line);color:var(--mut);font-size:15px}
+#mos .chan,#mos .chg,#mos .cur{opacity:0;transition:opacity .35s}
+#mos.on .chan,#mos.on .chg{opacity:1}
+#mos.on .cur{opacity:.95}
+#mos .el{opacity:0;transition:opacity .35s}
+#mos.on .el{opacity:1}
+@media (prefers-reduced-motion: no-preference){
+  .rail i{opacity:.85;animation:railfall 8s linear infinite}
+  .drawline{stroke-dasharray:1000;stroke-dashoffset:1000;animation:draw 1.7s ease-out .2s forwards}
+  #die .l1{animation:dk1 var(--clk) linear infinite}
+  #die .l2{animation:dk2 var(--clk) linear infinite}
+  #die .l3{animation:dk3 var(--clk) linear infinite}
+  #die .l4{animation:dk4 var(--clk) linear infinite}
+  #die .l5{animation:dk5 var(--clk) linear infinite}
+  #die .l6{animation:dk6 var(--clk) linear infinite}
+  #die .l7{animation:dk7 var(--clk) linear infinite}
+  #die .l8{animation:dk8 var(--clk) linear infinite}
+  #die .pu{animation:dkp var(--clk) linear infinite}
+  #mos.on .el{animation:mf .9s linear infinite}
+  .dpA{animation:dpA 3s linear infinite}
+  .dpB{animation:dpB 3s linear infinite}
+  .dpO{animation:dpO 3s linear infinite}
+  .dpF{animation:dpF 3s linear infinite}
+  .cp{animation:cpux 1.6s linear infinite}
+  .gc{animation:gsw 2s linear infinite}
+}
+@keyframes railfall{from{transform:translateY(-8vh)}to{transform:translateY(108vh)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes dk1{0%{opacity:.15}2%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dk2{0%{opacity:.15}14%{opacity:.15}16%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dk3{0%{opacity:.15}24%{opacity:.15}26%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dk4{0%{opacity:.15}38%{opacity:.15}40%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dk5{0%{opacity:.15}48%{opacity:.15}50%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dk6{0%{opacity:.15}62%{opacity:.15}64%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dk7{0%{opacity:.15}72%{opacity:.15}74%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dk8{0%{opacity:.15}82%{opacity:.15}84%{opacity:1}88%{opacity:1}96%{opacity:.15}100%{opacity:.15}}
+@keyframes dkp{0%{transform:translate(105px,410px);opacity:0}2%{opacity:1}14%{transform:translate(185px,392px)}24%{transform:translate(185px,328px)}38%{transform:translate(115px,312px)}48%{transform:translate(115px,248px)}62%{transform:translate(200px,236px)}72%{transform:translate(200px,170px)}82%{transform:translate(150px,154px)}92%{transform:translate(150px,84px);opacity:1}96%{opacity:0}100%{transform:translate(150px,84px);opacity:0}}
+@keyframes mf{0%{transform:translateX(0)}100%{transform:translateX(27px)}}
+@keyframes dpA{0%{transform:translate(360px,140px);opacity:0}4%{opacity:1}12%{transform:translate(360px,170px)}26%{transform:translate(590px,170px)}32%{transform:translate(590px,196px);opacity:1}36%{opacity:0}100%{transform:translate(590px,196px);opacity:0}}
+@keyframes dpB{0%{transform:translate(460px,140px);opacity:0}4%{opacity:1}14%{transform:translate(460px,185px)}28%{transform:translate(690px,185px)}32%{transform:translate(690px,196px);opacity:1}36%{opacity:0}100%{transform:translate(690px,196px);opacity:0}}
+@keyframes dpF{0%{opacity:0}34%{opacity:0}40%{opacity:.45}48%{opacity:0}100%{opacity:0}}
+@keyframes dpO{0%{transform:translate(640px,300px);opacity:0}46%{transform:translate(640px,300px);opacity:0}50%{opacity:1}58%{transform:translate(640px,345px)}72%{transform:translate(850px,345px)}88%{transform:translate(850px,60px)}94%{transform:translate(525px,60px);opacity:1}98%{opacity:0}100%{transform:translate(525px,60px);opacity:0}}
+@keyframes cpux{0%{transform:translate(48px,37px);opacity:0}4%{opacity:1}22%{transform:translate(116px,37px)}44%{transform:translate(184px,37px)}66%{transform:translate(252px,37px)}88%{transform:translate(320px,37px);opacity:1}96%{opacity:0}100%{transform:translate(320px,37px);opacity:0}}
+@keyframes gsw{0%{opacity:.3}6%{opacity:1}30%{opacity:1}44%{opacity:.3}100%{opacity:.3}}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr}
+  .flow .arr{flex-direction:row;padding:2px 0}
+  .die-grid{grid-template-columns:1fr}
+  .duo{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr 1fr}
+  .rail{display:none}
+  .bit{width:23px;height:32px;font-size:12px}
+}
+@media(max-width:560px){.facts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="rail" aria-hidden="true"><i></i></div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">An illustrated descent</p>
+        <h1>From characters<br>to electrons</h1>
+        <p class="sub">Text becomes numbers. Numbers become instructions. Instructions become voltages racing through copper and silicon. This page walks the whole stack, top to bottom &#8212; every panel below is live.</p>
+      </div>
+      <nav class="index" aria-label="Sections">
+        <a href="#language"><span>06</span><span>language</span></a>
+        <a href="#compile"><span>05</span><span>compilation</span></a>
+        <a href="#decode"><span>04</span><span>decode</span></a>
+        <a href="#die-sec"><span>03</span><span>the die</span></a>
+        <a href="#switch"><span>02</span><span>the switch</span></a>
+        <a href="#duo-sec"><span>&#8212;</span><span>two philosophies</span></a>
+        <a href="#notes"><span>&#8212;</span><span>field notes</span></a>
+      </nav>
+    </div>
+    <svg class="hero-trace" width="100%" viewBox="0 0 840 64" role="img" aria-label="A circuit trace drawing itself across the page">
+      <path class="drawline" d="M0 32 H170 L205 10 H392 L428 54 H630 L662 32 H840" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="170" cy="32" r="3.5" fill="#5A6172"/>
+      <circle cx="392" cy="10" r="3.5" fill="#5A6172"/>
+      <circle cx="630" cy="54" r="3.5" fill="#5A6172"/>
+    </svg>
+  </div>
+</header>
+
+<section id="language">
+  <div class="wrap">
+    <p class="eyebrow">Layer 06 &#8212; language</p>
+    <h2>A character is a number in costume</h2>
+    <p class="lede">Every character you type is already a number. Type one below and watch it undress: code point, bits, and the literal voltage waveform that carries it down a wire &#8212; eight bits, high for one, low for zero.</p>
+    <div class="panel">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <label for="ch-in">Type any character</label>
+        <input class="chin" id="ch-in" maxlength="1" value="A">
+      </div>
+      <div class="chainline">
+        <span class="big" id="ch-ch">A</span>
+        <span class="dim">&#8594;</span>
+        <span class="big" id="ch-dec">65</span>
+        <span class="dim">&#8594;</span>
+        <span class="big" id="ch-bits" style="letter-spacing:3px"></span>
+      </div>
+      <svg width="100%" viewBox="0 0 840 112" role="img" aria-label="Square wave of the byte on a wire">
+        <text x="8" y="29" font-size="12" fill="#5A6172" font-family="IBM Plex Mono">1</text>
+        <text x="8" y="75" font-size="12" fill="#5A6172" font-family="IBM Plex Mono">0</text>
+        <line x1="28" y1="24" x2="28" y2="70" stroke="rgba(232,235,242,.18)" stroke-width="1"/>
+        <path id="ch-wave" d="" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linejoin="round"/>
+        <g id="ch-lab" font-size="13" font-family="IBM Plex Mono" fill="#8B94A7" text-anchor="middle"></g>
+      </svg>
+      <p class="cap">High &#8776; supply voltage, low &#8776; 0&nbsp;V. Eight wires in parallel, or eight ticks on one wire, carry this byte through the machine.</p>
+    </div>
+  </div>
+</section>
+
+<section id="compile">
+  <div class="wrap">
+    <p class="eyebrow">Layer 05 &#8212; compilation</p>
+    <h2>Eight bytes is a whole function</h2>
+    <p class="lede">The compiler turns arithmetic into instructions; the assembler turns instructions into bit patterns. The function below survives the whole trip as just two 32&#8209;bit words. Hover the legend to see what each field of the first word controls &#8212; this is real ARM64 encoding, not a sketch.</p>
+    <div class="flow">
+      <div class="panel">
+        <p class="cardlab">C++ source</p>
+<pre><span class="ty">int</span> add(<span class="ty">int</span> a, <span class="ty">int</span> b) {
+  <span class="kw">return</span> a + b;
+}</pre>
+      </div>
+      <div class="arr" aria-hidden="true"><span>compiler</span><span>&#8594;</span></div>
+      <div class="panel">
+        <p class="cardlab">ARM64 assembly</p>
+<pre>add:
+  <span class="kw">add</span>  w0, w0, w1
+  <span class="kw">ret</span></pre>
+      </div>
+      <div class="arr" aria-hidden="true"><span>assembler</span><span>&#8594;</span></div>
+      <div class="panel">
+        <p class="cardlab">Machine code</p>
+<pre><span class="num">0x0B010000</span>  <span class="cm">; add</span>
+<span class="num">0xD65F03C0</span>  <span class="cm">; ret</span></pre>
+      </div>
+    </div>
+    <div class="bits" id="bitstrip" data-hl="">
+      <div class="bg-f f-op"><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">1</span><span class="bit">0</span><span class="bit">1</span><span class="bit">1</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span></div>
+      <div class="bg-f f-rm"><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">1</span></div>
+      <div class="bg-f f-sh"><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span></div>
+      <div class="bg-f f-rn"><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span></div>
+      <div class="bg-f f-rd"><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span><span class="bit">0</span></div>
+    </div>
+    <div class="leg" id="bitleg">
+      <span data-f="op"><i style="background:#F2A03D"></i>operation &#8212; add, shifted register</span>
+      <span data-f="rm"><i style="background:#5DCAA5"></i>source b &#8212; w1</span>
+      <span data-f="sh"><i style="background:#5A6172"></i>shift amount &#8212; 0</span>
+      <span data-f="rn"><i style="background:#AFA9EC"></i>source a &#8212; w0</span>
+      <span data-f="rd"><i style="background:#F0997B"></i>destination &#8212; w0</span>
+    </div>
+    <p class="cap">Bit 31 on the left, bit 0 on the right. The register fields aren't names &#8212; they're wire addresses. <span class="mono">00001</span> in the source&#8209;b field physically selects register w1's output bus.</p>
+  </div>
+</section>
+
+<section id="decode">
+  <div class="wrap">
+    <p class="eyebrow">Layer 04 &#8212; decode</p>
+    <h2>The moment software becomes hardware</h2>
+    <p class="lede">A fetched instruction lands in a register. Its opcode bits drive a decoder; the decoder raises exactly one control line; and that line physically selects which circuit inside the ALU the operand pulses flow through. Change the instruction &#8212; watch a different wire light and a different answer come back. Here w0&nbsp;=&nbsp;12 and w1&nbsp;=&nbsp;10.</p>
+    <div class="panel">
+      <div style="display:flex;gap:10px;flex-wrap:wrap" role="group" aria-label="Choose an instruction">
+        <button class="op-btn active" data-op="add">add w0, w0, w1</button>
+        <button class="op-btn" data-op="sub">sub w0, w0, w1</button>
+        <button class="op-btn" data-op="and">and w0, w0, w1</button>
+        <button class="op-btn" data-op="orr">orr w0, w0, w1</button>
+      </div>
+      <p class="mono" id="dp-bin" style="font-size:14px;letter-spacing:1.5px;margin:18px 0 6px;word-break:break-all"></p>
+      <p class="cap" style="margin:0 0 6px">Only the amber opcode field changes between these four instructions &#8212; the register fields stay put.</p>
+      <svg width="100%" viewBox="0 0 920 430" role="img" aria-label="Datapath: instruction register feeds a decoder, the decoder raises one control line into the ALU, operands flow from the register file through the ALU and the result writes back">
+        <rect x="30" y="40" width="200" height="60" rx="8" fill="#0E1218" stroke="rgba(232,235,242,.18)"/>
+        <text x="130" y="62" font-size="11" font-family="IBM Plex Mono" fill="#8B94A7" text-anchor="middle" letter-spacing="2">INSTRUCTION</text>
+        <text id="ir-hex" x="130" y="84" font-size="15" font-family="IBM Plex Mono" fill="#F2A03D" text-anchor="middle">0x0B010000</text>
+        <line x1="130" y1="100" x2="130" y2="160" stroke="#5A6172" stroke-width="1.5"/>
+        <rect x="30" y="160" width="200" height="70" rx="8" fill="#0E1218" stroke="rgba(232,235,242,.18)"/>
+        <text x="130" y="200" font-size="13" font-family="IBM Plex Mono" fill="#E8EBF2" text-anchor="middle">decoder</text>
+        <path d="M230 180 L268 180 L268 110 L300 110" fill="none" stroke="#5A6172" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="278" y="98" font-size="11" font-family="IBM Plex Mono" fill="#8B94A7">select w0, w1</text>
+        <rect x="300" y="40" width="220" height="100" rx="8" fill="#0E1218" stroke="rgba(232,235,242,.18)"/>
+        <text x="410" y="62" font-size="11" font-family="IBM Plex Mono" fill="#8B94A7" text-anchor="middle" letter-spacing="2">REGISTER FILE</text>
+        <text x="320" y="88" font-size="13" font-family="IBM Plex Mono" fill="#E8EBF2">w0 = 12</text>
+        <text x="320" y="110" font-size="13" font-family="IBM Plex Mono" fill="#E8EBF2">w1 = 10</text>
+        <text x="320" y="130" font-size="13" font-family="IBM Plex Mono" fill="#5A6172">w2 &#8230;</text>
+        <g class="cg" id="cg-add"><line x1="230" y1="235" x2="570" y2="235"/><text x="240" y="228" font-size="11" font-family="IBM Plex Mono">add</text></g>
+        <g class="cg" id="cg-sub"><line x1="230" y1="255" x2="576" y2="255"/><text x="240" y="248" font-size="11" font-family="IBM Plex Mono">sub</text></g>
+        <g class="cg" id="cg-and"><line x1="230" y1="275" x2="582" y2="275"/><text x="240" y="268" font-size="11" font-family="IBM Plex Mono">and</text></g>
+        <g class="cg" id="cg-orr"><line x1="230" y1="295" x2="588" y2="295"/><text x="240" y="288" font-size="11" font-family="IBM Plex Mono">orr</text></g>
+        <path d="M360 140 L360 170 L590 170 L590 198" fill="none" stroke="#5A6172" stroke-width="1.5"/>
+        <path d="M460 140 L460 185 L690 185 L690 198" fill="none" stroke="#5A6172" stroke-width="1.5"/>
+        <path d="M560 200 L620 200 L640 230 L660 200 L720 200 L690 300 L590 300 Z" fill="#121722" stroke="rgba(232,235,242,.25)" stroke-width="1.2"/>
+        <path class="dpF" d="M560 200 L620 200 L640 230 L660 200 L720 200 L690 300 L590 300 Z" fill="#F2A03D" opacity="0"/>
+        <text x="640" y="262" font-size="13" font-family="IBM Plex Mono" fill="#E8EBF2" text-anchor="middle">ALU</text>
+        <path d="M640 300 L640 345 L850 345 L850 60 L525 60" fill="none" stroke="#5A6172" stroke-width="1.5"/>
+        <text x="556" y="50" font-size="11" font-family="IBM Plex Mono" fill="#8B94A7">write back to w0</text>
+        <text id="dp-res" x="664" y="330" font-size="14" font-family="IBM Plex Mono" fill="#F2A03D">= 22  (0b10110)</text>
+        <circle class="dpA" r="4.5" fill="#F2A03D" opacity="0"/>
+        <circle class="dpB" r="4.5" fill="#F2A03D" opacity="0"/>
+        <circle class="dpO" r="4.5" fill="#F2A03D" opacity="0"/>
+      </svg>
+      <p class="cap">One decoded line per operation is a simplification &#8212; a real core decodes to dozens of control signals (register selects, write enables, memory strobes) &#8212; but the principle is exactly this: bits choosing wires, wires choosing circuits.</p>
+    </div>
+  </div>
+</section>
+
+<section id="die-sec">
+  <div class="wrap">
+    <p class="eyebrow">Layer 03 &#8212; the die</p>
+    <h2>Signals climb a copper skyline</h2>
+    <p class="lede">Zooming out: billions of those decoded pulses race through a real die. One thin layer of transistors sits at the bottom &#8212; the only layer that computes &#8212; with a dozen-plus layers of copper wiring stacked above it, joined by vertical vias. Drag the clock. Click a layer.</p>
+    <div class="panel">
+      <div class="die-grid">
+        <div id="die" style="--clk:1.5s">
+          <svg width="100%" viewBox="0 0 380 548" role="img" aria-label="Exploded chip stack: silicon wafer, transistor layer, local wiring, global routing, power and clock metal, solder bumps; an amber signal pulse climbs through it">
+            <g style="cursor:pointer" onclick="layerInfo(0)">
+              <path d="M55 470 L150 428 L245 470 L150 512 Z" fill="#B4B2A9"/>
+              <path d="M55 470 L150 512 L150 532 L55 490 Z" fill="#5F5E5A"/>
+              <path d="M245 470 L150 512 L150 532 L245 490 Z" fill="#5F5E5A"/>
+            </g>
+            <g style="cursor:pointer" onclick="layerInfo(1)">
+              <path d="M55 400 L150 358 L245 400 L150 442 Z" fill="#9FE1CB"/>
+              <path d="M55 400 L150 442 L150 454 L55 412 Z" fill="#1D9E75"/>
+              <path d="M245 400 L150 442 L150 454 L245 412 Z" fill="#1D9E75"/>
+              <rect x="101" y="406" width="8" height="8" rx="1.5" fill="#04342C"/>
+              <rect x="181" y="388" width="8" height="8" rx="1.5" fill="#04342C"/>
+              <rect x="124" y="376" width="8" height="8" rx="1.5" fill="#04342C"/>
+              <rect x="168" y="420" width="8" height="8" rx="1.5" fill="#04342C"/>
+            </g>
+            <g style="cursor:pointer" onclick="layerInfo(2)">
+              <path d="M55 322 L150 280 L245 322 L150 364 Z" fill="#AFA9EC"/>
+              <path d="M55 322 L150 364 L150 376 L55 334 Z" fill="#534AB7"/>
+              <path d="M245 322 L150 364 L150 376 L245 334 Z" fill="#534AB7"/>
+              <line x1="112" y1="316" x2="169" y2="341" stroke="#534AB7" stroke-width="1" opacity=".6"/>
+              <line x1="135" y1="298" x2="192" y2="323" stroke="#534AB7" stroke-width="1" opacity=".6"/>
+            </g>
+            <g style="cursor:pointer" onclick="layerInfo(3)">
+              <path d="M55 244 L150 202 L245 244 L150 286 Z" fill="#CECBF6"/>
+              <path d="M55 244 L150 286 L150 298 L55 256 Z" fill="#7F77DD"/>
+              <path d="M245 244 L150 286 L150 298 L245 256 Z" fill="#7F77DD"/>
+              <line x1="192" y1="228" x2="135" y2="253" stroke="#7F77DD" stroke-width="1" opacity=".7"/>
+              <line x1="210" y1="242" x2="153" y2="267" stroke="#7F77DD" stroke-width="1" opacity=".7"/>
+            </g>
+            <g style="cursor:pointer" onclick="layerInfo(4)">
+              <path d="M55 166 L150 124 L245 166 L150 208 Z" fill="#F5C4B3"/>
+              <path d="M55 166 L150 208 L150 220 L55 178 Z" fill="#993C1D"/>
+              <path d="M245 166 L150 208 L150 220 L245 178 Z" fill="#993C1D"/>
+              <line x1="110" y1="160" x2="167" y2="185" stroke="#993C1D" stroke-width="2" opacity=".55"/>
+              <line x1="128" y1="144" x2="185" y2="169" stroke="#993C1D" stroke-width="2" opacity=".55"/>
+            </g>
+            <g style="cursor:pointer" onclick="layerInfo(5)">
+              <path d="M55 88 L150 46 L245 88 L150 130 Z" fill="#D3D1C7"/>
+              <path d="M55 88 L150 130 L150 142 L55 100 Z" fill="#888780"/>
+              <path d="M245 88 L150 130 L150 142 L245 100 Z" fill="#888780"/>
+              <circle cx="118" cy="86" r="5" fill="#888780"/>
+              <circle cx="182" cy="86" r="5" fill="#888780"/>
+              <circle cx="150" cy="108" r="5" fill="#888780"/>
+              <circle cx="150" cy="78" r="5" fill="#888780"/>
+            </g>
+            <path d="M105 410 L185 392 L185 328 L115 312 L115 248 L200 236 L200 170 L150 154 L150 84" fill="none" stroke="#8B94A7" stroke-width="1.2" opacity=".55"/>
+            <path class="l1" d="M105 410 L185 392" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <path class="l2" d="M185 392 L185 328" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <path class="l3" d="M185 328 L115 312" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <path class="l4" d="M115 312 L115 248" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <path class="l5" d="M115 248 L200 236" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <path class="l6" d="M200 236 L200 170" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <path class="l7" d="M200 170 L150 154" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <path class="l8" d="M150 154 L150 84" fill="none" stroke="#F2A03D" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+            <circle class="l8" cx="150" cy="78" r="5.5" fill="#F2A03D" opacity="1"/>
+            <circle class="pu" r="4.5" fill="#F2A03D" opacity="0" transform="translate(105,410)"/>
+            <line x1="249" y1="88" x2="257" y2="88" stroke="#5A6172" stroke-width="1" stroke-dasharray="2 2"/>
+            <line x1="249" y1="166" x2="257" y2="166" stroke="#5A6172" stroke-width="1" stroke-dasharray="2 2"/>
+            <line x1="249" y1="244" x2="257" y2="244" stroke="#5A6172" stroke-width="1" stroke-dasharray="2 2"/>
+            <line x1="249" y1="322" x2="257" y2="322" stroke="#5A6172" stroke-width="1" stroke-dasharray="2 2"/>
+            <line x1="249" y1="400" x2="257" y2="400" stroke="#5A6172" stroke-width="1" stroke-dasharray="2 2"/>
+            <line x1="249" y1="470" x2="257" y2="470" stroke="#5A6172" stroke-width="1" stroke-dasharray="2 2"/>
+            <text x="261" y="92" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7">solder bumps</text>
+            <text x="261" y="170" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7">power + clock</text>
+            <text x="261" y="248" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7">global routing</text>
+            <text x="261" y="326" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7">local wiring</text>
+            <text x="261" y="404" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7">transistors</text>
+            <text x="261" y="474" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7">silicon wafer</text>
+          </svg>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:14px">
+            <label for="die-clk" style="white-space:nowrap">Clock speed</label>
+            <input type="range" id="die-clk" min="1" max="5" step="1" value="3">
+            <span class="mono" id="die-out" style="min-width:28px;text-align:right;font-weight:500">3&#215;</span>
+          </div>
+        </div>
+        <div>
+          <p id="layer-info"><b>Click a layer.</b> The amber pulse is one signal: fired at a transistor gate, hopping gate to gate, then climbing via to via through the wiring stack toward the package.</p>
+          <p class="cap">Real chips alternate routing direction between metal layers, like plywood grain &#8212; you can see it in the trace directions here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="switch">
+  <div class="wrap">
+    <p class="eyebrow">Layer 02 &#8212; the switch</p>
+    <h2>No electron ever enters the gate</h2>
+    <p class="lede">At the bottom of the stack, the only moving part is an electric field. Voltage on the gate reaches <em>through</em> an insulating oxide and pulls electrons up into a channel between source and drain. Remove the voltage and the bridge dissolves. The switch is a field effect &#8212; that's the F in MOSFET.</p>
+    <div class="panel" style="max-width:640px">
+      <div id="mos">
+        <svg width="100%" viewBox="0 0 380 232" role="img" aria-label="MOSFET cross-section; toggling gate voltage forms an electron channel under the oxide and current flows from source to drain">
+          <rect x="40" y="140" width="300" height="78" rx="8" fill="#B4B2A9"/>
+          <text x="190" y="204" font-size="12" font-family="IBM Plex Mono" fill="#2C2C2A" text-anchor="middle">p-type silicon</text>
+          <rect x="58" y="140" width="72" height="26" rx="3" fill="#5DCAA5"/>
+          <rect x="250" y="140" width="72" height="26" rx="3" fill="#5DCAA5"/>
+          <text x="94" y="157" font-size="11" font-family="IBM Plex Mono" fill="#04342C" text-anchor="middle">n+</text>
+          <text x="286" y="157" font-size="11" font-family="IBM Plex Mono" fill="#04342C" text-anchor="middle">n+</text>
+          <line x1="94" y1="140" x2="94" y2="52" stroke="#5A6172" stroke-width="4"/>
+          <line x1="306" y1="140" x2="306" y2="52" stroke="#5A6172" stroke-width="4"/>
+          <line x1="190" y1="100" x2="190" y2="52" stroke="#5A6172" stroke-width="4"/>
+          <rect x="132" y="132" width="116" height="8" fill="#E8EBF2" stroke="#5A6172" stroke-width="0.5"/>
+          <rect x="132" y="100" width="116" height="32" rx="3" fill="#F0997B" stroke="#993C1D" stroke-width="0.5"/>
+          <text x="190" y="114" font-size="12" font-family="IBM Plex Mono" fill="#4A1B0C" text-anchor="middle">gate</text>
+          <text class="chg" x="190" y="129" font-size="11" font-family="IBM Plex Mono" fill="#4A1B0C" text-anchor="middle" letter-spacing="6">+ + + + +</text>
+          <rect class="chan" x="132" y="140" width="116" height="9" fill="#0F6E56"/>
+          <circle class="el" cx="138" cy="144.5" r="3" fill="#9FE1CB"/>
+          <circle class="el" cx="165" cy="144.5" r="3" fill="#9FE1CB"/>
+          <circle class="el" cx="192" cy="144.5" r="3" fill="#9FE1CB"/>
+          <circle class="el" cx="219" cy="144.5" r="3" fill="#9FE1CB"/>
+          <path class="cur" d="M94 54 L94 144 L306 144 L306 54" fill="none" stroke="#F2A03D" stroke-width="3" stroke-linejoin="round"/>
+          <text x="94" y="42" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7" text-anchor="middle">source</text>
+          <text x="190" y="42" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7" text-anchor="middle">input</text>
+          <text x="306" y="42" font-size="12" font-family="IBM Plex Mono" fill="#8B94A7" text-anchor="middle">drain</text>
+          <line x1="250" y1="135" x2="262" y2="118" stroke="#5A6172" stroke-width="1" stroke-dasharray="2 2"/>
+          <text x="265" y="115" font-size="11" font-family="IBM Plex Mono" fill="#8B94A7">oxide</text>
+        </svg>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap">
+          <button id="mos-btn">Gate voltage: 0 V</button>
+          <span class="cap" id="mos-st" style="margin:0">Channel closed &#8212; no current</span>
+        </div>
+      </div>
+    </div>
+    <p class="coda">Layer 00 &#8212; electrons. Below this there is no machinery left: only charge, fields, and the arrangement we impose on them.</p>
+  </div>
+</section>
+
+<section id="duo-sec">
+  <div class="wrap">
+    <p class="eyebrow">Interlude &#8212; two philosophies</p>
+    <h2>One fast stream, or ten thousand in lockstep</h2>
+    <p class="lede">Same transistors, opposite bets. A CPU spends its silicon making one stream of instructions finish as fast as physics allows. A GPU spends it running one instruction across thousands of data lanes at once &#8212; same operation, different data &#8212; which is why matrices and hash workloads love it.</p>
+    <div class="duo">
+      <div class="panel">
+        <p class="cardlab">CPU &#8212; latency machine</p>
+        <svg width="100%" viewBox="0 0 380 76" role="img" aria-label="Five pipeline stages with register banks between them and one pulse moving through">
+          <line x1="20" y1="37" x2="348" y2="37" stroke="#5A6172" stroke-width="1" opacity=".5"/>
+          <rect x="20" y="20" width="56" height="34" rx="4" fill="#26215C" stroke="#7F77DD" stroke-width="0.5"/>
+          <rect x="88" y="20" width="56" height="34" rx="4" fill="#26215C" stroke="#7F77DD" stroke-width="0.5"/>
+          <rect x="156" y="20" width="56" height="34" rx="4" fill="#26215C" stroke="#7F77DD" stroke-width="0.5"/>
+          <rect x="224" y="20" width="56" height="34" rx="4" fill="#26215C" stroke="#7F77DD" stroke-width="0.5"/>
+          <rect x="292" y="20" width="56" height="34" rx="4" fill="#26215C" stroke="#7F77DD" stroke-width="0.5"/>
+          <text x="48" y="41" font-size="11" font-family="IBM Plex Mono" fill="#CECBF6" text-anchor="middle">fetch</text>
+          <text x="116" y="41" font-size="11" font-family="IBM Plex Mono" fill="#CECBF6" text-anchor="middle">decode</text>
+          <text x="184" y="41" font-size="11" font-family="IBM Plex Mono" fill="#CECBF6" text-anchor="middle">execute</text>
+          <text x="252" y="41" font-size="11" font-family="IBM Plex Mono" fill="#CECBF6" text-anchor="middle">memory</text>
+          <text x="320" y="41" font-size="11" font-family="IBM Plex Mono" fill="#CECBF6" text-anchor="middle">write</text>
+          <rect x="80" y="14" width="3" height="46" fill="#8B94A7"/>
+          <rect x="148" y="14" width="3" height="46" fill="#8B94A7"/>
+          <rect x="216" y="14" width="3" height="46" fill="#8B94A7"/>
+          <rect x="284" y="14" width="3" height="46" fill="#8B94A7"/>
+          <circle class="cp" r="4" fill="#F2A03D" opacity="0"/>
+        </svg>
+        <p class="cap">The gray bars are register banks &#8212; results wait there for the next clock tick before entering the next stage. Branch prediction and big caches exist to keep this one stream from ever stalling.</p>
+      </div>
+      <div class="panel">
+        <p class="cardlab">GPU &#8212; throughput machine</p>
+        <svg width="100%" viewBox="0 0 380 88" role="img" aria-label="Grid of small cores with a wave of one instruction sweeping across all columns">
+          <g class="gc" opacity=".85" style="animation-delay:-2s"><rect x="33" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="33" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="33" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="33" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-1.86s"><rect x="65" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="65" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="65" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="65" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-1.72s"><rect x="97" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="97" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="97" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="97" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-1.58s"><rect x="129" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="129" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="129" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="129" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-1.44s"><rect x="161" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="161" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="161" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="161" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-1.3s"><rect x="193" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="193" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="193" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="193" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-1.16s"><rect x="225" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="225" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="225" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="225" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-1.02s"><rect x="257" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="257" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="257" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="257" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-0.88s"><rect x="289" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="289" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="289" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="289" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+          <g class="gc" opacity=".85" style="animation-delay:-0.74s"><rect x="321" y="10" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="321" y="29" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="321" y="48" width="26" height="14" rx="2" fill="#5DCAA5"/><rect x="321" y="67" width="26" height="14" rx="2" fill="#5DCAA5"/></g>
+        </svg>
+        <p class="cap">Each cell is a small core. The bright wave is a single instruction executing across all of them in lockstep (SIMT) &#8212; not all instructions at once, but one instruction over thousands of operands at once.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="notes">
+  <div class="wrap">
+    <p class="eyebrow">Margins &#8212; field notes</p>
+    <h2>Notes from the fab</h2>
+    <div class="facts">
+      <div class="panel fact"><div class="n">13.5 nm</div><p>The wavelength chips are printed with &#8212; extreme-ultraviolet light made by lasering molten tin droplets 50,000 times a second.</p></div>
+      <div class="panel fact"><div class="n">100 B+</div><p>Transistors on a flagship die &#8212; roughly as many switches as there are stars in the galaxy, on a fingernail of silicon.</p></div>
+      <div class="panel fact"><div class="n">~20 nm</div><p>Width of key features. A virus is about five times bigger; a red blood cell is a continent by comparison.</p></div>
+      <div class="panel fact"><div class="n">6 cm</div><p>How far light travels in one 5 GHz clock cycle. On a 2 cm die, wire length is destiny &#8212; layout is applied relativity.</p></div>
+      <div class="panel fact"><div class="n">~1 ns</div><p>An L1 cache answer. Main RAM takes ~80 ns &#8212; the entire cache hierarchy exists to hide that gap from your one fast stream.</p></div>
+      <div class="panel fact"><div class="n">$20 B</div><p>Cost of a leading-edge fab. Each wafer spends about three months inside, passing through more than a thousand steps.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="mono" style="margin:0 0 8px;color:var(--amber)">end of descent</p>
+    <p style="max-width:640px;margin:0">Text becomes numbers, numbers become instructions, instructions become fields, and fields move electrons. Everything above layer zero is arrangement.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var inp=document.getElementById('ch-in');
+  function chUpd(){
+    var c=inp.value;if(!c){c='A';}
+    var code=c.charCodeAt(0);
+    var bits=(code&255).toString(2).padStart(8,'0');
+    document.getElementById('ch-ch').textContent=c;
+    document.getElementById('ch-dec').textContent=code;
+    document.getElementById('ch-bits').innerHTML=bits.split('').map(function(b){
+      return '<span style="color:'+(b==='1'?'#F2A03D':'#5A6172')+'">'+b+'</span>';
+    }).join('');
+    var d='',x=34,w=98,lab='';
+    bits.split('').forEach(function(b,i){
+      var y=b==='1'?24:70;
+      d+=(i===0?'M'+x+' '+y:' L'+x+' '+y)+' L'+(x+w)+' '+y;
+      lab+='<text x="'+(x+w/2)+'" y="98">'+b+'</text>';
+      x+=w;
+    });
+    document.getElementById('ch-wave').setAttribute('d',d);
+    document.getElementById('ch-lab').innerHTML=lab;
+  }
+  inp.addEventListener('input',chUpd);chUpd();
+
+  var strip=document.getElementById('bitstrip');
+  document.querySelectorAll('#bitleg span').forEach(function(el){
+    el.addEventListener('mouseenter',function(){strip.dataset.hl=el.dataset.f;});
+    el.addEventListener('mouseleave',function(){strip.dataset.hl='';});
+  });
+
+  var OPS={
+    add:{hex:'0x0B010000',bin:'00001011000000010000000000000000',res:'= 22  (0b10110)'},
+    sub:{hex:'0x4B010000',bin:'01001011000000010000000000000000',res:'= 2   (0b00010)'},
+    and:{hex:'0x0A010000',bin:'00001010000000010000000000000000',res:'= 8   (0b01000)'},
+    orr:{hex:'0x2A010000',bin:'00101010000000010000000000000000',res:'= 14  (0b01110)'}
+  };
+  function fieldClass(i){
+    if(i<11)return 'b-op';
+    if(i<16)return 'b-rm';
+    if(i<22)return 'b-sh';
+    if(i<27)return 'b-rn';
+    return 'b-rd';
+  }
+  function setOp(k){
+    var o=OPS[k];
+    document.getElementById('ir-hex').textContent=o.hex;
+    document.getElementById('dp-res').textContent=o.res;
+    document.getElementById('dp-bin').innerHTML=o.bin.split('').map(function(b,i){
+      return '<span class="'+fieldClass(i)+'">'+b+'</span>'+((i%4===3&&i<31)?' ':'');
+    }).join('');
+    ['add','sub','and','orr'].forEach(function(n){
+      document.getElementById('cg-'+n).classList.toggle('lit',n===k);
+    });
+    document.querySelectorAll('.op-btn').forEach(function(b){
+      b.classList.toggle('active',b.dataset.op===k);
+    });
+  }
+  document.querySelectorAll('.op-btn').forEach(function(b){
+    b.addEventListener('click',function(){setOp(b.dataset.op);});
+  });
+  setOp('add');
+
+  var die=document.getElementById('die'),dc=document.getElementById('die-clk'),dout=document.getElementById('die-out');
+  dc.addEventListener('input',function(){
+    var v=Math.round(+dc.value);
+    die.style.setProperty('--clk',(4.5/v).toFixed(2)+'s');
+    dout.textContent=v+'\u00d7';
+  });
+  var LAYERS=[
+    '<b>Silicon wafer.</b> A single crystal grown from molten silicon and sliced into 300 mm discs. Everything else is built on, and into, its top few micrometers.',
+    '<b>Transistor layer (FEOL).</b> Billions of switches patterned directly into the silicon. This is the only layer that computes; everything above it is wiring.',
+    '<b>Local wiring (M1\u2013M4).</b> The finest copper, stitching transistors into logic gates and gates into standard cells. Pitches here are a few dozen nanometers.',
+    '<b>Global routing (M5\u2013M8).</b> Longer, thicker wires carrying signals between blocks. Each layer routes mostly one direction, alternating like plywood grain.',
+    '<b>Power + clock (top metal).</b> The thickest copper: a grid feeding current downward and a carefully balanced tree spreading the clock so every register ticks together.',
+    '<b>Solder bumps.</b> The die\u2019s exit. Microbumps join the top of the stack to the package substrate, and the package to the board.'
+  ];
+  window.layerInfo=function(i){document.getElementById('layer-info').innerHTML=LAYERS[i];};
+
+  var mw=document.getElementById('mos'),mb=document.getElementById('mos-btn'),ms=document.getElementById('mos-st'),mon=false;
+  mb.addEventListener('click',function(){
+    mon=!mon;
+    mw.classList.toggle('on',mon);
+    mb.textContent='Gate voltage: '+(mon?'1 V':'0 V');
+    ms.textContent=mon?'Channel formed \u2014 current flows':'Channel closed \u2014 no current';
+  });
+})();
+</script>
+</body>
+</html>

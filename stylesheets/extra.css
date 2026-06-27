@@ -1,0 +1,248 @@
+/* -------------------------------------------------
+   Global site overrides (minimal)
+   File: docs/stylesheets/extra.css
+   ------------------------------------------------- */
+
+/* Tight spaceing for mono font */
+h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
+
+/* 1 — load it (Google Fonts) */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&display=swap");
+
+/* .md-typeset h1 {
+  font-size: xx-large;
+} */
+
+/* 2 — headings only; body + code keep the theme defaults */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 900;
+  letter-spacing: -0.04em;   /* the tight tracking that gives the decks their look */
+}
+
+.md-main__inner {
+  margin-top: 0.5rem;
+}
+
+.md-typeset h1 {
+  margin-bottom: 0.75rem;
+}
+
+/*
+.md-main__inner:has(.article--no-nav) {
+  grid-template-columns: 1fr !important;
+  display: block;
+}
+*/
+
+/* Whenever an .article--no-nav exists on the page, widen the column it sits in */
+.md-main__inner:has(.article--no-nav) .md-content {
+  max-width: none;
+  flex: 1 1 auto;     /* in case the parent is flex */
+}
+
+/* And inside the article, keep prose readable */
+.article--no-nav .md-typeset,
+.article--no-nav > .article__body {
+  max-width: 70ch;
+  margin-inline: auto;
+}
+
+
+/* =====================================================================
+   SLATE EMBER — Zensical (Material) custom colors
+   Nord-derived slate base · ember-orange · teal accent
+   ---------------------------------------------------------------------
+   The "RAW PALETTE" block below is byte-for-byte identical to the one in
+   the Obsidian theme.css — that is the single source of truth. Edit both
+   copies together (or keep this one canonical and paste into Obsidian).
+
+   Requires in zensical.toml:  primary = "custom"  and  accent = "custom"
+   (see zensical.snippet.toml). Place this file at docs/stylesheets/
+   and register it via  extra_css = ["stylesheets/extra.css"].
+   ===================================================================== */
+
+:root {
+  /* ---------- RAW PALETTE (shared with Obsidian) ---------- */
+
+  /* Slate */
+  --se-slate-950: #272c36;
+  --se-slate-900: #2e3440;
+  --se-slate-850: #333a47;
+  --se-slate-800: #3b4252;
+  --se-slate-700: #434c5e;
+  --se-slate-600: #4c566a;
+  --se-slate-500: #5b6679;
+  --se-slate-300: #d8dee9;
+  --se-slate-200: #e5e9f0;
+  --se-slate-100: #eceff4;
+  --se-slate-50:  #f6f8fb;
+
+  /* Frost */
+  --se-frost-deep: #5e81ac;
+  --se-frost:      #81a1c1;
+  --se-sky:        #88c0d0;
+
+  /* Ember (primary) */
+  --se-ember-deep:   #b65d22;
+  --se-ember:        #f0934e;
+  --se-ember-bright: #f7ab6e;
+
+  /* Teal (accent) */
+  --se-teal-deep:   #277e7e;
+  --se-teal:        #5bc2c2;
+  --se-teal-bright: #84d6d6;
+
+  /* Status hues */
+  --se-red:         #bf616a;
+  --se-yellow:      #ebcb8b;
+  --se-green:       #a3be8c;
+  --se-green-deep:  #4a7a3a;
+  --se-purple:      #b48ead;
+  --se-purple-deep: #855f9c;
+}
+
+/* =====================================================================
+   LIGHT  —  scheme "default"
+   ===================================================================== */
+[data-md-color-scheme="default"] {
+
+  /* Primary drives the header/nav + default link color.
+     We keep the CHROME slate (dimmed Nord look) and route ember into
+     content links via --md-typeset-a-color below.
+     --> Want an ORANGE header instead? Set the two values marked (A)
+         to var(--se-ember-deep) and var(--se-ember). */
+  --md-primary-fg-color:        var(--se-slate-800);   /* (A) header bg     */
+  --md-primary-fg-color--light: var(--se-slate-700);
+  --md-primary-fg-color--dark:  var(--se-slate-900);
+  --md-primary-bg-color:        var(--se-slate-50);    /* text on header    */
+  --md-primary-bg-color--light: rgba(246, 248, 251, 0.7);
+
+  /* Accent — interactive (hovered links, buttons, scrollbars) */
+  --md-accent-fg-color:             var(--se-teal-deep);
+  --md-accent-fg-color--transparent: rgba(39, 126, 126, 0.10);
+  --md-accent-bg-color:             #ffffff;
+  --md-accent-bg-color--light:      rgba(255, 255, 255, 0.7);
+
+  /* Foreground (text) */
+  --md-default-fg-color:          var(--se-slate-800);
+  --md-default-fg-color--light:   rgba(59, 66, 82, 0.68);
+  --md-default-fg-color--lighter: rgba(59, 66, 82, 0.34);
+  --md-default-fg-color--lightest:rgba(59, 66, 82, 0.12);
+
+  /* Background (surfaces) */
+  --md-default-bg-color:          var(--se-slate-50);
+  --md-default-bg-color--light:   rgba(246, 248, 251, 0.7);
+  --md-default-bg-color--lighter: rgba(246, 248, 251, 0.45);
+  --md-default-bg-color--lightest:rgba(246, 248, 251, 0.07);
+
+  /* Typeset body + links */
+  --md-typeset-color:   var(--se-slate-800);
+  --md-typeset-a-color: var(--se-ember-deep);   /* content links = ember */
+  --md-typeset-mark-color: rgba(240, 147, 78, 0.38);
+
+  /* Code */
+  --md-code-fg-color: var(--se-slate-800);
+  --md-code-bg-color: var(--se-slate-100);
+  --md-code-hl-color: rgba(240, 147, 78, 0.20);
+  --md-code-hl-number-color:      var(--se-purple-deep);
+  --md-code-hl-special-color:     var(--se-red);
+  --md-code-hl-function-color:    var(--se-frost-deep);
+  --md-code-hl-constant-color:    var(--se-purple-deep);
+  --md-code-hl-keyword-color:     var(--se-ember-deep);
+  --md-code-hl-string-color:      var(--se-green-deep);
+  --md-code-hl-name-color:        var(--se-slate-800);
+  --md-code-hl-operator-color:    var(--se-frost-deep);
+  --md-code-hl-punctuation-color: var(--se-slate-600);
+  --md-code-hl-comment-color:     var(--se-slate-500);
+  --md-code-hl-generic-color:     var(--se-slate-600);
+  --md-code-hl-variable-color:    var(--se-teal-deep);
+
+  /* Footer */
+  --md-footer-bg-color:        var(--se-slate-800);
+  --md-footer-bg-color--dark:  var(--se-slate-900);
+  --md-footer-fg-color:        var(--se-slate-100);
+  --md-footer-fg-color--light: var(--se-slate-300);
+  --md-footer-fg-color--lighter: var(--se-slate-500);
+}
+
+/* =====================================================================
+   DARK  —  scheme "slate"
+   ===================================================================== */
+[data-md-color-scheme="slate"] {
+  --md-hue: 220; /* nudges Material's slate toward the Nord blue-grey */
+
+  /* Primary / chrome (see the (A) note above to make the header ember) */
+  --md-primary-fg-color:        var(--se-slate-900);   /* (A) header bg  */
+  --md-primary-fg-color--light: var(--se-slate-800);
+  --md-primary-fg-color--dark:  var(--se-slate-950);
+  --md-primary-bg-color:        var(--se-slate-100);
+  --md-primary-bg-color--light: rgba(236, 239, 244, 0.7);
+
+  /* Accent */
+  --md-accent-fg-color:             var(--se-teal);
+  --md-accent-fg-color--transparent: rgba(91, 194, 194, 0.10);
+  --md-accent-bg-color:             var(--se-slate-950);
+  --md-accent-bg-color--light:      rgba(39, 44, 54, 0.7);
+
+  /* Foreground (text) */
+  --md-default-fg-color:          var(--se-slate-200);
+  --md-default-fg-color--light:   rgba(229, 233, 240, 0.72);
+  --md-default-fg-color--lighter: rgba(229, 233, 240, 0.45);
+  --md-default-fg-color--lightest:rgba(229, 233, 240, 0.12);
+
+  /* Background */
+  --md-default-bg-color:          var(--se-slate-900);
+  --md-default-bg-color--light:   rgba(46, 52, 64, 0.7);
+  --md-default-bg-color--lighter: rgba(46, 52, 64, 0.45);
+  --md-default-bg-color--lightest:rgba(46, 52, 64, 0.12);
+
+  /* Typeset body + links */
+  --md-typeset-color:   var(--se-slate-200);
+  --md-typeset-a-color: var(--se-ember);   /* content links = ember */
+  --md-typeset-mark-color: rgba(240, 147, 78, 0.30);
+
+  /* Code */
+  --md-code-fg-color: var(--se-slate-200);
+  --md-code-bg-color: var(--se-slate-950);
+  --md-code-hl-color: rgba(240, 147, 78, 0.18);
+  --md-code-hl-number-color:      var(--se-purple);
+  --md-code-hl-special-color:     var(--se-red);
+  --md-code-hl-function-color:    var(--se-sky);
+  --md-code-hl-constant-color:    var(--se-purple);
+  --md-code-hl-keyword-color:     var(--se-ember);
+  --md-code-hl-string-color:      var(--se-green);
+  --md-code-hl-name-color:        var(--se-slate-200);
+  --md-code-hl-operator-color:    var(--se-frost);
+  --md-code-hl-punctuation-color: var(--se-slate-300);
+  --md-code-hl-comment-color:     var(--se-slate-600);
+  --md-code-hl-generic-color:     var(--se-slate-500);
+  --md-code-hl-variable-color:    var(--se-teal);
+
+  /* Footer */
+  --md-footer-bg-color:        var(--se-slate-950);
+  --md-footer-bg-color--dark:  #20242c;
+  --md-footer-fg-color:        var(--se-slate-100);
+  --md-footer-fg-color--light: var(--se-slate-300);
+  --md-footer-fg-color--lighter: var(--se-slate-500);
+}
+
+/* =====================================================================
+   Shared touches (both schemes)
+   ===================================================================== */
+
+/* Ember left-edge on code blocks, matching the Obsidian theme */
+.md-typeset pre > code {
+  border-left: 3px solid var(--md-typeset-a-color);
+}
+
+/* Teal hairline under H2 — the same quiet "blog" cue as in Obsidian */
+.md-typeset h2 {
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--md-accent-fg-color);
+}

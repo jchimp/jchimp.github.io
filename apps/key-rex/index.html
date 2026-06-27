@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key-Rex — Tiny Arms. Massive Entropy.</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar pm-navbar sticky-top">
+  <div class="container position-relative justify-content-center">
+    <span class="pm-brand">
+      <i class="bi bi-key-fill me-2"></i>Key-Rex
+      <span class="pm-tagline">Tiny Arms. Massive Entropy.</span>
+    </span>
+    <div class="position-absolute end-0 me-3">
+      <button id="themeToggle" class="btn btn-sm btn-outline-secondary" title="Toggle dark/light mode">
+        <i class="bi bi-sun-fill" id="themeIcon"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4" style="max-width:860px">
+
+  <!-- ── Tabs ──────────────────────────────────────────────────────────────── -->
+  <ul class="nav pm-tabs mb-0" id="genTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-phrase">
+        <i class="bi bi-emoji-smile me-1"></i>Simple Phrase
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-random">
+        <i class="bi bi-shuffle me-1"></i>Random
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-diceware">
+        <i class="bi bi-dice-5 me-1"></i>Diceware
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-combo">
+        <i class="bi bi-puzzle me-1"></i>Combination
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-key">
+        <i class="bi bi-key-fill me-1"></i>Encryption Key
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-bip39">
+        <i class="bi bi-currency-bitcoin me-1"></i>BIP39
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-checker">
+        <i class="bi bi-shield-check me-1"></i>Test
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-0">
+
+    <!-- ── Tab 1: Simple Phrase ─────────────────────────────────────────────── -->
+    <div class="tab-pane fade show active" id="tab-phrase">
+      <div class="gen-card rounded-top-0">
+        <h6 class="fw-semibold mb-3">
+          Memorable phrase &mdash; adjective + noun style
+          <span class="badge bg-primary-subtle text-primary-emphasis ms-1 fw-normal">Dinopass-style</span>
+        </h6>
+
+        <div class="d-flex flex-wrap gap-3 mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="phraseCapitalize" checked>
+            <label class="form-check-label" for="phraseCapitalize">Capitalize</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="phraseNumber" checked>
+            <label class="form-check-label" for="phraseNumber">Include number</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="phraseSymbol">
+            <label class="form-check-label" for="phraseSymbol">Include symbol</label>
+          </div>
+        </div>
+
+        <div class="result-display mb-3" id="phraseResult">—</div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary" id="phraseGenerate">
+            <i class="bi bi-arrow-clockwise me-1"></i>Generate
+          </button>
+          <button class="btn btn-outline-secondary" id="phraseCopy" disabled>
+            <i class="bi bi-clipboard me-1"></i>Copy
+          </button>
+          <button class="btn btn-outline-secondary" id="phraseQR" disabled>
+            <i class="bi bi-qr-code me-1"></i>QR Code
+          </button>
+        </div>
+
+        <div class="strength-section" id="phraseStrength" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ── Tab 2: True Random ───────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-random">
+      <div class="gen-card rounded-top-0">
+        <h6 class="fw-semibold mb-3">
+          Cryptographically random characters
+          <span class="badge bg-info-subtle text-info-emphasis ms-1 fw-normal">CSPRNG</span>
+        </h6>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <div class="d-flex flex-wrap gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="randomUpper" checked>
+                <label class="form-check-label" for="randomUpper">Uppercase <code>A–Z</code></label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="randomLower" checked>
+                <label class="form-check-label" for="randomLower">Lowercase <code>a–z</code></label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="randomDigits" checked>
+                <label class="form-check-label" for="randomDigits">Digits <code>0–9</code></label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="randomSymbols">
+                <label class="form-check-label" for="randomSymbols">Symbols <code>!@#…</code></label>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium mb-1">
+              Length: <span class="slider-label" id="randomLengthVal">20</span>
+            </label>
+            <input type="range" class="form-range" id="randomLength" min="8" max="64" value="20" step="1">
+            <div class="d-flex justify-content-between">
+              <small class="text-muted">8</small>
+              <small class="text-muted">64</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-display mono-sm mb-3" id="randomResult">—</div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary" id="randomGenerate">
+            <i class="bi bi-arrow-clockwise me-1"></i>Generate
+          </button>
+          <button class="btn btn-outline-secondary" id="randomCopy" disabled>
+            <i class="bi bi-clipboard me-1"></i>Copy
+          </button>
+          <button class="btn btn-outline-secondary" id="randomQR" disabled>
+            <i class="bi bi-qr-code me-1"></i>QR Code
+          </button>
+        </div>
+
+        <div class="strength-section" id="randomStrength" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ── Tab 3: Diceware ──────────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-diceware">
+      <div class="gen-card rounded-top-0">
+        <h6 class="fw-semibold mb-3">
+          EFF Large Wordlist passphrase
+          <span class="badge bg-success-subtle text-success-emphasis ms-1 fw-normal">~11 bits/word</span>
+        </h6>
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label fw-medium" for="dicewareCount">Number of words</label>
+            <select class="form-select" id="dicewareCount">
+              <option value="4">4 words (~44 bits)</option>
+              <option value="5">5 words (~55 bits)</option>
+              <option value="6" selected>6 words (~66 bits)</option>
+              <option value="7">7 words (~77 bits)</option>
+              <option value="8">8 words (~88 bits)</option>
+            </select>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium" for="dicewareSep">Word separator</label>
+            <select class="form-select" id="dicewareSep">
+              <option value="space">Space</option>
+              <option value="hyphen">Hyphen  –</option>
+              <option value="dot">Dot  .</option>
+              <option value="none">None (run together)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="result-display mb-3" id="dicewareResult">—</div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary" id="dicewareGenerate">
+            <i class="bi bi-arrow-clockwise me-1"></i>Generate
+          </button>
+          <button class="btn btn-outline-secondary" id="dicewareCopy" disabled>
+            <i class="bi bi-clipboard me-1"></i>Copy
+          </button>
+          <button class="btn btn-outline-secondary" id="dicewareQR" disabled>
+            <i class="bi bi-qr-code me-1"></i>QR Code
+          </button>
+        </div>
+
+        <div class="strength-section" id="dicewareStrength" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ── Tab 4: Combination ───────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-combo">
+      <div class="gen-card rounded-top-0">
+        <h6 class="fw-semibold mb-3">
+          Build a password from parts
+          <span class="badge bg-secondary-subtle text-secondary-emphasis ms-1 fw-normal">Modular</span>
+        </h6>
+
+        <p class="section-title">Add parts</p>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button class="btn combo-add-btn" data-part="noun">+ Noun</button>
+          <button class="btn combo-add-btn" data-part="verb">+ Verb</button>
+          <button class="btn combo-add-btn" data-part="adjective">+ Adjective</button>
+          <button class="btn combo-add-btn" data-part="number">+ Number</button>
+          <button class="btn combo-add-btn" data-part="symbol">+ Symbol</button>
+          <button class="btn combo-add-btn" data-part="letters">+ Letters</button>
+        </div>
+
+        <p class="section-title">Structure</p>
+        <div class="combo-parts-area mb-3" id="comboPartsDisplay">
+          <span class="text-muted small">Add parts above to build your password structure.</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+          <label class="fw-medium text-nowrap" for="comboSep">Separator:</label>
+          <input type="text" class="form-control form-control-sm" id="comboSep" value="-" style="max-width:80px" maxlength="5">
+          <div class="form-check form-switch ms-2 mb-0">
+            <input class="form-check-input" type="checkbox" id="comboCapitalize">
+            <label class="form-check-label" for="comboCapitalize">Capitalize words</label>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary ms-auto" id="comboClear">
+            <i class="bi bi-trash me-1"></i>Clear
+          </button>
+        </div>
+
+        <div class="result-display mb-3" id="comboResult">—</div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary" id="comboGenerate">
+            <i class="bi bi-arrow-clockwise me-1"></i>Generate
+          </button>
+          <button class="btn btn-outline-secondary" id="comboCopy" disabled>
+            <i class="bi bi-clipboard me-1"></i>Copy
+          </button>
+          <button class="btn btn-outline-secondary" id="comboQR" disabled>
+            <i class="bi bi-qr-code me-1"></i>QR Code
+          </button>
+        </div>
+
+        <div class="strength-section" id="comboStrength" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ── Tab 5: Encryption Key ────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-key">
+      <div class="gen-card rounded-top-0">
+        <h6 class="fw-semibold mb-3">
+          Cryptographic key material
+          <span class="badge bg-danger-subtle text-danger-emphasis ms-1 fw-normal">AES / JWT ready</span>
+        </h6>
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label fw-medium" for="keyBits">Key size</label>
+            <select class="form-select" id="keyBits">
+              <option value="128">128-bit (AES-128)</option>
+              <option value="192">192-bit (AES-192)</option>
+              <option value="256" selected>256-bit (AES-256)</option>
+              <option value="512">512-bit</option>
+            </select>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium" for="keyFormat">Format</label>
+            <select class="form-select" id="keyFormat">
+              <option value="hex" selected>Hex</option>
+              <option value="base64">Base64</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="result-display mono-sm mb-3" id="keyResult">—</div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary" id="keyGenerate">
+            <i class="bi bi-arrow-clockwise me-1"></i>Generate
+          </button>
+          <button class="btn btn-outline-secondary" id="keyCopy" disabled>
+            <i class="bi bi-clipboard me-1"></i>Copy
+          </button>
+          <button class="btn btn-outline-secondary" id="keyQR" disabled>
+            <i class="bi bi-qr-code me-1"></i>QR Code
+          </button>
+        </div>
+
+        <div class="strength-section" id="keyStrength" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ── Tab 6: BIP39 ─────────────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-bip39">
+      <div class="gen-card rounded-top-0">
+        <h6 class="fw-semibold mb-3">
+          BIP39 mnemonic seed phrase
+          <span class="badge bg-warning-subtle text-warning-emphasis ms-1 fw-normal">Crypto wallet</span>
+        </h6>
+
+        <div class="mb-3">
+          <label class="form-label fw-medium" for="bip39Count">Word count</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="bip39Count" id="bip39Count" value="12" checked>
+              <label class="form-check-label" for="bip39Count">12 words (128 bits)</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="bip39Count" id="bip39Count24" value="24">
+              <label class="form-check-label" for="bip39Count24">24 words (256 bits)</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="bip39-grid" id="bip39Grid"></div>
+
+        <!-- Hidden result for copy/QR — not displayed visually once grid shows -->
+        <div class="result-display mt-3" id="bip39Result" style="display:none">—</div>
+
+        <div class="d-flex gap-2 flex-wrap mt-3">
+          <button class="btn btn-primary" id="bip39Generate">
+            <i class="bi bi-arrow-clockwise me-1"></i>Generate
+          </button>
+          <button class="btn btn-outline-secondary" id="bip39Copy" disabled>
+            <i class="bi bi-clipboard me-1"></i>Copy All
+          </button>
+          <button class="btn btn-outline-secondary" id="bip39QR" disabled>
+            <i class="bi bi-qr-code me-1"></i>QR Code
+          </button>
+        </div>
+
+        <div class="strength-section" id="bip39Strength" style="display:none"></div>
+
+        <div class="alert alert-warning mt-3 mb-0 py-2 small">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>
+          <strong>Warning:</strong> This generates mnemonic words only. For real wallet use,
+          proper BIP39 checksum entropy (from a hardware wallet or audited tool) is required.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tab 7: Strength Checker ─────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-checker">
+      <div class="gen-card rounded-top-0">
+        <h6 class="fw-semibold mb-1">
+          Password Strength Checker
+          <span class="badge bg-success-subtle text-success-emphasis ms-1 fw-normal">Client-side only</span>
+        </h6>
+        <p class="text-muted small mb-3">Paste or type any password, passphrase, or key to analyze its strength.</p>
+
+        <!-- Input -->
+        <div class="mb-3">
+          <div class="input-group">
+            <input type="password" class="form-control font-monospace" id="checkerInput"
+              placeholder="Paste your password here…" autocomplete="off" spellcheck="false">
+            <button class="btn btn-outline-secondary" id="checkerToggle" type="button" title="Show/hide">
+              <i class="bi bi-eye" id="checkerEyeIcon"></i>
+            </button>
+            <button class="btn btn-outline-secondary" id="checkerClear" type="button" title="Clear">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <div class="d-flex justify-content-between mt-1">
+            <small class="text-muted">Entropy estimated from character set — higher is better</small>
+            <small class="text-muted font-monospace" id="checkerLength">0 characters</small>
+          </div>
+        </div>
+
+        <!-- Strength meter -->
+        <div id="checkerStrength" style="display:none" class="mb-4"></div>
+
+        <!-- Composition badges -->
+        <div id="checkerCompositionWrap" style="display:none" class="mb-4">
+          <p class="section-title">Character composition</p>
+          <div class="d-flex flex-wrap gap-2" id="checkerComposition"></div>
+        </div>
+
+        <!-- Crack time table -->
+        <div id="checkerCrackWrap" style="display:none" class="mb-4">
+          <p class="section-title">Time to crack</p>
+          <div class="crack-table" id="checkerCrackTable"></div>
+          <p class="text-muted mt-2 mb-0" style="font-size:.72rem">
+            <i class="bi bi-info-circle me-1"></i>Times are expected averages (half search space). Assumes brute-force; dictionary attacks on weak passwords are far faster.
+          </p>
+        </div>
+
+        <!-- Warnings -->
+        <div id="checkerWarningsWrap" style="display:none">
+          <p class="section-title">Observations</p>
+          <div id="checkerWarnings" class="d-flex flex-column gap-2"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /tab-content -->
+
+  <!-- ── History ───────────────────────────────────────────────────────────── -->
+  <div class="history-section mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h6 class="mb-0 fw-semibold">
+        <i class="bi bi-clock-history me-1 text-muted"></i>Recent History
+        <small class="text-muted fw-normal">(last 10, session)</small>
+      </h6>
+      <button class="btn btn-sm btn-outline-secondary" onclick="clearHistory()">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ── QR Modal ──────────────────────────────────────────────────────────── -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-label="QR Code">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header py-2 px-3">
+        <h6 class="modal-title mb-0"><i class="bi bi-qr-code me-1"></i>Scan to share</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center py-3">
+        <div id="qrCanvas" class="d-inline-block"></div>
+        <p class="mt-3 mb-0 text-muted" id="qrValue" style="font-size:.72rem;word-break:break-all"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="wordlists/eff-large.js"></script>
+<script src="wordlists/bip39.js"></script>
+<script src="generators.js"></script>
+<script src="app.js"></script>
+<script>
+  function clearHistory() {
+    appHistory.length = 0;
+    localStorage.removeItem('passmake-history');
+    renderHistory();
+  }
+  window.clearHistory = clearHistory;
+</script>
+</body>
+</html>
