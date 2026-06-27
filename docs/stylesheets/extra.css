@@ -32,6 +32,7 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
 .md-typeset h1 {
   margin-bottom: 0.75rem;
 }
+
 /*
 .md-main__inner:has(.article--no-nav) {
   grid-template-columns: 1fr !important;
