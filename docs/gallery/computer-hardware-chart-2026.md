@@ -1,5 +1,7 @@
 ---
 title: Computer Hardware Chart 2026
+hide:
+  - navigation
 ---
 
 # Computer Hardware Chart 2026

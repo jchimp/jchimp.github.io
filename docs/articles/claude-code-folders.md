@@ -3,7 +3,6 @@ title: "Claude Code - From Four Terminals to One Good Folder"
 date: 2026-06-27
 hide:
   - navigation
-#  - toc
 ---
 # Claude Code - From Four Terminals to One Good Folder
 

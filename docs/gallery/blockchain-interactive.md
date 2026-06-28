@@ -1,5 +1,7 @@
 ---
 title: How a Blockchain Works
+hide:
+  - navigation
 ---
 
 # How a Blockchain Works - Interactive Blockchain Poster

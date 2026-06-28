@@ -1,5 +1,7 @@
 ---
-title: How a Blockchain Works
+title: Connector Pinout Poster
+hide:
+  - navigation
 ---
 
 # Connector Pinout Poster
