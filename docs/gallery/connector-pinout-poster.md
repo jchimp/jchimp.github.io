@@ -1,7 +1,5 @@
 ---
 title: Connector Pinout Poster
-hide:
-  - navigation
 ---
 
 # Connector Pinout Poster

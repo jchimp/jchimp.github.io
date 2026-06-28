@@ -3,11 +3,10 @@ title: "Local LLMs Field Notes on Picking and Running Them"
 date: 2026-06-27
 hide:
   - navigation
-#  - toc
 ---
 # Local LLMs: Field Notes on Picking and Running Them
 
-Working notes, kept for reference. Current as of mid-2026. 
+Working notes, kept for reference. Current as of mid-2026.
 
 View the full page poster here: **<a href="../files/local-llm-models-mid-2026/local-llm-field-guide.html" target="_blank" rel="noopener">Local LLM Field Guide Mid-2026</a>**
 ## Selection rule

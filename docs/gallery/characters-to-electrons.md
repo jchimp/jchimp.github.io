@@ -1,7 +1,5 @@
 ---
 title: From Characters to Electrons
-hide:
-  - navigation
 ---
 
 # From Characters to Electrons

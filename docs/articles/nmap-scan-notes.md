@@ -3,7 +3,6 @@ title: "Nmap The Working Set"
 date: 2026-06-27
 hide:
   - navigation
-#  - toc
 ---
 # Nmap: The Working Set
 

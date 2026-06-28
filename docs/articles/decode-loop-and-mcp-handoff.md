@@ -3,15 +3,14 @@ title: "The Decode Loop and the MCP Handoff"
 date: 2026-06-27
 hide:
   - navigation
-#  - toc
 ---
 # The Decode Loop and the MCP Handoff
 
-*Field notes on what runs between a prompt and a tool result.*
-
 A language model generates one token at a time and does nothing else. It reads a sequence of tokens, produces a probability distribution over the next one, and returns. Sampling, stopping, calling tools, and splicing results back into the conversation are all done by the program around the model, the harness. The distinction sounds academic until something breaks, at which point it is the only thing that matters: latency, caching, stop conditions, tool routing, and the security boundary most architecture diagrams leave out all live in the harness, not the model.
 
-Interactive example of the decode loop and MCP tool call: **<a href="../files/decode-loop-and-mcp-handoff/decode-loop-mcp.html" target="_blank" rel="noopener">View Example</a>** 
+Interactive example of the decode loop and MCP tool call: **<a href="../files/decode-loop-and-mcp-handoff/decode-loop-mcp.html" target="_blank" rel="noopener">View Example</a>**
+
+<a href="../files/decode-loop-and-mcp-handoff/decode-loop-mcp.html" target="_blank" rel="noopener"><img src="../images/decoder-loop-mcp-demo.png" width="100%" alt="" /></a>
 
 ## The loop is four steps
 

@@ -1,7 +1,5 @@
 ---
 title: Claude Code Folders
-hide:
-  - navigation
 ---
 
 # Claude Code Folders

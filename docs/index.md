@@ -12,9 +12,9 @@ How-tos, references, operating notes, and project write-ups from my homelab and 
 {: .hero-subtitle }
 
 <div class="home-hero-actions" markdown>
-[Browse How-To](how-to/README.md){ .hero-btn }
+[Browse Articles](articles/index.md){ .hero-btn }
 [Browse Projects](projects/README.md){ .hero-btn }
-[Browse References](references/README.md){ .hero-btn }
+[Browse Gallery](gallery/README.md){ .hero-btn }
 </div>
 
 </section>
@@ -32,15 +32,15 @@ How-tos, references, operating notes, and project write-ups from my homelab and 
 <div class="recent-list">
 
 <div class="recent-item">
-<h4><a href="how-to/README.md">Proxmox Ceph Health Checks</a></h4>
-<span class="recent-meta">2026-06-01 &middot; proxmox, ceph, monitoring</span>
-<p>Quick runbook for checking Ceph cluster health after a node reboot or OSD replacement.</p>
+<h4><a href="articles/decode-loop-and-mcp-handoff.md">The Decode Loop and the MCP Handoff</a></h4>
+<span class="recent-meta">2026-06-01 &middot; decode, llm, mcp, loop</span>
+<p>A language model generates one token at a time and does nothing else. How do they accomplish tasks and uses tools?</p>
 </div>
 
 <div class="recent-item">
-<h4><a href="how-to/README.md">Docker Compose Patterns</a></h4>
+<h4><a href="articles/how-an-llm-actually-works.md">How an LLM Actually Works</a></h4>
 <span class="recent-meta">2026-05-28 &middot; docker, compose, patterns</span>
-<p>Reusable Compose patterns for reverse proxy, logging, and health checks.</p>
+<p>The two systesms that make up LLMs and how they relate. Interactive dashboard of systems.</p>
 </div>
 
 </div>
@@ -54,15 +54,15 @@ How-tos, references, operating notes, and project write-ups from my homelab and 
 <div class="recent-list">
 
 <div class="recent-item">
-<h4><a href="projects/zonerr.md">Zonerr</a></h4>
-<span class="recent-meta">2026-06-01 &middot; dns, flask, docker</span>
-<p>Added provider abstraction layer and updated container deployment notes.</p>
+<h4><a href="gallery/blockchain-interactive.md">How a Blockchain Works</a></h4>
+<span class="recent-meta">2026-06-01 &middot; blockchain, bitcoin, hashing</span>
+<p>Interactive demo of how a blockchain works.</p>
 </div>
 
 <div class="recent-item">
-<h4><a href="projects/jrepo.md">JRepo</a></h4>
-<span class="recent-meta">2026-05-25 &middot; sync, backup</span>
-<p>Documented dry-run workflow and added scheduling examples for cron and Task Scheduler.</p>
+<h4><a href="gallery/computer-hardware-chart-2026.md">Computer Hardware Chart 2026</a></h4>
+<span class="recent-meta">2026-05-25 &middot; hardware, peripherals, connectors</span>
+<p>An update the classic Computer Hardware poster.</p>
 </div>
 
 </div>

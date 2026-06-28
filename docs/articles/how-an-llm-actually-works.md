@@ -3,7 +3,6 @@ title: "How an LLM Actually Works Reference Notes"
 date: 2026-06-27
 hide:
   - navigation
-#  - toc
 ---
 # How an LLM Actually Works: Reference Notes
 

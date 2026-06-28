@@ -1,10 +1,8 @@
 ---
 title: How a Blockchain Works
-hide:
-  - navigation
 ---
 
-# How a Blockchain Works - Interactive Blockchain Poster
+# How a Blockchain Works
 
 **<a href="../files/blockchain-poster/blockchain_interactive.html" target="_blank" rel="noopener">How a Blockchain Works - Interactive Blockchain Poster</a>**
 
