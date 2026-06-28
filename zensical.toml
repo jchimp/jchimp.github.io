@@ -58,7 +58,8 @@ nav = [
     { "Gallery" = [
         { "Overview"            = "gallery/README.md" },
         { "Computer Hardware Chart"     = "gallery/computer-hardware-chart-2026.md" },
-        { "Characters to Electrons"     = "gallery/chars-to-electrons.md" },
+        { "Characters to Electrons"     = "gallery/characters-to-electrons.md" },
+        { "How a Blockchain Works"     = "gallery/blockchain-interactive.md" },
     ]},
     { "Links" = "links/index.md" },
     { "About" = "about.md" },
