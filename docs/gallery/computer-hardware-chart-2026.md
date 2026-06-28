@@ -4,7 +4,7 @@ title: Computer Hardware Chart 2026
 
 # Computer Hardware Chart 2026
 
-An ommige to the origianl Computer Hardware Chart: [Internet Archive](https://archive.org/details/1555962765881-2).
+An ommige to the original Computer Hardware Chart: [Internet Archive](https://archive.org/details/1555962765881-2).
 
 **<a href="../files/computer-hardware-chart/computer-hardware-chart-2026.html" target="_blank" rel="noopener">Computer Hardware Chart 2026</a>**
 

@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connector Pinout Reference — USB · HDMI · DisplayPort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;500;600;700&family=Saira+Semi+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================ THEME TOKENS ============================ */
+:root{
+  --paper:#FAF9F5; --ink:#1b1b1a; --ink-soft:#6a665d;
+  --line:#26261f; --hair:#8f8b7e;
+  --grid:#e4e1d6; --grid-bold:#d2cdbe;
+  --plate-bg:#ffffff; --block-bg:#f3f1e8; --block-stripe:#fbfaf5;
+  --c-power:#b23a2e; --c-gnd:#565a5e; --c-hs:#27598a; --c-ls:#1f7a68; --c-cfg:#a9791b; --c-nc:#b6b3a8;
+  --sheet-shadow: 0 2px 28px rgba(0,0,0,.16);
+}
+[data-mode="blueprint"]{
+  --paper:#0b2236; --ink:#e9f1fb; --ink-soft:#9fb8d4;
+  --line:#c2d6ef; --hair:#5d83a7;
+  --grid:#163a55; --grid-bold:#1f4d70;
+  --plate-bg:#0e2a42; --block-bg:#0b2034; --block-stripe:#0d2740;
+  --c-power:#ff6f5e; --c-gnd:#a6b7c8; --c-hs:#5aa6ff; --c-ls:#3ed6b4; --c-cfg:#ffcf5a; --c-nc:#56738f;
+  --sheet-shadow: 0 2px 40px rgba(0,0,0,.55);
+}
+
+/* ============================ PAGE / SCALER ============================ */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#3a3a38;
+  font-family:"Saira Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+[data-mode="blueprint"] body{ background:#06121e; }
+
+.toolbar{
+  position:fixed; z-index:50; top:0; left:0; right:0;
+  display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center;
+  padding:10px 16px;
+  background:rgba(20,20,18,.92); color:#eee; backdrop-filter:blur(6px);
+  font-family:"Saira Condensed",sans-serif; font-size:13px; letter-spacing:.04em;
+  border-bottom:1px solid #000;
+}
+.toolbar .grp{ display:flex; align-items:center; gap:8px; }
+.toolbar .grp + .grp{ border-left:1px solid #555; padding-left:18px; }
+.toolbar label{ text-transform:uppercase; color:#bdb9ad; font-size:11px; letter-spacing:.12em; }
+.toolbar button, .toolbar .seg{
+  font-family:"Saira Condensed",sans-serif; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase;
+  background:#2c2c29; color:#f0eee6; border:1px solid #56554d; padding:5px 11px; border-radius:2px; cursor:pointer;
+}
+.toolbar button:hover, .seg span:hover{ background:#3a3a35; }
+.seg{ display:inline-flex; padding:0; overflow:hidden; }
+.seg span{ padding:5px 11px; cursor:pointer; border-right:1px solid #56554d; }
+.seg span:last-child{ border-right:none; }
+.seg span.on{ background:#c9a24a; color:#1b1b1a; }
+.toolbar .hint{ color:#8d8a80; font-size:11px; letter-spacing:.02em; }
+
+.scaler{ transform-origin:top left; margin:0 auto; }
+.scaler-wrap{ padding-top:46px; }
+
+/* ============================ SHEET ============================ */
+.sheet{
+  width:24in; height:36in; position:relative; background:var(--paper);
+  box-shadow:var(--sheet-shadow);
+  background-image:
+     linear-gradient(var(--grid) .5px, transparent .5px),
+     linear-gradient(90deg, var(--grid) .5px, transparent .5px),
+     linear-gradient(var(--grid-bold) .75px, transparent .75px),
+     linear-gradient(90deg, var(--grid-bold) .75px, transparent .75px);
+  background-size: .1in .1in, .1in .1in, .5in .5in, .5in .5in;
+  color:var(--ink);
+}
+
+/* drafting frame + zone markers */
+.frame{ position:absolute; inset:.28in; border:1.5px solid var(--line); }
+.frame::before{ content:""; position:absolute; inset:.13in; border:.75px solid var(--line); }
+.zone{ position:absolute; font-family:"IBM Plex Mono",monospace; font-size:9pt; color:var(--ink-soft); }
+
+.content{ position:absolute; inset:.5in; display:grid;
+  grid-template-columns:1fr 1fr; gap:.16in; align-content:start; }
+
+/* ============================ HEADER ============================ */
+.header{ grid-column:1 / -1; display:grid; grid-template-columns: 1.55fr 1fr; gap:.18in; align-items:stretch; }
+.titlewrap{ border:1.25px solid var(--line); background:var(--plate-bg); padding:.18in .22in; }
+.titlewrap .eyebrow{ font-family:"IBM Plex Mono",monospace; font-size:9.5pt; letter-spacing:.34em; color:var(--ink-soft); text-transform:uppercase; }
+.titlewrap h1{ font-family:"Saira Condensed",sans-serif; font-weight:700; text-transform:uppercase;
+  letter-spacing:.01em; line-height:.92; margin:.06in 0 .04in; font-size:40pt; }
+.titlewrap h1 .amp{ color:var(--c-cfg); }
+.titlewrap .thesis{ font-size:11.5pt; line-height:1.32; max-width:9.4in; color:var(--ink); margin-top:.06in; }
+.titlewrap .thesis b{ color:var(--c-power); font-weight:600; }
+
+.legendbox{ border:1.25px solid var(--line); background:var(--plate-bg); padding:.14in .16in; display:flex; flex-direction:column; }
+.legendbox .lh{ font-family:"IBM Plex Mono",monospace; font-size:9pt; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); border-bottom:.75px solid var(--hair); padding-bottom:.05in; margin-bottom:.08in; display:flex; justify-content:space-between;}
+.legendgrid{ display:grid; grid-template-columns:1fr 1fr; gap:.05in .14in; }
+.lgi{ display:flex; align-items:center; gap:.08in; cursor:pointer; padding:.03in .04in; border:.75px solid transparent; user-select:none; }
+.lgi:hover{ border-color:var(--hair); }
+.lgi.active{ background:var(--block-bg); border-color:var(--line); }
+.swatch{ width:.17in; height:.17in; border:1px solid var(--line); flex:none; }
+.lgi .nm{ font-family:"Saira Condensed",sans-serif; font-weight:600; text-transform:uppercase; font-size:10.5pt; letter-spacing:.03em; }
+.lgi .ct{ font-family:"IBM Plex Mono",monospace; font-size:8pt; color:var(--ink-soft); margin-left:auto; }
+.sw-power{background:var(--c-power)} .sw-gnd{background:var(--c-gnd)} .sw-hs{background:var(--c-hs)}
+.sw-ls{background:var(--c-ls)} .sw-cfg{background:var(--c-cfg)} .sw-nc{background:var(--c-nc)}
+.legendbox .fhint{ margin-top:auto; font-size:8.5pt; color:var(--ink-soft); padding-top:.06in; line-height:1.2;}
+
+/* ============================ PLATE ============================ */
+.plate{ border:1.25px solid var(--line); background:var(--plate-bg); display:flex; flex-direction:column; min-width:0; }
+.plate.span{ grid-column:1 / -1; }
+.plate .pbar{ display:flex; align-items:baseline; gap:.12in; padding:.07in .14in; border-bottom:1px solid var(--line);
+  background:var(--block-bg); }
+.plate .pno{ font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:10pt; color:var(--paper); background:var(--ink);
+  padding:.02in .07in; letter-spacing:.04em; }
+[data-mode="blueprint"] .plate .pno{ color:var(--paper); background:var(--line); }
+.plate .ptitle{ font-family:"Saira Condensed",sans-serif; font-weight:700; text-transform:uppercase; font-size:15pt; letter-spacing:.02em; }
+.plate .psub{ font-family:"IBM Plex Mono",monospace; font-size:8.5pt; color:var(--ink-soft); letter-spacing:.02em; margin-left:auto; text-align:right; }
+.plate .pbody{ display:grid; grid-template-columns: var(--svgcol, 3.4in) 1fr; gap:.04in; min-width:0; }
+.plate.tall .pbody{ --svgcol:4.7in; }
+
+.viewcell{ border-right:1px solid var(--hair); padding:.1in .06in .06in; display:flex; flex-direction:column; }
+.viewcell .vlabel{ font-family:"IBM Plex Mono",monospace; font-size:7.5pt; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); text-align:center; }
+.viewcell svg{ width:100%; height:auto; display:block; margin-top:.02in; }
+.viewcell .controls{ margin-top:auto; padding-top:.06in; }
+
+/* connector svg primitives */
+.shell{ fill:none; stroke:var(--line); stroke-width:2; }
+.shell-soft{ fill:var(--block-bg); stroke:var(--hair); stroke-width:1; }
+.tongue{ fill:var(--block-bg); stroke:var(--hair); stroke-width:1; }
+.tongue.ss{ fill:color-mix(in srgb, var(--c-hs) 14%, var(--plate-bg)); }
+.dimline{ stroke:var(--hair); stroke-width:.75; }
+.dimtxt{ fill:var(--ink-soft); font-family:"IBM Plex Mono",monospace; font-size:7pt; }
+.calloutline{ stroke:var(--ink-soft); stroke-width:.75; fill:none; }
+.callouttxt{ fill:var(--ink); font-family:"Saira Condensed",sans-serif; font-weight:600; font-size:8pt; text-transform:uppercase; letter-spacing:.02em;}
+
+.pin{ stroke:var(--line); stroke-width:1; cursor:pointer; transition:opacity .12s; }
+.pin.sig-power{ fill:var(--c-power) } .pin.sig-gnd{ fill:var(--c-gnd) } .pin.sig-hs{ fill:var(--c-hs) }
+.pin.sig-ls{ fill:var(--c-ls) } .pin.sig-cfg{ fill:var(--c-cfg) } .pin.sig-nc{ fill:var(--c-nc) }
+.pinnum{ fill:var(--paper); font-family:"IBM Plex Mono",monospace; font-size:5.6px; font-weight:600; text-anchor:middle; pointer-events:none; }
+.pinnum.dk{ fill:var(--paper); }
+.p1mark{ fill:var(--c-power); stroke:none; }
+.rowlbl{ fill:var(--ink-soft); font-family:"IBM Plex Mono",monospace; font-size:8px; font-weight:600; text-anchor:middle; }
+.svgnote{ fill:var(--ink-soft); font-family:"IBM Plex Mono",monospace; font-size:6.5px; letter-spacing:.04em; text-anchor:middle; text-transform:uppercase; }
+
+/* highlight + filter states */
+.pin.hl{ stroke:var(--ink); stroke-width:2.4; }
+.pin.pair{ stroke:var(--ink); stroke-width:1.8; stroke-dasharray:2 1.5; }
+.dim .pin:not(.keep), .dim tr.prow:not(.keep){ opacity:.13; }
+.pin.unwired{ fill:var(--paper); stroke:var(--c-nc); stroke-dasharray:2.5 2; opacity:.55; }
+tr.prow.unwired td{ opacity:.4; }
+tr.prow.unwired .signame{ text-decoration:line-through; }
+
+/* ============================ PIN TABLE ============================ */
+.tablecell{ padding:.06in .02in; min-width:0; display:flex; gap:.12in; }
+.tablecell.split > div{ flex:1; min-width:0; }
+table.pintab{ width:100%; border-collapse:collapse; font-size:8.4pt; }
+table.pintab th{ font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:7pt; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-soft); text-align:left; border-bottom:1px solid var(--line); padding:.03in .05in; white-space:nowrap; }
+table.pintab td{ padding:.028in .05in; border-bottom:.5px solid var(--hair); vertical-align:top; line-height:1.12; }
+tr.prow{ cursor:pointer; }
+tr.prow:hover{ background:var(--block-bg); }
+tr.prow.hl{ background:color-mix(in srgb, var(--c-cfg) 18%, var(--plate-bg)); }
+tr.prow.pairhl{ background:color-mix(in srgb, var(--c-cfg) 9%, var(--plate-bg)); }
+td.c-pin{ font-family:"IBM Plex Mono",monospace; font-weight:600; white-space:nowrap; position:relative; padding-left:.12in; }
+td.c-pin::before{ content:""; position:absolute; left:.02in; top:.04in; bottom:.04in; width:.045in; background:var(--cdot,var(--hair)); }
+.cd-power{--cdot:var(--c-power)} .cd-gnd{--cdot:var(--c-gnd)} .cd-hs{--cdot:var(--c-hs)} .cd-ls{--cdot:var(--c-ls)} .cd-cfg{--cdot:var(--c-cfg)} .cd-nc{--cdot:var(--c-nc)}
+td.c-sig .signame{ font-family:"Saira Semi Condensed",sans-serif; font-weight:600; }
+td.c-sig{ white-space:nowrap; }
+.wire{ display:inline-block; width:.12in; height:.12in; border:.75px solid var(--line); border-radius:50%; vertical-align:-1px; margin-right:.05in; }
+td.c-pair{ font-family:"IBM Plex Mono",monospace; font-size:7.6pt; color:var(--ink-soft); white-space:nowrap; }
+td.c-lvl{ font-family:"IBM Plex Mono",monospace; font-size:7.6pt; white-space:nowrap; }
+td.c-note{ font-size:8pt; color:var(--ink); }
+
+.platefoot{ border-top:1px solid var(--hair); padding:.05in .14in; font-size:8.2pt; color:var(--ink-soft); display:flex; gap:.2in; flex-wrap:wrap;}
+.platefoot b{ color:var(--ink); font-weight:600; }
+
+/* control chips inside plates */
+.chips{ display:flex; flex-wrap:wrap; gap:.05in; align-items:center; }
+.chips .clab{ font-family:"IBM Plex Mono",monospace; font-size:7.5pt; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-right:.04in;}
+.chip{ font-family:"Saira Condensed",sans-serif; font-weight:600; text-transform:uppercase; font-size:8.5pt; letter-spacing:.03em;
+  padding:.03in .09in; border:1px solid var(--line); background:var(--plate-bg); color:var(--ink); cursor:pointer; border-radius:1px; }
+.chip.on{ background:var(--ink); color:var(--paper); }
+[data-mode="blueprint"] .chip.on{ background:var(--c-hs); color:#06121e; border-color:var(--c-hs); }
+
+/* ============================ INFO BLOCK ============================ */
+.infoblock{ border:1.25px solid var(--line); background:var(--block-bg); padding:.12in .16in; display:flex; flex-direction:column; }
+.infoblock .ih{ font-family:"Saira Condensed",sans-serif; font-weight:700; text-transform:uppercase; font-size:13.5pt; letter-spacing:.02em; border-bottom:1px solid var(--line); padding-bottom:.05in; margin-bottom:.07in;}
+.infoblock ul{ margin:0; padding:0; list-style:none; }
+.infoblock li{ position:relative; padding:.04in 0 .055in .2in; font-size:9.3pt; line-height:1.26; border-bottom:.5px dotted var(--hair); }
+.infoblock li:last-child{ border-bottom:none; }
+.infoblock li::before{ content:"▸"; position:absolute; left:0; top:.04in; color:var(--c-cfg); font-size:9pt; }
+.infoblock li b{ font-weight:600; }
+.infoblock li .tag{ font-family:"IBM Plex Mono",monospace; font-size:7.5pt; background:var(--ink); color:var(--paper); padding:0 .04in; letter-spacing:.04em; }
+[data-mode="blueprint"] .infoblock li .tag{ background:var(--line); }
+
+/* ============================ FOOTER / TITLE BLOCK ============================ */
+.footer{ grid-column:1 / -1; display:grid; grid-template-columns: 1fr 1fr 1.15fr; gap:.16in; align-items:stretch; }
+.notesblock{ border:1.25px solid var(--line); background:var(--plate-bg); padding:.1in .14in; }
+.notesblock .nh{ font-family:"IBM Plex Mono",monospace; font-size:8.5pt; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); border-bottom:.75px solid var(--hair); padding-bottom:.04in; margin-bottom:.05in;}
+.notesblock ol{ margin:0; padding-left:.24in; }
+.notesblock li{ font-size:8.4pt; line-height:1.28; margin-bottom:.03in; }
+.notesblock li b{ font-weight:600; }
+
+/* title block — the signature element */
+.titleblock{ border:1.5px solid var(--line); background:var(--plate-bg); display:grid;
+  grid-template-columns: repeat(6, 1fr); grid-auto-rows:min-content; align-self:end; }
+.tb{ border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:.05in .07in .06in; min-width:0; }
+.tb .k{ font-family:"IBM Plex Mono",monospace; font-size:6.5pt; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); display:block; }
+.tb .v{ font-family:"Saira Condensed",sans-serif; font-weight:600; font-size:11pt; text-transform:uppercase; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.tb.big .v{ font-size:13pt; }
+.tb.title{ grid-column:1 / 5; }
+.tb.title .v{ font-size:16pt; font-weight:700; letter-spacing:.01em; white-space:normal; line-height:1; }
+.tb.logo{ grid-column:5 / 7; grid-row:1 / 3; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.04in; border-right:none;}
+.tb.logo .mk{ font-family:"Saira Condensed",sans-serif; font-weight:700; font-size:22pt; letter-spacing:-.01em; line-height:.86; text-align:center;}
+.tb.logo .mk .d{ color:var(--c-power);}
+.tb.logo .sb{ font-family:"IBM Plex Mono",monospace; font-size:6.5pt; letter-spacing:.18em; color:var(--ink-soft); text-transform:uppercase;}
+.tb:nth-child(n){}
+.rev{ grid-column:1 / -1; border-right:none; border-bottom:none; }
+.rev table{ width:100%; border-collapse:collapse; }
+.rev th,.rev td{ border-top:1px solid var(--line); border-right:1px solid var(--line); padding:.03in .06in; font-size:7.5pt; text-align:left;}
+.rev th{ font-family:"IBM Plex Mono",monospace; font-size:6.5pt; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft);}
+.rev td{ font-family:"Saira Semi Condensed",sans-serif; }
+.rev th:last-child,.rev td:last-child{ border-right:none; }
+
+/* ============================ PRINT ============================ */
+@media print{
+  @page{ size:24in 36in; margin:0; }
+  body{ background:#fff; }
+  .toolbar{ display:none !important; }
+  .scaler-wrap{ padding:0; }
+  .scaler{ transform:none !important; }
+  .sheet{ box-shadow:none; }
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="grp">
+    <strong style="font-family:'Saira Condensed';letter-spacing:.06em">PINOUT REFERENCE</strong>
+  </div>
+  <div class="grp">
+    <label>Print master</label>
+    <span class="seg" id="modeSeg">
+      <span data-mode="whiteprint" class="on">Whiteprint</span>
+      <span data-mode="blueprint">Blueprint</span>
+    </span>
+  </div>
+  <div class="grp">
+    <button id="resetBtn">Reset highlights</button>
+    <button id="printBtn">Print / PDF · 24×36</button>
+  </div>
+  <div class="grp hint">Hover a pin or row to cross-highlight · click a signal class to spotlight it everywhere · use the chips on USB-C / HDMI / DP</div>
+</div>
+
+<div class="scaler-wrap">
+  <div class="scaler" id="scaler">
+    <div class="sheet" id="sheet">
+      <div class="frame"></div>
+      <!-- zone markers injected by JS -->
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   DATA  —  every pinout verified against connector standards
+   cls: power | gnd | hs | ls | cfg | nc
+   pair: differential-pair group key (for partner highlight) or ""
+   ===================================================================== */
+const CLASSES = [
+  {key:"power", nm:"Power",        sw:"sw-power"},
+  {key:"gnd",   nm:"Ground / Shield", sw:"sw-gnd"},
+  {key:"hs",    nm:"Hi-Speed Data", sw:"sw-hs"},
+  {key:"ls",    nm:"Lo-Speed / Aux", sw:"sw-ls"},
+  {key:"cfg",   nm:"Config / Sideband", sw:"sw-cfg"},
+  {key:"nc",    nm:"No-Connect / Rsvd", sw:"sw-nc"},
+];
+
+// wire colors only where standardized (USB-A 2.0 / Micro-B)
+const W = {red:"#c33",white:"#fff",green:"#2a9d3f",black:"#222",blue:"#2b6cb0",yellow:"#e3c000",purple:"#7a3d9c",orange:"#e07b1a"};
+
+const CONN = {
+  usba2:{
+    title:"USB Standard-A", sub:"USB 2.0 · 4 POSITION · TYPE-A PLUG",
+    dims:"12.0 × 4.5 mm", view:"usba2",
+    foot:[["Bus power","5 V @ 0.5 A (2.0)"],["Pairs","D+/D− half-duplex"]],
+    pins:[
+      {n:1,sig:"VBUS",cls:"power",pair:"",lvl:"+5 V",note:"Bus power, 0.5 A max (USB 2.0).",wire:"red"},
+      {n:2,sig:"D−",cls:"ls",pair:"D",lvl:"diff",note:"USB 2.0 half-duplex data, − leg.",wire:"white"},
+      {n:3,sig:"D+",cls:"ls",pair:"D",lvl:"diff",note:"USB 2.0 half-duplex data, + leg.",wire:"green"},
+      {n:4,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Power & signal return.",wire:"black"},
+    ]
+  },
+  usba3:{
+    title:"USB Standard-A", sub:"USB 3.2 GEN 1 · 9 POSITION · SUPERSPEED",
+    dims:"12.0 × 4.5 mm", view:"usba3",
+    foot:[["Back row","5 SuperSpeed contacts, recessed"],["Back-compat","Pins 1–4 mate USB 2.0"]],
+    pins:[
+      {n:1,sig:"VBUS",cls:"power",pair:"",lvl:"+5 V",note:"Bus power, 0.9 A (USB 3.x).",wire:"red"},
+      {n:2,sig:"D−",cls:"ls",pair:"D",lvl:"diff",note:"USB 2.0 data − (legacy).",wire:"white"},
+      {n:3,sig:"D+",cls:"ls",pair:"D",lvl:"diff",note:"USB 2.0 data + (legacy).",wire:"green"},
+      {n:4,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Power return.",wire:"black"},
+      {n:5,sig:"StdA_SSRX−",cls:"hs",pair:"SSRX",lvl:"diff",note:"SuperSpeed receive −.",wire:"blue"},
+      {n:6,sig:"StdA_SSRX+",cls:"hs",pair:"SSRX",lvl:"diff",note:"SuperSpeed receive +.",wire:"yellow"},
+      {n:7,sig:"GND_DRAIN",cls:"gnd",pair:"",lvl:"0 V",note:"SuperSpeed signal-pair drain.",wire:"black"},
+      {n:8,sig:"StdA_SSTX−",cls:"hs",pair:"SSTX",lvl:"diff",note:"SuperSpeed transmit −.",wire:"purple"},
+      {n:9,sig:"StdA_SSTX+",cls:"hs",pair:"SSTX",lvl:"diff",note:"SuperSpeed transmit +.",wire:"orange"},
+    ]
+  },
+  microb:{
+    title:"USB Micro-B", sub:"USB 2.0 · 5 POSITION · OTG-CAPABLE",
+    dims:"6.85 × 1.8 mm", view:"microb",
+    foot:[["Pin 4 = ID","Selects host vs device for OTG"],["Charging","Dedicated ports short D+/D−"]],
+    pins:[
+      {n:1,sig:"VBUS",cls:"power",pair:"",lvl:"+5 V",note:"Bus power.",wire:"red"},
+      {n:2,sig:"D−",cls:"ls",pair:"D",lvl:"diff",note:"USB 2.0 data −.",wire:"white"},
+      {n:3,sig:"D+",cls:"ls",pair:"D",lvl:"diff",note:"USB 2.0 data +.",wire:"green"},
+      {n:4,sig:"ID",cls:"cfg",pair:"",lvl:"sense",note:"OTG role: floating = device (B), tied to GND = host (A).",wire:""},
+      {n:5,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Return.",wire:"black"},
+    ]
+  },
+  usbc:{
+    title:"USB Type-C", sub:"24 POSITION · REVERSIBLE · USB4 / TB",
+    dims:"8.4 × 2.6 mm", view:"usbc", tall:true,
+    foot:[["Reversible","Receptacle mirrors rows A/B — either flip works"],["e-marker","Required &gt; 3 A / 60 W and for all USB4"]],
+    pins:[
+      {n:"A1",sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground return."},
+      {n:"A2",sig:"SSTXp1",cls:"hs",pair:"TX1",lvl:"diff",note:"SuperSpeed TX pair 1 +."},
+      {n:"A3",sig:"SSTXn1",cls:"hs",pair:"TX1",lvl:"diff",note:"SuperSpeed TX pair 1 −."},
+      {n:"A4",sig:"VBUS",cls:"power",pair:"",lvl:"5–48 V",note:"Bus power; up to 240 W with EPR PD."},
+      {n:"A5",sig:"CC1",cls:"cfg",pair:"",lvl:"cfg",note:"Configuration channel: orientation, PD comms, VCONN."},
+      {n:"A6",sig:"Dp1",cls:"ls",pair:"D1",lvl:"diff",note:"USB 2.0 data + (one pair used)."},
+      {n:"A7",sig:"Dn1",cls:"ls",pair:"D1",lvl:"diff",note:"USB 2.0 data −."},
+      {n:"A8",sig:"SBU1",cls:"cfg",pair:"",lvl:"sideband",note:"Sideband use — becomes DP AUX in Alt Mode."},
+      {n:"A9",sig:"VBUS",cls:"power",pair:"",lvl:"5–48 V",note:"Bus power."},
+      {n:"A10",sig:"SSRXn2",cls:"hs",pair:"RX2",lvl:"diff",note:"SuperSpeed RX pair 2 −."},
+      {n:"A11",sig:"SSRXp2",cls:"hs",pair:"RX2",lvl:"diff",note:"SuperSpeed RX pair 2 +."},
+      {n:"A12",sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground return."},
+      {n:"B1",sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground return."},
+      {n:"B2",sig:"SSTXp2",cls:"hs",pair:"TX2",lvl:"diff",note:"SuperSpeed TX pair 2 +."},
+      {n:"B3",sig:"SSTXn2",cls:"hs",pair:"TX2",lvl:"diff",note:"SuperSpeed TX pair 2 −."},
+      {n:"B4",sig:"VBUS",cls:"power",pair:"",lvl:"5–48 V",note:"Bus power."},
+      {n:"B5",sig:"CC2 / VCONN",cls:"cfg",pair:"",lvl:"cfg",note:"Second CC; powers e-marker / accessories as VCONN."},
+      {n:"B6",sig:"Dp2",cls:"ls",pair:"D2",lvl:"diff",note:"USB 2.0 data + (2nd pair; usually unused)."},
+      {n:"B7",sig:"Dn2",cls:"ls",pair:"D2",lvl:"diff",note:"USB 2.0 data −."},
+      {n:"B8",sig:"SBU2",cls:"cfg",pair:"",lvl:"sideband",note:"Sideband use — DP AUX in Alt Mode."},
+      {n:"B9",sig:"VBUS",cls:"power",pair:"",lvl:"5–48 V",note:"Bus power."},
+      {n:"B10",sig:"SSRXn1",cls:"hs",pair:"RX1",lvl:"diff",note:"SuperSpeed RX pair 1 −."},
+      {n:"B11",sig:"SSRXp1",cls:"hs",pair:"RX1",lvl:"diff",note:"SuperSpeed RX pair 1 +."},
+      {n:"B12",sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground return."},
+    ],
+    modes:{
+      label:"Cable wiring",
+      sets:{
+        "USB4 / TB":["A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12"],
+        "USB 3.2":["A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","B1","B2","B3","B4","B5","B9","B10","B11","B12"],
+        "USB 2.0":["A1","A4","A5","A6","A7","A9","A12","B1","B4","B5","B9","B12"],
+        "Charge-only":["A1","A4","A5","A9","A12","B1","B4","B5","B9","B12"],
+        "DP-Alt":["A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","B1","B2","B3","B4","B5","B8","B9","B10","B11","B12"],
+      },
+      def:"USB4 / TB"
+    }
+  },
+  hdmi:{
+    title:"HDMI Type-A", sub:"19 POSITION · TMDS · CEC + DDC",
+    dims:"13.9 × 4.45 mm", view:"hdmi", tall:true,
+    foot:[["TMDS","3 data pairs + 1 clock pair, each shielded"],["HEAC","Pins 14/19 active only on HDMI-w/-Ethernet cable"]],
+    pins:[
+      {n:1,sig:"TMDS Data2+",cls:"hs",pair:"D2",lvl:"diff",note:"Transition-minimized data, ch 2 +."},
+      {n:2,sig:"Data2 Shield",cls:"gnd",pair:"",lvl:"0 V",note:"Shield for ch 2 pair."},
+      {n:3,sig:"TMDS Data2−",cls:"hs",pair:"D2",lvl:"diff",note:"Data ch 2 −."},
+      {n:4,sig:"TMDS Data1+",cls:"hs",pair:"D1",lvl:"diff",note:"Data ch 1 +."},
+      {n:5,sig:"Data1 Shield",cls:"gnd",pair:"",lvl:"0 V",note:"Shield for ch 1 pair."},
+      {n:6,sig:"TMDS Data1−",cls:"hs",pair:"D1",lvl:"diff",note:"Data ch 1 −."},
+      {n:7,sig:"TMDS Data0+",cls:"hs",pair:"D0",lvl:"diff",note:"Data ch 0 +."},
+      {n:8,sig:"Data0 Shield",cls:"gnd",pair:"",lvl:"0 V",note:"Shield for ch 0 pair."},
+      {n:9,sig:"TMDS Data0−",cls:"hs",pair:"D0",lvl:"diff",note:"Data ch 0 −."},
+      {n:10,sig:"TMDS Clock+",cls:"hs",pair:"CK",lvl:"diff",note:"Pixel clock +."},
+      {n:11,sig:"Clock Shield",cls:"gnd",pair:"",lvl:"0 V",note:"Shield for clock pair."},
+      {n:12,sig:"TMDS Clock−",cls:"hs",pair:"CK",lvl:"diff",note:"Pixel clock −."},
+      {n:13,sig:"CEC",cls:"cfg",pair:"",lvl:"1-wire",note:"Consumer Electronics Control bus."},
+      {n:14,sig:"Utility / HEAC+",cls:"cfg",pair:"HEAC",lvl:"opt",note:"Reserved (≤1.3); HEC+/ARC on Ethernet cables (1.4+)."},
+      {n:15,sig:"SCL",cls:"ls",pair:"DDC",lvl:"I²C",note:"DDC clock (EDID read)."},
+      {n:16,sig:"SDA",cls:"ls",pair:"DDC",lvl:"I²C",note:"DDC data."},
+      {n:17,sig:"DDC/CEC GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground for DDC, CEC, HEAC."},
+      {n:18,sig:"+5 V Power",cls:"power",pair:"",lvl:"+5 V",note:"Bus power, 50 mA min (powers EDID EEPROM)."},
+      {n:19,sig:"Hot Plug / HEAC−",cls:"cfg",pair:"HEAC",lvl:"sense",note:"Hot-plug detect; HEC−/ARC return on Ethernet cables."},
+    ],
+    toggle:{label:"HDMI w/ Ethernet (HEAC)", pins:[14,19], key:"heac"}
+  },
+  dp:{
+    title:"DisplayPort", sub:"FULL-SIZE TYPE-A · 20 POSITION · VESA",
+    dims:"16.1 × 4.76 mm", view:"dp", tall:true,
+    foot:[["Main Link","4 lanes, each a shielded pair (pins 1–12)"],["Pin 20","DP_PWR — see compliant-cable toggle"]],
+    pins:[
+      {n:1,sig:"ML_Lane0+",cls:"hs",pair:"L0",lvl:"diff",note:"Main Link lane 0 +."},
+      {n:2,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Lane 0 return / shield."},
+      {n:3,sig:"ML_Lane0−",cls:"hs",pair:"L0",lvl:"diff",note:"Main Link lane 0 −."},
+      {n:4,sig:"ML_Lane1+",cls:"hs",pair:"L1",lvl:"diff",note:"Main Link lane 1 +."},
+      {n:5,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Lane 1 return / shield."},
+      {n:6,sig:"ML_Lane1−",cls:"hs",pair:"L1",lvl:"diff",note:"Main Link lane 1 −."},
+      {n:7,sig:"ML_Lane2+",cls:"hs",pair:"L2",lvl:"diff",note:"Main Link lane 2 +."},
+      {n:8,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Lane 2 return / shield."},
+      {n:9,sig:"ML_Lane2−",cls:"hs",pair:"L2",lvl:"diff",note:"Main Link lane 2 −."},
+      {n:10,sig:"ML_Lane3+",cls:"hs",pair:"L3",lvl:"diff",note:"Main Link lane 3 +."},
+      {n:11,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Lane 3 return / shield."},
+      {n:12,sig:"ML_Lane3−",cls:"hs",pair:"L3",lvl:"diff",note:"Main Link lane 3 −."},
+      {n:13,sig:"CONFIG1",cls:"cfg",pair:"",lvl:"GND",note:"Tied to GND in cable; cable-present detect."},
+      {n:14,sig:"CONFIG2",cls:"cfg",pair:"",lvl:"GND",note:"Tied to GND in cable."},
+      {n:15,sig:"AUX_CH+",cls:"ls",pair:"AUX",lvl:"diff",note:"Auxiliary channel + (EDID, link training)."},
+      {n:16,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"AUX return / shield."},
+      {n:17,sig:"AUX_CH−",cls:"ls",pair:"AUX",lvl:"diff",note:"Auxiliary channel −."},
+      {n:18,sig:"Hot Plug Detect",cls:"cfg",pair:"",lvl:"sense",note:"Sink-present / interrupt signal."},
+      {n:19,sig:"Return (DP_PWR)",cls:"gnd",pair:"",lvl:"0 V",note:"Return for DP_PWR."},
+      {n:20,sig:"DP_PWR",cls:"power",pair:"",lvl:"+3.3 V",note:"3.3 V / 500 mA for adapters. Compliant cables leave NC at sink end."},
+    ],
+    toggle:{label:"Compliant cable (pin 20 NC)", pins:[20], key:"dppwr", unwire:true}
+  },
+  mdp:{
+    title:"Mini DisplayPort", sub:"mDP · 20 POSITION · SOURCE-SIDE",
+    dims:"7.5 × 4.6 mm", view:"mdp", tall:true,
+    foot:[["Same signals","Electrically identical to full-size DP"],["Different map","Pin order differs — note pin 2 = HPD"]],
+    pins:[
+      {n:1,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground."},
+      {n:2,sig:"Hot Plug Detect",cls:"cfg",pair:"",lvl:"sense",note:"Sink-present / interrupt."},
+      {n:3,sig:"ML_Lane0+",cls:"hs",pair:"L0",lvl:"diff",note:"Main Link lane 0 +."},
+      {n:4,sig:"CONFIG1",cls:"cfg",pair:"",lvl:"cfg",note:"Configuration / cable detect."},
+      {n:5,sig:"ML_Lane0−",cls:"hs",pair:"L0",lvl:"diff",note:"Main Link lane 0 −."},
+      {n:6,sig:"CONFIG2",cls:"cfg",pair:"",lvl:"cfg",note:"Configuration."},
+      {n:7,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground."},
+      {n:8,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground."},
+      {n:9,sig:"ML_Lane1+",cls:"hs",pair:"L1",lvl:"diff",note:"Main Link lane 1 +."},
+      {n:10,sig:"ML_Lane3+",cls:"hs",pair:"L3",lvl:"diff",note:"Main Link lane 3 + (interleaved)."},
+      {n:11,sig:"ML_Lane1−",cls:"hs",pair:"L1",lvl:"diff",note:"Main Link lane 1 −."},
+      {n:12,sig:"ML_Lane3−",cls:"hs",pair:"L3",lvl:"diff",note:"Main Link lane 3 −."},
+      {n:13,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground."},
+      {n:14,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground."},
+      {n:15,sig:"ML_Lane2+",cls:"hs",pair:"L2",lvl:"diff",note:"Main Link lane 2 +."},
+      {n:16,sig:"AUX_CH+",cls:"ls",pair:"AUX",lvl:"diff",note:"Auxiliary channel +."},
+      {n:17,sig:"ML_Lane2−",cls:"hs",pair:"L2",lvl:"diff",note:"Main Link lane 2 −."},
+      {n:18,sig:"AUX_CH−",cls:"ls",pair:"AUX",lvl:"diff",note:"Auxiliary channel −."},
+      {n:19,sig:"GND",cls:"gnd",pair:"",lvl:"0 V",note:"Ground."},
+      {n:20,sig:"DP_PWR",cls:"power",pair:"",lvl:"+3.3 V",note:"3.3 V power; not wired in standard cables."},
+    ]
+  }
+};
+
+/* =====================================================================
+   SVG HEAD-ON VIEWS
+   ===================================================================== */
+/* ---- primitives ---- */
+function dot(conn,n,cls,cx,cy,r,disp,fs){
+  fs=fs||5.6;
+  return `<circle class="pin sig-${cls}" data-conn="${conn}" data-pin="${n}" cx="${cx}" cy="${cy}" r="${r}"/>`
+       + `<text class="pinnum" x="${cx}" y="${cy+fs*0.35}" style="font-size:${fs}px">${disp}</text>`;
+}
+function prect(conn,n,cls,x,y,w,h,disp){
+  return `<rect class="pin sig-${cls}" data-conn="${conn}" data-pin="${n}" x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5"/>`
+       + `<text class="pinnum dk" x="${x+w/2}" y="${y+h/2+2.1}" style="font-size:6px">${disp}</text>`;
+}
+function p1tri(cx,apexY){ // pin-1 indicator: small triangle pointing down at the pin
+  return `<path class="p1mark" d="M ${cx-3.2} ${apexY-5} L ${cx+3.2} ${apexY-5} L ${cx} ${apexY-1} Z"/>`;
+}
+function dimH(x1,x2,y,label){
+  return `<line class="dimline" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`
+       + `<line class="dimline" x1="${x1}" y1="${y-3}" x2="${x1}" y2="${y+3}"/>`
+       + `<line class="dimline" x1="${x2}" y1="${y-3}" x2="${x2}" y2="${y+3}"/>`
+       + `<text class="dimtxt" x="${(x1+x2)/2}" y="${y-2.5}" text-anchor="middle">${label}</text>`;
+}
+function pitchDim(x1,x2,y,label){ // pitch between two adjacent pin centres
+  return `<line class="dimline" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`
+       + `<line class="dimline" x1="${x1}" y1="${y-2.4}" x2="${x1}" y2="${y+2.4}"/>`
+       + `<line class="dimline" x1="${x2}" y1="${y-2.4}" x2="${x2}" y2="${y+2.4}"/>`
+       + `<text class="dimtxt" x="${(x1+x2)/2}" y="${y+7}" text-anchor="middle">${label}</text>`;
+}
+function callout(x1,y1,x2,y2,label,anchor){
+  return `<line class="calloutline" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`
+       + `<circle class="p1mark" cx="${x1}" cy="${y1}" r="1.4"/>`
+       + `<text class="callouttxt" x="${x2+(anchor==='end'?-3:3)}" y="${y2+2.6}" text-anchor="${anchor}">${label}</text>`;
+}
+function svgnote(cx,cy,txt){ return `<text class="svgnote" x="${cx}" y="${cy}">${txt}</text>`; }
+
+/* ---- USB Standard-A 2.0 ---- */
+function svgUSBA2(){
+  let p="";
+  p+=`<rect class="shell" x="20" y="32" width="160" height="66" rx="3"/>`;
+  p+=`<rect class="tongue" x="30" y="42" width="140" height="24"/>`;
+  const cs=[47.5,82.5,117.5,152.5];
+  cs.forEach((x,i)=> p+=prect("usba2",i+1,CONN.usba2.pins[i].cls,x-12,46,24,14,i+1));
+  p+=p1tri(47.5,46);
+  p+=pitchDim(47.5,82.5,74,"2.50");
+  p+=callout(47.5,53,33,24,"VBUS","end");
+  p+=callout(152.5,53,167,24,"GND","start");
+  p+=dimH(20,180,110,"12.0");
+  p+=svgnote(100,124,"Contact view · pin 1 at left · tongue uppermost");
+  return wrapSVG(p,"0 0 200 132");
+}
+/* ---- USB Standard-A 3.x (SuperSpeed) ---- */
+function svgUSBA3(){
+  let p="";
+  p+=`<rect class="shell" x="18" y="26" width="164" height="88" rx="3"/>`;
+  // recessed SuperSpeed row (5 contacts, set back)
+  p+=`<rect class="tongue ss" x="34" y="38" width="132" height="14"/>`;
+  const ss=[47.2,73.6,100,126.4,152.8];
+  ss.forEach((x,i)=> p+=prect("usba3",i+5,CONN.usba3.pins[i+4].cls,x-9,40,18,10,i+5));
+  // front USB 2.0 row on tongue (4 contacts)
+  p+=`<rect class="tongue" x="28" y="60" width="144" height="24"/>`;
+  const fr=[46,82,118,154];
+  fr.forEach((x,i)=> p+=prect("usba3",i+1,CONN.usba3.pins[i].cls,x-12,64,24,14,i+1));
+  p+=p1tri(46,64);
+  p+=pitchDim(46,82,92,"2.50");
+  p+=callout(46,71,32,26,"VBUS","end");
+  p+=dimH(18,182,126,"12.0");
+  p+=svgnote(100,138,"Front 1–4 = USB 2.0 · recessed 5–9 = SuperSpeed");
+  return wrapSVG(p,"0 0 200 148");
+}
+/* ---- USB Micro-B ---- */
+function svgMicroB(){
+  let p="";
+  p+=`<path class="shell" d="M42 46 L158 46 L148 86 L52 86 Z"/>`;
+  const cs=[70,85,100,115,130];
+  cs.forEach((x,i)=> p+=prect("microb",i+1,CONN.microb.pins[i].cls,x-5,58,10,16,i+1));
+  p+=p1tri(70,58);
+  p+=callout(115,66,150,32,"ID","start");
+  p+=dimH(42,158,100,"6.85");
+  p+=svgnote(100,112,"OTG trapezoid · pin 4 = ID role-select");
+  return wrapSVG(p,"0 0 200 122");
+}
+/* ---- USB Type-C (24-pin, reversible, B-row mirrored) ---- */
+function svgUSBC(){
+  let p="";
+  const cmap={}; CONN.usbc.pins.forEach(o=>cmap[o.n]=o.cls);
+  p+=`<rect class="shell" x="14" y="46" width="372" height="44" rx="22"/>`;
+  const x0=34, dx=(372-40)/11;
+  for(let i=0;i<12;i++){ const n="A"+(i+1); p+=dot("usbc",n,cmap[n],x0+dx*i,58,6.4,(i+1),5.4); }
+  for(let i=0;i<12;i++){ const num=12-i, n="B"+num; p+=dot("usbc",n,cmap[n],x0+dx*i,78,6.4,num,5.4); }
+  p+=`<text class="rowlbl" x="22" y="61">A</text><text class="rowlbl" x="22" y="81">B</text>`;
+  p+=p1tri(x0,58-6.4+0.5);
+  p+=pitchDim(x0,x0+dx,40,"0.50");
+  p+=callout(x0+dx*4,58,150,26,"CC1","end");
+  p+=dimH(14,386,104,"8.4");
+  p+=svgnote(200,116,"Row B mirrored (B12…B1) — connector is reversible");
+  return wrapSVG(p,"0 0 400 122");
+}
+/* ---- HDMI Type-A (19-pin, true two-row stagger) ---- */
+function svgHDMI(){
+  let p="";
+  p+=`<path class="shell" d="M28 42 L372 42 L352 84 L48 84 Z"/>`;
+  const top=[1,3,5,7,9,11,13,15,17,19], bot=[2,4,6,8,10,12,14,16,18];
+  top.forEach((n,i)=> p+=dot("hdmi",n,CONN.hdmi.pins[n-1].cls,65+30*i,56,6,n,5.4));
+  bot.forEach((n,i)=> p+=dot("hdmi",n,CONN.hdmi.pins[n-1].cls,80+30*i,70,6,n,5.4));
+  p+=p1tri(65,50);
+  p+=callout(65,56,40,26,"TMDS D2+","end");
+  p+=dimH(28,372,98,"13.9");
+  p+=svgnote(200,112,"Odd pins · top row    even pins · lower row (half-pitch stagger)");
+  return wrapSVG(p,"0 0 400 120");
+}
+/* ---- DisplayPort full-size (20-pin, staggered, keyed chamfer) ---- */
+function svgDP(){
+  let p="";
+  p+=`<path class="shell" d="M26 42 L374 42 L374 72 L362 82 L26 82 Z"/>`;
+  const top=[1,3,5,7,9,11,13,15,17,19], bot=[2,4,6,8,10,12,14,16,18,20];
+  top.forEach((n,i)=> p+=dot("dp",n,CONN.dp.pins[n-1].cls,61+31*i,56,6,n,5.4));
+  bot.forEach((n,i)=> p+=dot("dp",n,CONN.dp.pins[n-1].cls,76.5+31*i,71,6,n,5.4));
+  p+=p1tri(61,50);
+  p+=callout(355.5,71,300,104,"DP_PWR · PIN 20","end");
+  p+=callout(368,79,384,99,"KEY","start");
+  p+=dimH(26,374,98,"16.1");
+  p+=svgnote(200,114,"Odd top / even lower · staggered · chamfer = keying");
+  return wrapSVG(p,"0 0 400 122");
+}
+/* ---- Mini DisplayPort (20-pin, staggered, distinct pin map) ---- */
+function svgMDP(){
+  let p="";
+  p+=`<path class="shell" d="M72 46 L328 46 L336 54 L336 76 L64 76 L64 54 Z"/>`;
+  p+=`<rect class="shell-soft" x="190" y="46" width="20" height="3.5"/>`;
+  const top=[1,3,5,7,9,11,13,15,17,19], bot=[2,4,6,8,10,12,14,16,18,20];
+  top.forEach((n,i)=> p+=dot("mdp",n,CONN.mdp.pins[n-1].cls,92+24*i,57,5.4,n,5));
+  bot.forEach((n,i)=> p+=dot("mdp",n,CONN.mdp.pins[n-1].cls,104+24*i,69,5.4,n,5));
+  p+=p1tri(92,51.6);
+  p+=callout(104,69,60,98,"HPD · PIN 2","start");
+  p+=dimH(72,328,92,"7.5");
+  p+=svgnote(200,112,"Pin 2 = HPD · lanes 1/3 interleaved · same signals as DP");
+  return wrapSVG(p,"0 0 400 120");
+}
+function wrapSVG(inner,vb){ return `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`; }
+const SVGS={usba2:svgUSBA2,usba3:svgUSBA3,microb:svgMicroB,usbc:svgUSBC,hdmi:svgHDMI,dp:svgDP,mdp:svgMDP};
+
+/* =====================================================================
+   TABLE RENDERING
+   ===================================================================== */
+function rowHTML(conn,p){
+  const wire = p.wire ? `<span class="wire" style="background:${W[p.wire]}"></span>` : "";
+  return `<tr class="prow" data-conn="${conn}" data-pin="${p.n}" data-pair="${p.pair||''}">
+    <td class="c-pin cd-${p.cls}">${p.n}</td>
+    <td class="c-sig">${wire}<span class="signame">${p.sig}</span></td>
+    <td class="c-pair">${p.pair||'—'}</td>
+    <td class="c-lvl">${p.lvl}</td>
+    <td class="c-note">${p.note}</td>
+  </tr>`;
+}
+function tableHTML(conn,pins){
+  const head=`<thead><tr><th>Pin</th><th>Signal</th><th>Pair</th><th>Level</th><th>Notes</th></tr></thead>`;
+  return `<table class="pintab">${head}<tbody>${pins.map(p=>rowHTML(conn,p)).join("")}</tbody></table>`;
+}
+function tableCell(conn,pins){
+  if(pins.length>14){
+    const mid=Math.ceil(pins.length/2);
+    return `<div class="tablecell split"><div>${tableHTML(conn,pins.slice(0,mid))}</div><div>${tableHTML(conn,pins.slice(mid))}</div></div>`;
+  }
+  return `<div class="tablecell"><div style="flex:1">${tableHTML(conn,pins)}</div></div>`;
+}
+
+/* control chips */
+function modeChips(conn,cfg){
+  const sets=Object.keys(cfg.sets);
+  return `<div class="chips" data-modesel="${conn}"><span class="clab">${cfg.label}</span>`+
+    sets.map(s=>`<button class="chip ${s===cfg.def?'on':''}" data-set="${s}">${s}</button>`).join("")+`</div>`;
+}
+function toggleChip(conn,t){
+  return `<div class="chips" data-toggle="${conn}"><span class="clab">Cable variant</span>
+    <button class="chip" data-tkey="${t.key}">${t.label}</button></div>`;
+}
+
+/* plate */
+function plateHTML(no,conn){
+  const c=CONN[conn];
+  const ctrls = c.modes ? modeChips(conn,c.modes) : (c.toggle? toggleChip(conn,c.toggle):"");
+  const foot = (c.foot||[]).map(f=>`<span><b>${f[0]}:</b> ${f[1]}</span>`).join("");
+  return `<div class="plate span ${c.tall?'tall':''}">
+    <div class="pbar"><span class="pno">${no}</span><span class="ptitle">${c.title}</span><span class="psub">${c.sub} · ${c.dims}</span></div>
+    <div class="pbody">
+      <div class="viewcell">
+        <div class="vlabel">Head-on contact view · pin 1 reference</div>
+        ${SVGS[c.view]()}
+        <div class="controls">${ctrls}</div>
+      </div>
+      ${tableCell(conn,c.pins)}
+    </div>
+    <div class="platefoot">${foot}</div>
+  </div>`;
+}
+function plateHTMLhalf(no,conn){
+  const c=CONN[conn];
+  const foot=(c.foot||[]).map(f=>`<span><b>${f[0]}:</b> ${f[1]}</span>`).join("");
+  return `<div class="plate" style="--svgcol:2.5in">
+    <div class="pbar"><span class="pno">${no}</span><span class="ptitle">${c.title}</span><span class="psub">${c.sub}</span></div>
+    <div class="pbody">
+      <div class="viewcell"><div class="vlabel">Head-on · ${c.dims}</div>${SVGS[c.view]()}</div>
+      ${tableCell(conn,c.pins)}
+    </div>
+    <div class="platefoot">${foot}</div>
+  </div>`;
+}
+
+/* =====================================================================
+   STATIC BLOCKS
+   ===================================================================== */
+function headerHTML(){
+  const leg = CLASSES.map(c=>{
+    const count = Object.values(CONN).reduce((a,cn)=>a+cn.pins.filter(p=>p.cls===c.key).length,0);
+    return `<div class="lgi" data-class="${c.key}"><span class="swatch ${c.sw}"></span><span class="nm">${c.nm}</span><span class="ct">${count}</span></div>`;
+  }).join("");
+  return `<div class="header">
+    <div class="titlewrap">
+      <div class="eyebrow">Display &amp; Data Interconnects — Pin Assignment Reference</div>
+      <h1>USB <span class="amp">·</span> HDMI <span class="amp">·</span> DisplayPort<br>Connector Pinouts</h1>
+      <div class="thesis">Every connector below has a <b>fixed number of positions</b>, but cables do not all wire every position. A USB-C plug always has 24 contacts — yet a charge-only or USB&nbsp;2.0 cable leaves most of them unconnected. Use the cable-variant controls to see which conductors a given cable actually carries.</div>
+    </div>
+    <div class="legendbox">
+      <div class="lh"><span>Signal Class</span><span>pins</span></div>
+      <div class="legendgrid">${leg}</div>
+      <div class="fhint">Click a class to spotlight those pins across all seven connectors. Click again to clear.</div>
+    </div>
+  </div>`;
+}
+
+function infoBlockHTML(){
+  return `<div class="infoblock">
+    <div class="ih">Why “Same Connector” ≠ “Same Cable”</div>
+    <ul>
+      <li><b>Positions are fixed; conductors are not.</b> Manufacturers legally drop wires to cut cost. The shell mates fine — the missing conductors just mean missing features.</li>
+      <li><b>USB-C is the worst offender.</b> <span class="tag">24 PIN</span> A USB&nbsp;2.0 C-to-C cable omits all four SuperSpeed pairs and both SBU lines: it charges and syncs slowly but carries <b>no video and no 5/10/40&nbsp;Gbps data</b>.</li>
+      <li><b>Charge-only cables</b> may also drop the D+/D− pair, so the device never enumerates — it only sees power.</li>
+      <li><b>Current rating lives in the e-marker, not the contacts.</b> Above 3&nbsp;A / 60&nbsp;W, and for all USB4, the plug needs an e-marker chip on CC/VCONN. No chip = capped at 3&nbsp;A regardless of wire gauge.</li>
+      <li><b>DisplayPort pin 20 (DP_PWR).</b> <span class="tag">DP_PWR</span> Compliant cables leave it disconnected at the monitor end; mis-wired off-brand cables tie both ends together and can back-feed power and damage hardware.</li>
+      <li><b>HDMI is all 19 pins, every version.</b> The differences are shielding/category and whether the HEAC channel (pins 14/19) is wired — only “HDMI with Ethernet” cables carry it.</li>
+    </ul>
+  </div>`;
+}
+
+function notesHTML(){
+  return `<div class="notesblock">
+    <div class="nh">General Notes</div>
+    <ol>
+      <li>Pin numbering shown is the <b>source / plug, contact-side</b> orientation. Receptacle and sink views mirror left-to-right.</li>
+      <li>USB Type-C is <b>reversible</b>: rows A and B are mirror images, so either insertion orientation presents a working set.</li>
+      <li><b>Differential pairs</b> (Pair column) are routed as matched-length shielded twisted pairs; the +/− legs are meaningless alone.</li>
+      <li>“diff” = differential signaling, not a fixed DC level. “0 V” = ground reference. Voltages are nominal.</li>
+      <li>Mini DisplayPort carries the <b>same signals</b> as full-size DP but on a <b>different pin map</b> — note pin 2 = Hot Plug Detect and the interleaved lanes 1/3.</li>
+      <li>Wire-color swatches (USB-A 2.0, Micro-B) reflect the conventional color code; SuperSpeed and Type-C cables are not color-standardized.</li>
+    </ol>
+  </div>`;
+}
+
+function titleBlockHTML(){
+  const today=new Date().toISOString().slice(0,10);
+  return `<div class="footer">
+    ${notesHTML()}
+    ${infoBlockHTML()}
+    <div class="titleblock">
+      <div class="tb title"><span class="k">Title</span><span class="v">Connector Pinout Reference — USB · HDMI · DisplayPort</span></div>
+      <div class="tb logo"><div class="mk">PIN<span class="d">·</span>OUT</div><div class="sb">Engineering Ref</div></div>
+      <div class="tb"><span class="k">Dwg No</span><span class="v">REF-PINOUT-001</span></div>
+      <div class="tb"><span class="k">Rev</span><span class="v">A</span></div>
+      <div class="tb"><span class="k">Sheet</span><span class="v">1 / 1</span></div>
+      <div class="tb"><span class="k">Size</span><span class="v">ARCH C</span></div>
+      <div class="tb"><span class="k">Scale</span><span class="v">NTS</span></div>
+      <div class="tb"><span class="k">Sheet Size</span><span class="v">24×36 in</span></div>
+      <div class="tb"><span class="k">Date</span><span class="v">${today}</span></div>
+      <div class="tb"><span class="k">Drawn</span><span class="v">JEREMY</span></div>
+      <div class="tb"><span class="k">Units</span><span class="v">mm</span></div>
+      <div class="rev">
+        <table>
+          <tr><th>Rev</th><th>Date</th><th>Description</th><th>By</th></tr>
+          <tr><td>A</td><td>${today}</td><td>Initial release — 7 connectors, verified pin maps</td><td>JEREMY</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   ZONE MARKERS
+   ===================================================================== */
+function zoneMarkers(){
+  const sheet=document.getElementById('sheet');
+  const rows="ABCDEFGH", cols=6;
+  const top=0.41, left=0.41, w=24-0.82, h=36-0.82;
+  let html="";
+  for(let i=0;i<cols;i++){ const x=left + w*(i+0.5)/cols;
+    html+=`<div class="zone" style="top:${top-0.02}in;left:${x}in;transform:translate(-50%,-100%)">${i+1}</div>`;
+    html+=`<div class="zone" style="top:${top+h+0.02}in;left:${x}in;transform:translate(-50%,0)">${i+1}</div>`;
+  }
+  for(let i=0;i<rows.length;i++){ const y=top + h*(i+0.5)/rows.length;
+    html+=`<div class="zone" style="top:${y}in;left:${left-0.04}in;transform:translate(-100%,-50%)">${rows[i]}</div>`;
+    html+=`<div class="zone" style="top:${y}in;left:${left+w+0.04}in;transform:translate(0,-50%)">${rows[i]}</div>`;
+  }
+  sheet.insertAdjacentHTML('beforeend',html);
+}
+
+/* =====================================================================
+   BUILD
+   ===================================================================== */
+function build(){
+  const C=document.getElementById('content');
+  let html=headerHTML();
+  // short plates paired
+  html+=plateHTMLhalf("01","usba2");
+  html+=plateHTMLhalf("02","usba3");
+  html+=plateHTMLhalf("03","microb");
+  html+=`<div class="infoblock" style="grid-column:auto"></div>`; // placeholder replaced below
+  // full plates
+  html+=plateHTML("04","usbc");
+  html+=plateHTML("05","hdmi");
+  html+=plateHTML("06","dp");
+  html+=plateHTML("07","mdp");
+  html+=titleBlockHTML();
+  C.innerHTML=html;
+  // replace placeholder infoblock with the real one (so it sits next to micro-B)
+  const ph=C.querySelector('.infoblock'); if(ph) ph.outerHTML=infoBlockHTML();
+  zoneMarkers();
+  wireInteractions();
+  fitScale();
+}
+
+/* =====================================================================
+   INTERACTIONS
+   ===================================================================== */
+function q(sel,root=document){return [...root.querySelectorAll(sel)];}
+function pinEls(conn,pin){return q(`.pin[data-conn="${conn}"][data-pin="${pin}"]`);}
+function rowEl(conn,pin){return document.querySelector(`tr.prow[data-conn="${conn}"][data-pin="${pin}"]`);}
+
+let activeClasses=new Set();
+
+function clearHL(){
+  q('.pin.hl,.pin.pair').forEach(e=>e.classList.remove('hl','pair'));
+  q('tr.prow.hl,tr.prow.pairhl').forEach(e=>e.classList.remove('hl','pairhl'));
+}
+function highlight(conn,pin){
+  clearHL();
+  pinEls(conn,pin).forEach(e=>e.classList.add('hl'));
+  const r=rowEl(conn,pin); if(r) r.classList.add('hl');
+  // pair partner
+  const row=document.querySelector(`tr.prow[data-conn="${conn}"][data-pin="${pin}"]`);
+  const pair=row && row.getAttribute('data-pair');
+  if(pair){
+    q(`tr.prow[data-conn="${conn}"][data-pair="${pair}"]`).forEach(rr=>{
+      const pn=rr.getAttribute('data-pin');
+      if(pn!=String(pin)){ rr.classList.add('pairhl'); pinEls(conn,pn).forEach(e=>e.classList.add('pair')); }
+    });
+  }
+}
+function applyClassFilter(){
+  const sheet=document.getElementById('sheet');
+  if(activeClasses.size===0){ sheet.classList.remove('dim'); q('.keep').forEach(e=>e.classList.remove('keep')); 
+    q('.lgi').forEach(l=>l.classList.remove('active')); return; }
+  sheet.classList.add('dim');
+  q('.pin,tr.prow').forEach(e=>e.classList.remove('keep'));
+  activeClasses.forEach(cls=>{
+    q(`.pin.sig-${cls}`).forEach(e=>e.classList.add('keep'));
+    Object.keys(CONN).forEach(conn=>{
+      CONN[conn].pins.filter(p=>p.cls===cls).forEach(p=>{ const r=rowEl(conn,p.n); if(r) r.classList.add('keep'); });
+    });
+  });
+  q('.lgi').forEach(l=> l.classList.toggle('active', activeClasses.has(l.getAttribute('data-class'))));
+}
+
+function setUSBCmode(conn,set){
+  const wired=new Set(CONN[conn].modes.sets[set]);
+  CONN[conn].pins.forEach(p=>{
+    const on=wired.has(String(p.n));
+    pinEls(conn,p.n).forEach(e=>e.classList.toggle('unwired',!on));
+    const r=rowEl(conn,p.n); if(r) r.classList.toggle('unwired',!on);
+  });
+}
+function setToggle(conn,t,on){
+  if(t.unwire){
+    t.pins.forEach(n=>{ pinEls(conn,n).forEach(e=>e.classList.toggle('unwired',on)); const r=rowEl(conn,n); if(r) r.classList.toggle('unwired',on); });
+  } else {
+    t.pins.forEach(n=>{ pinEls(conn,n).forEach(e=>e.classList.toggle('hl',on)); const r=rowEl(conn,n); if(r) r.classList.toggle('hl',on); });
+  }
+}
+
+function wireInteractions(){
+  const C=document.getElementById('content');
+  // hover cross-highlight (pins + rows)
+  C.addEventListener('mouseover',e=>{
+    const t=e.target.closest('.pin,tr.prow'); if(!t) return;
+    if(activeClasses.size) return; // don't fight the class filter
+    highlight(t.getAttribute('data-conn'), t.getAttribute('data-pin'));
+  });
+  C.addEventListener('mouseout',e=>{
+    const t=e.target.closest('.pin,tr.prow'); if(!t) return;
+    if(activeClasses.size) return;
+    clearHL();
+  });
+  // tap to lock highlight (mobile)
+  C.addEventListener('click',e=>{
+    const lg=e.target.closest('.lgi');
+    if(lg){ const k=lg.getAttribute('data-class'); activeClasses.has(k)?activeClasses.delete(k):activeClasses.add(k); applyClassFilter(); return; }
+    const chip=e.target.closest('.chip');
+    if(chip){
+      const selWrap=chip.closest('[data-modesel]'), tgWrap=chip.closest('[data-toggle]');
+      if(selWrap){ const conn=selWrap.getAttribute('data-modesel');
+        q('.chip',selWrap).forEach(c=>c.classList.remove('on')); chip.classList.add('on');
+        setUSBCmode(conn,chip.getAttribute('data-set')); }
+      if(tgWrap){ const conn=tgWrap.getAttribute('data-toggle'); const on=!chip.classList.contains('on');
+        chip.classList.toggle('on',on);
+        const t = CONN[conn].toggle; setToggle(conn,t,on); }
+      return;
+    }
+  });
+}
+
+/* =====================================================================
+   SCALING (screen) + TOOLBAR
+   ===================================================================== */
+function fitScale(){
+  const scaler=document.getElementById('scaler');
+  const avail = Math.min(window.innerWidth-24, 2304); // 24in @96dpi = 2304px
+  const scale = avail / 2304;
+  scaler.style.transform=`scale(${scale})`;
+  document.querySelector('.scaler-wrap').style.height = (36*96*scale + 60) + 'px';
+}
+window.addEventListener('resize',fitScale);
+
+document.getElementById('modeSeg').addEventListener('click',e=>{
+  const s=e.target.closest('span[data-mode]'); if(!s) return;
+  q('#modeSeg span').forEach(x=>x.classList.remove('on')); s.classList.add('on');
+  document.documentElement.setAttribute('data-mode', s.getAttribute('data-mode'));
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  activeClasses.clear(); applyClassFilter(); clearHL();
+  q('.pin.unwired,tr.prow.unwired').forEach(e=>e.classList.remove('unwired'));
+  q('[data-toggle] .chip.on').forEach(c=>c.classList.remove('on'));
+  // restore USB-C default
+  q('[data-modesel]').forEach(w=>{ const conn=w.getAttribute('data-modesel'); const def=CONN[conn].modes.def;
+    q('.chip',w).forEach(c=>c.classList.toggle('on',c.getAttribute('data-set')===def)); setUSBCmode(conn,def); });
+});
+document.getElementById('printBtn').addEventListener('click',()=>window.print());
+
+document.documentElement.setAttribute('data-mode','whiteprint');
+build();
+</script>
+</body>
+</html>
