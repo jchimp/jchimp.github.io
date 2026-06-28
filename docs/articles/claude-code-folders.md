@@ -11,7 +11,7 @@ Notes from configuring Claude Code properly after several months of running it a
 
 Claude Code is configured by a set of files in your home folder and in the repo (directory) your are working in. Without those files, every session starts cold and the orchestration happens by hand; with them, configuration carries context across sessions and prior work accumulates.
 
-View the poster here: **<a href="../files/claude-code-folders/claude-code-operating-map.html" target="_blank" rel="noopener">Claude Code Folders</a>**
+View the poster here: **<a href="../files/claude-code-folders/claude-code-folders.html" target="_blank" rel="noopener">Claude Code Folders</a>**
 
 ## Two folders hold the entire configuration layer
 
@@ -253,5 +253,3 @@ Model aliases:
 | `opus`      | architecture, multi-input synthesis, hard debugging   |
 | `haiku`     | mechanical bulk, simple lookups, raw speed            |
 | `opusplan`  | session default when work involves real planning      |
-
-
