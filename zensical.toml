@@ -118,25 +118,22 @@ code = "JetBrains Mono"   # swap to "Mononoki" only if self-hosted; it is not on
 #  Color palette — dark/light toggle
 # ----------------------------------------------------------------------------
 
-# Dark mode
+# --- Dark mode (the deep "Midnight" Nord) -------------------------------
 [[project.theme.palette]]
 scheme  = "slate"
 primary = "custom"
 accent  = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
 
-[project.theme.palette.toggle]
-icon = "lucide/sun"
-name = "Switch to light mode"
-
-# Light mode
+# --- Light mode ---------------------------------------------------------
 [[project.theme.palette]]
 scheme  = "default"
-primary = "custom"
-accent  = "custom"
+primary = "custom"   # tells the theme to read our --md-primary-fg-color
+accent  = "custom"   # tells the theme to read our --md-accent-fg-color
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
 
-[project.theme.palette.toggle]
-icon = "lucide/moon"
-name = "Switch to dark mode"
 
 # ----------------------------------------------------------------------------
 #  Plugins

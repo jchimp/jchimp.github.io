@@ -1,37 +1,14 @@
-/* -------------------------------------------------
-   Global site overrides (minimal)
-   File: docs/stylesheets/extra.css
-   ------------------------------------------------- */
+/* =====================================================================
+   Layout (Zensical only — these target Material DOM Obsidian lacks)
+   ===================================================================== */
 
-/* 1 — load it (Google Fonts) */
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&display=swap");
+/* Pull the content up a touch + tighten the H1 gap */
+.md-main__inner { margin-top: 0.5rem; }
+.md-typeset h1  { margin-bottom: 0.75rem; }
 
-/* Tight spaceing for mono font */
-h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
-
-/* .md-typeset h1 {
-  font-size: xx-large;
-} */
-
-/* 2 — headings only; body + code keep the theme defaults */
-.md-typeset h1,
-.md-typeset h2,
-.md-typeset h3,
-.md-typeset h4,
-.md-typeset h5,
-.md-typeset h6 {
-  font-family: "JetBrains Mono", monospace;
-  font-weight: 900;
-  letter-spacing: -0.04em;   /* the tight tracking that gives the decks their look */
-}
-
-.md-main__inner {
-  margin-top: 0.5rem;
-}
-
-.md-typeset h1 {
-  margin-bottom: 0.75rem;
-}
+/*
+.md-typeset h1 { font-size: xx-large; }
+*/
 
 /*
 .md-main__inner:has(.article--no-nav) {
@@ -40,13 +17,13 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
 }
 */
 
-/* Whenever an .article--no-nav exists on the page, widen the column it sits in */
+/* When an .article--no-nav is on the page, widen the column it sits in */
 .md-main__inner:has(.article--no-nav) .md-content {
   max-width: none;
   flex: 1 1 auto;     /* in case the parent is flex */
 }
 
-/* And inside the article, keep prose readable */
+/* …but keep the prose itself readable */
 .article--no-nav .md-typeset,
 .article--no-nav > .article__body {
   max-width: 70ch;
@@ -55,8 +32,12 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
 
 
 /* =====================================================================
-   SLATE EMBER — Zensical (Material) custom colors
-   Nord-derived slate base · ember-orange · teal accent
+   SLATE AURORA — Zensical (Material) custom colors
+   The colorful sibling of Slate Ember. Same Nord DNA, warmer:
+     · deep "Midnight" Nord as the dark scheme (slate-900 / slate-950)
+     · ember header bar, ember bold + H1/H2 headings
+     · monospace headings (JetBrains Mono ExtraBold)
+     · modern tables (teal header row, zebra, hover)
    ---------------------------------------------------------------------
    The "RAW PALETTE" block below is byte-for-byte identical to the one in
    the Obsidian theme.css — that is the single source of truth. Edit both
@@ -66,6 +47,10 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
    (see zensical.snippet.toml). Place this file at docs/stylesheets/
    and register it via  extra_css = ["stylesheets/extra.css"].
    ===================================================================== */
+
+/* JetBrains Mono (700/800) for the monospace headings below. Obsidian
+   reads locally-installed fonts, so it has no equivalent @import. */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&display=swap");
 
 :root {
   /* ---------- RAW PALETTE (shared with Obsidian) ---------- */
@@ -112,15 +97,12 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
    ===================================================================== */
 [data-md-color-scheme="default"] {
 
-  /* Primary drives the header/nav + default link color.
-     We keep the CHROME slate (dimmed Nord look) and route ember into
-     content links via --md-typeset-a-color below.
-     --> Want an ORANGE header instead? Set the two values marked (A)
-         to var(--se-ember-deep) and var(--se-ember). */
-  --md-primary-fg-color:        var(--se-slate-800);   /* (A) header bg     */
-  --md-primary-fg-color--light: var(--se-slate-700);
-  --md-primary-fg-color--dark:  var(--se-slate-900);
-  --md-primary-bg-color:        var(--se-slate-50);    /* text on header    */
+  /* Primary drives the header/nav. Slate Aurora makes it EMBER for a
+     warm branded bar (the colorful header you asked for). */
+  --md-primary-fg-color:        var(--se-ember-deep);  /* header bg     */
+  --md-primary-fg-color--light: var(--se-ember);
+  --md-primary-fg-color--dark:  #9a4d1c;
+  --md-primary-bg-color:        var(--se-slate-50);    /* text on header */
   --md-primary-bg-color--light: rgba(246, 248, 251, 0.7);
 
   /* Accent — interactive (hovered links, buttons, scrollbars) */
@@ -169,18 +151,22 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
   --md-footer-fg-color:        var(--se-slate-100);
   --md-footer-fg-color--light: var(--se-slate-300);
   --md-footer-fg-color--lighter: var(--se-slate-500);
+
+  /* Heading + bold accent (consumed by shared rules below) */
+  --aurora-emphasis: var(--se-ember-deep);
 }
 
 /* =====================================================================
-   DARK  —  scheme "slate"
+   DARK  —  scheme "slate"  =  the deep "Midnight" Nord
+   Slate Ember's deep surfaces (slate-900 / slate-950) with Aurora's color.
    ===================================================================== */
 [data-md-color-scheme="slate"] {
   --md-hue: 220; /* nudges Material's slate toward the Nord blue-grey */
 
-  /* Primary / chrome (see the (A) note above to make the header ember) */
-  --md-primary-fg-color:        var(--se-slate-900);   /* (A) header bg  */
-  --md-primary-fg-color--light: var(--se-slate-800);
-  --md-primary-fg-color--dark:  var(--se-slate-950);
+  /* Primary / chrome — EMBER header bar */
+  --md-primary-fg-color:        var(--se-ember-deep);  /* header bg  */
+  --md-primary-fg-color--light: var(--se-ember);
+  --md-primary-fg-color--dark:  #9a4d1c;
   --md-primary-bg-color:        var(--se-slate-100);
   --md-primary-bg-color--light: rgba(236, 239, 244, 0.7);
 
@@ -196,7 +182,7 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
   --md-default-fg-color--lighter: rgba(229, 233, 240, 0.45);
   --md-default-fg-color--lightest:rgba(229, 233, 240, 0.12);
 
-  /* Background */
+  /* Background — deep Nord */
   --md-default-bg-color:          var(--se-slate-900);
   --md-default-bg-color--light:   rgba(46, 52, 64, 0.7);
   --md-default-bg-color--lighter: rgba(46, 52, 64, 0.45);
@@ -230,11 +216,32 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
   --md-footer-fg-color:        var(--se-slate-100);
   --md-footer-fg-color--light: var(--se-slate-300);
   --md-footer-fg-color--lighter: var(--se-slate-500);
+
+  /* Heading + bold accent */
+  --aurora-emphasis: var(--se-ember);
 }
 
 /* =====================================================================
-   Shared touches (both schemes)
+   Shared touches (all schemes)
    ===================================================================== */
+
+/* Ember-tinted bold + H1/H2 (the warm emphasis) */
+.md-typeset strong { color: var(--aurora-emphasis); }
+.md-typeset h1,
+.md-typeset h2 { color: var(--aurora-emphasis); }
+
+/* Monospace headings — JetBrains Mono ExtraBold with tight tracking (the
+   "deck" look). Same face is applied in the Obsidian theme. */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
 
 /* Ember left-edge on code blocks, matching the Obsidian theme */
 .md-typeset pre > code {
@@ -245,4 +252,25 @@ h1, h2 { letter-spacing: -0.02em; font-weight: 800; }
 .md-typeset h2 {
   padding-bottom: 0.2rem;
   border-bottom: 1px solid var(--md-accent-fg-color);
+}
+
+/* Modern tables — teal-tinted header row, zebra, hover, rounded corners */
+.md-typeset table:not([class]) {
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.3rem 0.6rem;
+  line-height: 1.4;
+}
+.md-typeset table:not([class]) th {
+  background: var(--md-accent-fg-color--transparent);
+  color: var(--md-default-fg-color);
+  font-weight: 700;
+}
+.md-typeset table:not([class]) tbody tr:nth-child(even) {
+  background: var(--md-default-fg-color--lightest);
+}
+.md-typeset table:not([class]) tbody tr:hover {
+  background: var(--md-accent-fg-color--transparent);
 }
