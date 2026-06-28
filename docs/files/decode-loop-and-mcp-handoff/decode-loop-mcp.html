@@ -44,7 +44,7 @@
   .dot.s{background:var(--mcp);color:var(--mcp)}
 
   .grid{display:grid;grid-template-columns:minmax(0,460px) minmax(0,1fr);gap:18px}
-  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}.scope{min-height:0}}
 
   .card{background:linear-gradient(180deg,var(--panel),#10171f);
     border:1px solid var(--line);border-radius:12px;padding:14px}
@@ -71,7 +71,7 @@
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
   /* context buffer */
-  .buffer{display:flex;flex-direction:column;gap:9px;max-height:420px;overflow:auto;padding-right:4px}
+  .buffer{display:flex;flex-direction:column;gap:9px;max-height:520px;overflow:auto;padding-right:4px}
   .seg{border-left:3px solid var(--line);padding:7px 10px;border-radius:0 8px 8px 0;background:#0f161e}
   .seg .role{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;display:flex;justify-content:space-between;gap:8px}
   .seg .role em{font-style:normal;color:var(--faint);opacity:.8;font-size:9px;letter-spacing:.04em;text-transform:none}
@@ -88,7 +88,7 @@
   @keyframes blink{50%{opacity:0}}
 
   /* detail / scope panel */
-  .scope{margin-top:14px}
+  .scope{margin-top:14px;min-height:148px}
   .scope pre{margin:0;font-size:11px;background:#0c1219;border:1px solid var(--line);
     border-radius:8px;padding:10px;overflow:auto;color:#bcd}
   .scope .k{color:var(--harness)} .scope .str{color:var(--mcp)} .scope .num{color:var(--model)}
