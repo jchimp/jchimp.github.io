@@ -220,9 +220,14 @@
   background: var(--md-default-fg-color--lightest);
 }
 
-/* --- tables: heavy head rule, hairline rows, no zebra --- */
+/* --- tables: heavy head rule, hairline rows, no zebra (BRAND.md §5) ---
+   The modern variant ships filled/bordered tables with roomy padding,
+   5rem min-width heads, and a hover fill + inset shadow — all of which
+   must be neutralized here or the bench-sheet look never lands. */
 .md-typeset table:not([class]) {
+  background: transparent;
   border: none;
+  border-radius: 0;
   box-shadow: none;
   font-size: 0.72rem;
 }
@@ -235,13 +240,26 @@
   color: var(--md-default-fg-color--light);
   background: transparent;
   border-bottom: 2px solid var(--md-default-fg-color);
+  min-width: 0;
+  padding: 0.5em 0.75em;
 }
 .md-typeset table:not([class]) td {
   border-top: none;
   border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding: 0.6em 0.75em;
 }
 .md-typeset table:not([class]) tr:last-child td { border-bottom: none; }
+/* numerics right-aligned in mono (markdown `---:` columns emit align="right") */
+.md-typeset table:not([class]) td[align="right"] {
+  font-family: var(--jc-font-mono);
+  font-size: 0.68rem;
+}
 .md-typeset table:not([class]) tr:nth-child(2n) { background: transparent; } /* no zebra */
+.md-typeset table:not([class]) tbody tr:hover {
+  background: transparent;
+  box-shadow: none;
+}
+.md-typeset table:not([class]) tbody tr { transition: none; }
 
 /* --- code blocks: bordered surface, no shadow --- */
 .md-typeset pre > code {

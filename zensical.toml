@@ -118,17 +118,18 @@ code = "JetBrains Mono"
 # ----------------------------------------------------------------------------
 
 [[project.theme.palette]]
-media = "(prefers-color-scheme)"
-[project.theme.palette.toggle]
-icon = "lucide/sun-moon"
-name = "Switch to light mode"
-
-[[project.theme.palette]]
 media = "(prefers-color-scheme: light)"
 scheme = "default"
 [project.theme.palette.toggle]
 icon = "lucide/sun"
 name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+[project.theme.palette.toggle]
+icon = "lucide/moon"
+name = "Switch to system preference"
 
 
 # ----------------------------------------------------------------------------
