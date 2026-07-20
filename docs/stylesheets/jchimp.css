@@ -1,0 +1,344 @@
+/* ==========================================================================
+   jchimp.tech "Lab Bench" — Zensical theme
+   Place at docs/stylesheets/jchimp.css and register in zensical.toml
+   (see jchimp-zensical.toml alongside this file).
+
+   Zensical shares Material for MkDocs' HTML + CSS variable architecture:
+   light scheme = "default", dark scheme = "slate". This sheet overrides
+   the --md-* variables with Lab Bench tokens and applies the brand's
+   element grammar (heavy table head rule, no zebra, mono instrumentation).
+
+   Accent logic: green acts · brass warns · blue links · red = danger only.
+   ========================================================================== */
+
+/* ---------- type (fonts are loaded via zensical.toml theme.font;
+   Archivo for display is loaded here since config supports one text font) */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&display=swap");
+
+:root {
+  --jc-font-display: "Archivo", "IBM Plex Sans", sans-serif;
+  --jc-font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+
+/* ==========================================================================
+   LIGHT · "Slate" (scheme: default)
+   ========================================================================== */
+[data-md-color-scheme="default"] {
+  /* ground & surfaces */
+  --md-default-bg-color:            #F6F7F8;
+  --md-default-fg-color:            #24272C;
+  --md-default-fg-color--light:     #78808A;
+  --md-default-fg-color--lighter:   #A6ADB6;
+  --md-default-fg-color--lightest:  #DFE3E8;
+
+  /* primary drives header/sidebar (classic) and links */
+  --md-primary-fg-color:            #4F8A1E;
+  --md-primary-fg-color--light:     #6AA33A;
+  --md-primary-fg-color--dark:      #457A19;
+  --md-primary-bg-color:            #FFFFFF;
+  --md-primary-bg-color--light:     #FFFFFFB3;
+
+  /* accent = interactive highlights */
+  --md-accent-fg-color:             #457A19;
+  --md-accent-fg-color--transparent:#4F8A1E1A;
+  --md-accent-bg-color:             #FFFFFF;
+
+  /* prose links get their own blue, per brand */
+  --md-typeset-a-color:             #2F6E93;
+
+  /* code */
+  --md-code-bg-color:               #FFFFFF;
+  --md-code-fg-color:               #3E434B;
+  --md-code-hl-color:               #4F8A1E26;
+  --md-code-hl-number-color:        #9A7118;
+  --md-code-hl-special-color:       #A6402C;
+  --md-code-hl-function-color:      #2F6E93;
+  --md-code-hl-constant-color:      #457A19;
+  --md-code-hl-keyword-color:       #4F8A1E;
+  --md-code-hl-string-color:        #9A7118;
+  --md-code-hl-name-color:          #24272C;
+  --md-code-hl-operator-color:      #78808A;
+  --md-code-hl-punctuation-color:   #78808A;
+  --md-code-hl-comment-color:       #A6ADB6;
+  --md-code-hl-generic-color:       #78808A;
+  --md-code-hl-variable-color:      #24272C;
+
+  /* misc chrome */
+  --md-typeset-mark-color:          #9A71182E;
+  --md-typeset-kbd-color:           #FFFFFF;
+  --md-typeset-kbd-border-color:    #DFE3E8;
+  --md-typeset-table-color:         #DFE3E8;
+  --md-footer-bg-color:             #24272C;
+  --md-footer-bg-color--dark:       #16181B;
+  --md-footer-fg-color:             #D5D8DC;
+}
+
+/* ==========================================================================
+   DARK · "Workshop" (scheme: slate)
+   ========================================================================== */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color:            #16181B;
+  --md-default-fg-color:            #D5D8DC;
+  --md-default-fg-color--light:     #7F8791;
+  --md-default-fg-color--lighter:   #5C636D;
+  --md-default-fg-color--lightest:  #2D3138;
+
+  --md-primary-fg-color:            #97C459;
+  --md-primary-fg-color--light:     #A9D06F;
+  --md-primary-fg-color--dark:      #86B24C;
+  --md-primary-bg-color:            #16181B;
+  --md-primary-bg-color--light:     #16181BB3;
+
+  --md-accent-fg-color:             #A9D06F;
+  --md-accent-fg-color--transparent:#97C4591F;
+  --md-accent-bg-color:             #16181B;
+
+  --md-typeset-a-color:             #85B4CE;
+
+  --md-code-bg-color:               #1D2024;
+  --md-code-fg-color:               #C3C8CE;
+  --md-code-hl-color:               #97C45926;
+  --md-code-hl-number-color:        #C9973F;
+  --md-code-hl-special-color:       #C96A55;
+  --md-code-hl-function-color:      #85B4CE;
+  --md-code-hl-constant-color:      #A9D06F;
+  --md-code-hl-keyword-color:       #97C459;
+  --md-code-hl-string-color:        #C9973F;
+  --md-code-hl-name-color:          #D5D8DC;
+  --md-code-hl-operator-color:      #7F8791;
+  --md-code-hl-punctuation-color:   #7F8791;
+  --md-code-hl-comment-color:       #5C636D;
+  --md-code-hl-generic-color:       #7F8791;
+  --md-code-hl-variable-color:      #D5D8DC;
+
+  --md-typeset-mark-color:          #C9973F2E;
+  --md-typeset-kbd-color:           #1D2024;
+  --md-typeset-kbd-border-color:    #2D3138;
+  --md-typeset-table-color:         #2D3138;
+  --md-footer-bg-color:             #101113;
+  --md-footer-bg-color--dark:       #0C0D0F;
+  --md-footer-fg-color:             #7F8791;
+
+  /* header/tabs readable on dark ground in modern variant */
+  --md-header-bg-color:             #16181B;
+}
+
+/* ==========================================================================
+   Element grammar (both schemes)
+   ========================================================================== */
+
+/* --- headings: Archivo display, mono-caps h5 tier --- */
+.md-typeset h1,
+.md-typeset h2 {
+  font-family: var(--jc-font-display);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--md-default-fg-color);
+}
+.md-typeset h1 { font-weight: 800; }
+.md-typeset h3 { font-weight: 600; }
+.md-typeset h5 {
+  font-family: var(--jc-font-mono);
+  font-weight: 500;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+}
+
+/* accent stub under h1 — never full width */
+.md-typeset h1::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 3px;
+  margin-top: 0.5rem;
+  background: var(--md-primary-fg-color);
+}
+
+/* hairline separator under section headings — the default rule, not the
+   scarce heavy 3px one (that stays reserved for masthead/table-head/footer) */
+.md-typeset h2,
+.md-typeset h3 {
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+/* --- rules: five kinds, each with one job (BRAND.md §5) ---
+   hairline (default) · heavy 3px ink (masthead/table-head/footer only,
+   scarcity is the point) · tick (figure/diagram boundary) · labeled
+   (MONO CAPS section transition). Accent stub lives on h1::after above. */
+.md-typeset hr {
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+/* heavy 3px ink rule — use sparingly, not mid-content */
+.md-typeset hr.jc-rule-heavy {
+  height: 3px;
+  border: none;
+  background: var(--md-default-fg-color);
+}
+
+/* tick rule — hairline with short end ticks; markup: <div class="jc-rule-tick"></div> */
+.md-typeset .jc-rule-tick {
+  position: relative;
+  height: 1px;
+  margin: 1.5rem 0;
+  background: var(--md-default-fg-color--lightest);
+}
+.md-typeset .jc-rule-tick::before,
+.md-typeset .jc-rule-tick::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: var(--md-default-fg-color--lighter);
+}
+.md-typeset .jc-rule-tick::before { left: 0; }
+.md-typeset .jc-rule-tick::after { right: 0; }
+
+/* labeled rule — mono-caps tracked label between two hairlines;
+   markup: <div class="jc-rule-labeled">SECTION LABEL</div> */
+.md-typeset .jc-rule-labeled {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin: 2rem 0 1.25rem;
+  color: var(--md-default-fg-color--light);
+  font-family: var(--jc-font-mono);
+  font-weight: 500;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.md-typeset .jc-rule-labeled::before,
+.md-typeset .jc-rule-labeled::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--md-default-fg-color--lightest);
+}
+
+/* --- tables: heavy head rule, hairline rows, no zebra --- */
+.md-typeset table:not([class]) {
+  border: none;
+  box-shadow: none;
+  font-size: 0.72rem;
+}
+.md-typeset table:not([class]) th {
+  font-family: var(--jc-font-mono);
+  font-weight: 500;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border-bottom: 2px solid var(--md-default-fg-color);
+}
+.md-typeset table:not([class]) td {
+  border-top: none;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset table:not([class]) tr:last-child td { border-bottom: none; }
+.md-typeset table:not([class]) tr:nth-child(2n) { background: transparent; } /* no zebra */
+
+/* --- code blocks: bordered surface, no shadow --- */
+.md-typeset pre > code {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 5px;
+}
+.md-typeset code {
+  border-radius: 3px;
+}
+
+/* --- admonitions: hairline surface, 3px semantic left bar, mono-caps title --- */
+.md-typeset .admonition,
+.md-typeset details {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-left-width: 3px;
+  border-radius: 0 4px 4px 0;
+  box-shadow: none;
+  background: var(--md-code-bg-color);
+  font-size: 0.72rem;
+}
+.md-typeset .admonition-title,
+.md-typeset summary {
+  font-family: var(--jc-font-mono);
+  font-weight: 500;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: transparent !important;
+}
+/* semantic bar colors: note/info → link blue · tip/success → green ·
+   warning → brass · danger/bug → danger red */
+.md-typeset .admonition.note,    .md-typeset details.note,
+.md-typeset .admonition.info,    .md-typeset details.info,
+.md-typeset .admonition.abstract,.md-typeset details.abstract {
+  border-left-color: var(--md-typeset-a-color);
+}
+.md-typeset .note > .admonition-title,     .md-typeset .note > summary,
+.md-typeset .info > .admonition-title,     .md-typeset .info > summary,
+.md-typeset .abstract > .admonition-title, .md-typeset .abstract > summary {
+  color: var(--md-typeset-a-color);
+}
+.md-typeset .admonition.tip,     .md-typeset details.tip,
+.md-typeset .admonition.success, .md-typeset details.success {
+  border-left-color: var(--md-primary-fg-color);
+}
+.md-typeset .tip > .admonition-title,     .md-typeset .tip > summary,
+.md-typeset .success > .admonition-title, .md-typeset .success > summary {
+  color: var(--md-primary-fg-color--dark);
+}
+.md-typeset .admonition.warning, .md-typeset details.warning,
+.md-typeset .admonition.question,.md-typeset details.question {
+  border-left-color: #9A7118;
+}
+[data-md-color-scheme="slate"] .md-typeset .admonition.warning,
+[data-md-color-scheme="slate"] .md-typeset details.warning {
+  border-left-color: #C9973F;
+}
+.md-typeset .warning > .admonition-title, .md-typeset .warning > summary { color: #9A7118; }
+[data-md-color-scheme="slate"] .md-typeset .warning > .admonition-title,
+[data-md-color-scheme="slate"] .md-typeset .warning > summary { color: #C9973F; }
+.md-typeset .admonition.danger,  .md-typeset details.danger,
+.md-typeset .admonition.failure, .md-typeset details.failure,
+.md-typeset .admonition.bug,     .md-typeset details.bug {
+  border-left-color: #A6402C;
+}
+[data-md-color-scheme="slate"] .md-typeset .admonition.danger,
+[data-md-color-scheme="slate"] .md-typeset details.danger {
+  border-left-color: #C96A55;
+}
+.md-typeset .danger > .admonition-title, .md-typeset .danger > summary { color: #A6402C; }
+[data-md-color-scheme="slate"] .md-typeset .danger > .admonition-title,
+[data-md-color-scheme="slate"] .md-typeset .danger > summary { color: #C96A55; }
+
+/* --- blockquote: brass, per brand grammar --- */
+.md-typeset blockquote {
+  border-left: 3px solid #9A7118;
+  background: #FBF7EC;
+  border-radius: 0 3px 3px 0;
+  color: var(--md-default-fg-color);
+}
+[data-md-color-scheme="slate"] .md-typeset blockquote {
+  border-left-color: #C9973F;
+  background: #2C2415;
+}
+
+/* --- buttons --- */
+.md-typeset .md-button {
+  border-radius: 3px;
+  border-color: var(--md-default-fg-color--lightest);
+  color: var(--md-primary-fg-color--dark);
+}
+.md-typeset .md-button--primary {
+  background: var(--md-primary-fg-color);
+  border-color: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+/* --- nav/search chrome: flatten shadows --- */
+.md-search__form { border-radius: 4px; }
+.md-nav__title { box-shadow: none; }
