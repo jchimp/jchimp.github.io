@@ -130,13 +130,6 @@ scheme = "default"
 icon = "lucide/sun"
 name = "Switch to dark mode"
 
-[[project.theme.palette]]
-media = "(prefers-color-scheme: dark)"
-scheme = "slate"
-[project.theme.palette.toggle]
-icon = "lucide/moon"
-name = "Switch to system preference"
-
 
 # ----------------------------------------------------------------------------
 #  Plugins
