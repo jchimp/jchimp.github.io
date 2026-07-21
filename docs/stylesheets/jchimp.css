@@ -167,8 +167,10 @@ body .md-typeset h2 {
   font-weight: 700;
   letter-spacing: -0.012em;
   color: var(--md-default-fg-color);
+  /*border-bottom: 2px solid var(--md-default-fg-color--lightest);*/
+  border-bottom: 1px solid var(--md-primary-fg-color--dark);
 }
-body .md-typeset h1 { font-weight: 800; }
+body .md-typeset h1 { font-weight: 1000; }
 body .md-typeset h3 { font-weight: 600; }
 body .md-typeset h5 {
   font-family: var(--jc-font-mono) !important;

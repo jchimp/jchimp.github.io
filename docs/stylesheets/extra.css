@@ -6,17 +6,6 @@
 .md-main__inner { margin-top: 0.5rem; }
 .md-typeset h1  { margin-bottom: 0.75rem; }
 
-/*
-.md-typeset h1 { font-size: xx-large; }
-*/
-
-/*
-.md-main__inner:has(.article--no-nav) {
-  grid-template-columns: 1fr !important;
-  display: block;
-}
-*/
-
 /* When an .article--no-nav is on the page, widen the column it sits in */
 .md-main__inner:has(.article--no-nav) .md-content {
   max-width: none;
