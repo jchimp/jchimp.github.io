@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open-Weight LLM Field Guide — June 2026</title>
+<style>
+  :root{
+    --bg:#14161d; --bg2:#191c25; --panel:#1e222d; --panel2:#232838;
+    --line:#2f3545; --line2:#3a4254;
+    --ink:#e9e7df; --dim:#99a1b0; --faint:#69707e;
+    --copper:#e0913f; --copper-bright:#f2ab53;
+    --steel:#6fb3c4; --green:#84b56a; --amber:#d9a341; --red:#cd6b5a; --violet:#9189cc;
+    --display:"Bahnschrift","DIN Alternate","Oswald","Arial Narrow Bold","Arial Narrow",system-ui,sans-serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:"Cascadia Code","JetBrains Mono","SF Mono","Consolas",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{
+    margin:0;background:
+      radial-gradient(1200px 600px at 12% -8%, #1d2333 0%, transparent 60%),
+      radial-gradient(1000px 700px at 100% 0%, #20191a 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);font-family:var(--sans);line-height:1.45;
+    padding:30px clamp(14px,3vw,46px) 60px;
+  }
+  .wrap{max-width:1480px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  .masthead{display:flex;gap:26px;align-items:flex-end;justify-content:space-between;
+    flex-wrap:wrap;border-bottom:1px solid var(--line2);padding-bottom:22px}
+  .brand{display:flex;align-items:center;gap:18px}
+  .chip-svg{width:58px;height:58px;flex:0 0 auto;opacity:.92}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--copper);margin:0 0 6px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.6vw,52px);
+    line-height:.92;letter-spacing:.01em;margin:0;text-transform:uppercase}
+  h1 span{color:var(--copper)}
+  .tagline{max-width:430px;font-size:13.5px;color:var(--dim);margin:0;text-align:right}
+  .tagline b{color:var(--ink);font-weight:600}
+  .stamp{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:8px;
+    letter-spacing:.04em}
+
+  /* ---------- legend ---------- */
+  .legend{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);margin:22px 0 30px;border-radius:8px;overflow:hidden}
+  .lg{background:var(--bg2);padding:13px 16px}
+  .lg h4{font-family:var(--mono);margin:0 0 5px;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--copper)}
+  .lg p{margin:0;font-size:12px;color:var(--dim)}
+  .lg p b{color:var(--ink);font-weight:600}
+  .keydots{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+  .keydot{font-family:var(--mono);font-size:11px;color:var(--dim);display:flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+  /* ---------- columns ---------- */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .col{display:flex;flex-direction:column;gap:18px}
+  .cat{display:flex;align-items:center;gap:13px;padding:2px 2px 12px;
+    border-bottom:2px solid var(--copper)}
+  .cat svg{width:30px;height:30px;flex:0 0 auto;color:var(--copper)}
+  .cat-name{font-family:var(--display);text-transform:uppercase;font-weight:700;
+    font-size:23px;letter-spacing:.02em;line-height:1}
+  .cat-job{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.05em;
+    margin-top:3px}
+
+  /* ---------- card ---------- */
+  .card{background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);
+    border:1px solid var(--line);border-radius:11px;padding:17px 17px 16px;
+    position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;
+    background:var(--tier,#555);opacity:.9}
+  .card.low{--tier:linear-gradient(90deg,var(--green),var(--steel))}
+  .card.high{--tier:linear-gradient(90deg,var(--copper),var(--red))}
+  .card-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:9px}
+  .tier-tag{color:var(--copper)}
+  .tier-tag.lo{color:var(--green)}
+  .model{font-family:var(--display);font-weight:700;font-size:27px;line-height:1;
+    letter-spacing:.01em;margin:0}
+  .maker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:7px 0 13px}
+  .maker .by{font-size:12px;color:var(--dim)}
+  .lic{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.04em;
+    padding:2.5px 7px;border-radius:4px;text-transform:uppercase;white-space:nowrap}
+  .lic.perm{background:rgba(132,181,106,.14);color:var(--green);border:1px solid rgba(132,181,106,.35)}
+  .lic.cust{background:rgba(217,163,65,.13);color:var(--amber);border:1px solid rgba(217,163,65,.35)}
+
+  .specs{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-bottom:14px}
+  .spec{background:var(--panel2);padding:8px 10px}
+  .spec .k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:3px}
+  .spec .v{font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:600;line-height:1.2}
+  .spec .v small{color:var(--dim);font-weight:400;font-size:11px}
+
+  /* ---------- signature: VRAM meter ---------- */
+  .meter{margin:6px 0 14px}
+  .meter-lab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .meter-lab b{color:var(--steel);font-weight:600}
+  .track{position:relative;height:30px;border-radius:5px;border:1px solid var(--line2);
+    background:
+      linear-gradient(90deg,
+        rgba(132,181,106,.10) 0%, rgba(132,181,106,.10) 25%,
+        rgba(217,163,65,.10) 25%, rgba(217,163,65,.10) 50%,
+        rgba(205,107,90,.12) 50%, rgba(205,107,90,.12) 100%);
+    overflow:hidden}
+  .tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line2)}
+  .tick span{position:absolute;top:2px;left:3px;font-family:var(--mono);font-size:8.5px;
+    color:var(--faint)}
+  .fill{position:absolute;top:0;bottom:0;left:0;border-right:2px solid var(--ink);
+    transform-origin:left;animation:grow .9s cubic-bezier(.2,.7,.2,1) both}
+  .fill.green{background:linear-gradient(90deg,rgba(132,181,106,.30),rgba(132,181,106,.55))}
+  .fill.amber{background:linear-gradient(90deg,rgba(111,179,196,.28),rgba(217,163,65,.5))}
+  .fill.server{background:linear-gradient(90deg,rgba(224,145,63,.35),rgba(205,107,90,.6))}
+  .fill .mk{position:absolute;right:-1px;top:50%;transform:translate(50%,-50%);
+    font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink);
+    background:var(--bg);border:1px solid var(--ink);padding:1px 5px;border-radius:4px;white-space:nowrap}
+  @keyframes grow{from{width:0 !important}}
+  .gpu-hint{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:7px}
+  .gpu-hint::before{content:"▸ ";color:var(--copper)}
+
+  /* ---------- capability chips ---------- */
+  .caps{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:13px}
+  .cap{font-family:var(--mono);font-size:10.5px;padding:3px 8px;border-radius:5px;
+    background:var(--panel2);border:1px solid var(--line2);color:var(--ink)}
+  .cap.hot{border-color:rgba(224,145,63,.5);color:var(--copper-bright);
+    background:rgba(224,145,63,.08)}
+  .cap.cool{border-color:rgba(111,179,196,.4);color:var(--steel);background:rgba(111,179,196,.07)}
+
+  /* ---------- deploy line ---------- */
+  .deploy{font-family:var(--mono);font-size:12px;background:#0e1016;border:1px solid var(--line2);
+    border-radius:6px;padding:8px 11px;color:var(--ink);margin-bottom:14px;overflow-x:auto;white-space:nowrap}
+  .deploy .pr{color:var(--green);user-select:none}
+  .deploy .cmd{color:var(--copper-bright)}
+  .deploy.alt{color:var(--dim)}
+
+  /* ---------- alternates ---------- */
+  .alts-h{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 8px;border-top:1px dashed var(--line2);padding-top:11px}
+  .alt{font-size:12px;color:var(--dim);margin:0 0 6px;padding-left:13px;position:relative}
+  .alt::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;
+    background:var(--line2)}
+  .alt b{color:var(--ink);font-weight:600;font-family:var(--display);font-size:14px;letter-spacing:.01em}
+  .alt .m{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .flag{color:var(--amber)}
+
+  .footnote{margin-top:30px;border-top:1px solid var(--line2);padding-top:16px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .footnote p{margin:0;font-size:11.5px;color:var(--faint);line-height:1.5}
+  .footnote b{color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;display:block;margin-bottom:4px;color:var(--copper)}
+
+  .lic.nc{background:rgba(205,107,90,.13);color:var(--red);border:1px solid rgba(205,107,90,.42)}
+
+  /* ---------- RAG plumbing band ---------- */
+  .ragband{margin-top:34px;border-top:1px solid var(--line2);padding-top:24px}
+  .ragband-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+  .ragband-head h2{font-family:var(--display);text-transform:uppercase;font-weight:700;
+    font-size:25px;letter-spacing:.02em;margin:0}
+  .ragband-head .sub{font-family:var(--mono);font-size:11px;color:var(--copper);
+    letter-spacing:.14em;text-transform:uppercase}
+  .ragband-intro{font-size:13px;color:var(--dim);max-width:1000px;margin:0 0 20px}
+  .ragband-intro b{color:var(--ink);font-weight:600}
+  .ragcols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .ragcol > h3{font-family:var(--display);text-transform:uppercase;font-size:18px;letter-spacing:.03em;
+    margin:0 0 13px;color:var(--steel);border-bottom:1px solid var(--line);padding-bottom:7px;
+    display:flex;justify-content:space-between;align-items:baseline}
+  .ragcol > h3 .cnt{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em}
+  .scards{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:11px}
+  .scard{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px 13px}
+  .sc-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px}
+  .sc-name{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:.01em;line-height:1}
+  .sc-spec{font-family:var(--mono);font-size:10.5px;color:var(--steel);margin-bottom:6px;line-height:1.45}
+  .sc-for{font-size:12px;color:var(--dim);margin-bottom:9px;line-height:1.42}
+  .sc-pull{font-family:var(--mono);font-size:10.5px;color:var(--ink);background:#0e1016;
+    border:1px solid var(--line2);border-radius:5px;padding:5px 8px;white-space:nowrap;overflow-x:auto}
+  .sc-pull .pr{color:var(--green);user-select:none}
+  .sc-pull.host{color:var(--amber);background:transparent;border-style:dashed}
+  .rag-note{font-size:11.5px;color:var(--faint);margin:18px 0 0;font-family:var(--mono);
+    border-left:2px solid var(--copper);padding-left:12px;line-height:1.65}
+  .rag-note b{color:var(--dim)}
+
+  @media (max-width:1080px){
+    .grid{grid-template-columns:1fr}
+    .legend{grid-template-columns:repeat(2,1fr)}
+    .footnote{grid-template-columns:1fr}
+    .ragcols{grid-template-columns:1fr}
+    .tagline{text-align:left}
+    .masthead{align-items:flex-start}
+  }
+  @media (prefers-reduced-motion:reduce){.fill{animation:none}}
+
+  /* ---------- print: clean light theme for paper ---------- */
+  @media print{
+    :root{
+      --bg:#fff;--bg2:#faf9f6;--panel:#fff;--panel2:#f4f3ef;
+      --line:#d6d3ca;--line2:#bdb8ab;
+      --ink:#1a1c22;--dim:#3f444e;--faint:#6b7280;
+      --copper:#a85715;--copper-bright:#8f4a11;
+      --steel:#27697a;--green:#4c7637;--amber:#8c6111;--red:#9e3f2b;
+    }
+    body{background:#fff !important;color:var(--ink);padding:0;font-size:11px}
+    .wrap{max-width:none}
+    h1{font-size:33px}
+    .chip-svg{width:46px;height:46px}
+    .tagline{font-size:10.5px}
+    .lg{background:#faf9f6}
+    .grid{gap:12px}
+    .col{gap:12px}
+    .card{background:#fff !important;break-inside:avoid;page-break-inside:avoid}
+    .track{background:#f1efe9 !important}
+    .fill{border-right-color:#1a1c22;animation:none}
+    .fill.green{background:#dcead0 !important}
+    .fill.amber{background:#ece0c4 !important}
+    .fill.server{background:#ebd4c7 !important}
+    .fill .mk{background:#fff;border-color:#1a1c22}
+    .deploy{background:#f4f3ef !important;border-color:#d6d3ca}
+    .deploy.alt{background:transparent !important}
+    .cap{background:#f4f3ef !important;border-color:#d6d3ca}
+    .cap.hot{background:#f9efe2 !important}
+    .cap.cool{background:#eaf2f4 !important}
+    .scard{background:#fff !important;break-inside:avoid}
+    .sc-pull{background:#f4f3ef !important;border-color:#d6d3ca}
+    .sc-pull.host{background:transparent !important}
+    .cat,.ragband,.footnote,.scard,.legend{break-inside:avoid}
+    @page{size:A4 landscape;margin:9mm}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== MASTHEAD ===================== -->
+  <header class="masthead">
+    <div class="brand">
+      <svg class="chip-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--copper)">
+        <rect x="16" y="16" width="32" height="32" rx="3"/>
+        <rect x="24" y="24" width="16" height="16" rx="1.5" fill="rgba(224,145,63,.18)"/>
+        <g stroke-linecap="round">
+          <path d="M24 16V9M32 16V9M40 16V9M24 55v-7M32 55v-7M40 55v-7"/>
+          <path d="M16 24H9M16 32H9M16 40H9M55 24h-7M55 32h-7M55 40h-7"/>
+        </g>
+      </svg>
+      <div>
+        <p class="eyebrow">Local Deployment · Datasheet</p>
+        <h1>Open-Weight<br><span>LLM Field Guide</span></h1>
+      </div>
+    </div>
+    <div>
+      <p class="tagline">Pick by <b>job</b> and by <b>what fits your card</b>. Every model split into a low-VRAM and high-VRAM tier, with capabilities, license signal, and a memory budget you can read against your GPU.</p>
+      <p class="stamp">SNAPSHOT 2026-06 · VERIFY THE MODEL CARD BEFORE SHIPPING</p>
+    </div>
+  </header>
+
+  <!-- ===================== LEGEND ===================== -->
+  <section class="legend">
+    <div class="lg">
+      <h4>Reading the meter</h4>
+      <p>Bar = approx <b>VRAM to hold weights at Q4_K_M</b>, plotted on a 0–96 GB scale. Ticks mark common GPU tiers.</p>
+    </div>
+    <div class="lg">
+      <h4>Quantization</h4>
+      <p>All figures assume <b>Q4</b>. Full precision (FP16) runs <b>2–4×</b> larger. Add KV-cache for long context.</p>
+    </div>
+    <div class="lg">
+      <h4>MoE caveat</h4>
+      <p>Mixture-of-Experts is <b>fast like its active params, hungry like its total</b>. All weights must load; <b>--cpu-moe</b> can offload idle experts to RAM.</p>
+    </div>
+    <div class="lg">
+      <h4>License signal</h4>
+      <div class="keydots">
+        <span class="keydot"><span class="dot" style="background:var(--green)"></span>Apache / MIT — permissive</span>
+        <span class="keydot"><span class="dot" style="background:var(--amber)"></span>Custom — check terms</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== GRID ===================== -->
+  <main class="grid">
+
+    <!-- ============ COL 1: CODING AGENTS ============ -->
+    <section class="col">
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13 5l-2 14"/>
+        </svg>
+        <div>
+          <div class="cat-name">Coding Agents</div>
+          <div class="cat-job">read · edit · run tools · verify · loop</div>
+        </div>
+      </div>
+
+      <!-- coding low -->
+      <article class="card low">
+        <div class="card-head"><span>Coding</span><span class="tier-tag lo">● Low VRAM</span></div>
+        <h3 class="model">Devstral Small</h3>
+        <div class="maker"><span class="by">Mistral AI · 24B dense</span><span class="lic perm">Apache 2.0</span></div>
+        <div class="specs">
+          <div class="spec"><div class="k">Params</div><div class="v">24B <small>dense</small></div></div>
+          <div class="spec"><div class="k">Context</div><div class="v">128K</div></div>
+          <div class="spec"><div class="k">VRAM ·Q4</div><div class="v">~15 <small>GB</small></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-lab"><span>VRAM budget</span><span><b>fits 1× 16 GB</b></span></div>
+          <div class="track">
+            <div class="tick" style="left:8.3%"><span>8</span></div>
+            <div class="tick" style="left:16.7%"><span>16</span></div>
+            <div class="tick" style="left:25%"><span>24</span></div>
+            <div class="tick" style="left:50%"><span>48</span></div>
+            <div class="tick" style="left:83.3%"><span>80</span></div>
+            <div class="fill green" style="width:15.6%"><span class="mk">15GB</span></div>
+          </div>
+          <div class="gpu-hint">RTX 4060 Ti 16G / 4090 / 32 GB Mac</div>
+        </div>
+        <div class="caps">
+          <span class="cap hot">tool-calling</span><span class="cap hot">agent-tuned</span>
+          <span class="cap">OpenHands-ready</span><span class="cap cool">dense = stable loops</span>
+        </div>
+        <div class="deploy"><span class="pr">$ </span><span class="cmd">ollama run devstral</span></div>
+        <p class="alts-h">Also consider</p>
+        <p class="alt"><b>Qwen3-Coder-Next</b> <span class="m">· 80B/3B MoE · Apache · ~70% SWE-bench · fits 16 GB via CPU-MoE</span></p>
+        <p class="alt"><b>gpt-oss 20B</b> <span class="m">· OpenAI · Apache · 21B/3.6B MoE · adjustable reasoning · ~16 GB</span></p>
+        <p class="alt"><b>Qwen2.5-Coder 32B</b> <span class="m">· FIM autocomplete king · ~20 GB</span></p>
+      </article>
+
+      <!-- coding high -->
+      <article class="card high">
+        <div class="card-head"><span>Coding</span><span class="tier-tag">◆ High VRAM</span></div>
+        <h3 class="model">GLM-5.2</h3>
+        <div class="maker"><span class="by">Z.ai · 754B / 40B active MoE</span><span class="lic perm">MIT</span></div>
+        <div class="specs">
+          <div class="spec"><div class="k">Params</div><div class="v">754B <small>/40B act</small></div></div>
+          <div class="spec"><div class="k">Context</div><div class="v">~1M</div></div>
+          <div class="spec"><div class="k">Class</div><div class="v">Server</div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-lab"><span>VRAM budget</span><span><b>multi-GPU</b></span></div>
+          <div class="track">
+            <div class="tick" style="left:8.3%"><span>8</span></div>
+            <div class="tick" style="left:16.7%"><span>16</span></div>
+            <div class="tick" style="left:25%"><span>24</span></div>
+            <div class="tick" style="left:50%"><span>48</span></div>
+            <div class="tick" style="left:83.3%"><span>80</span></div>
+            <div class="fill server" style="width:100%"><span class="mk">SERVER</span></div>
+          </div>
+          <div class="gpu-hint">H100 / MI300X cluster · vLLM / SGLang</div>
+        </div>
+        <div class="caps">
+          <span class="cap hot">agentic SOTA</span><span class="cap hot">tool-calling</span>
+          <span class="cap cool">1M context</span><span class="cap">reasoning levels</span>
+          <span class="cap">SWE-bench Pro lead</span>
+        </div>
+        <div class="deploy alt"><span class="pr"># </span>vllm serve zai-org/GLM-5.2 — multi-GPU</div>
+        <p class="alts-h">Also consider</p>
+        <p class="alt"><b>DeepSeek-V4</b> <span class="m">· Pro 1.6T/49B · Flash 284B/13B · MIT · 1M ctx</span></p>
+        <p class="alt"><b>Kimi K2.6</b> <span class="m">· ~1.1T MoE · Mod-MIT · agent swarms · long autonomous runs</span></p>
+        <p class="alt"><b>Qwen3-Coder-480B</b> <span class="m">· 35B active · Apache · 69.6% SWE-bench Verified</span></p>
+        <p class="alt"><b>GLM-4.7 Flash</b> <span class="m">· lighter, locally-runnable agentic fallback</span></p>
+      </article>
+    </section>
+
+    <!-- ============ COL 2: VISION ============ -->
+    <section class="col">
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+        <div>
+          <div class="cat-name">Vision</div>
+          <div class="cat-job">OCR · charts · screenshots · GUI agents</div>
+        </div>
+      </div>
+
+      <!-- vision low -->
+      <article class="card low">
+        <div class="card-head"><span>Vision</span><span class="tier-tag lo">● Low VRAM</span></div>
+        <h3 class="model">Qwen3-VL 8B</h3>
+        <div class="maker"><span class="by">Alibaba · 8B dense</span><span class="lic cust">Tongyi Qianwen</span></div>
+        <div class="specs">
+          <div class="spec"><div class="k">Params</div><div class="v">8B <small>+ViT</small></div></div>
+          <div class="spec"><div class="k">Context</div><div class="v">256K</div></div>
+          <div class="spec"><div class="k">VRAM ·Q4</div><div class="v">~9 <small>GB</small></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-lab"><span>VRAM budget</span><span><b>fits 1× 8–12 GB</b></span></div>
+          <div class="track">
+            <div class="tick" style="left:8.3%"><span>8</span></div>
+            <div class="tick" style="left:16.7%"><span>16</span></div>
+            <div class="tick" style="left:25%"><span>24</span></div>
+            <div class="tick" style="left:50%"><span>48</span></div>
+            <div class="tick" style="left:83.3%"><span>80</span></div>
+            <div class="fill green" style="width:9.4%"><span class="mk">9GB</span></div>
+          </div>
+          <div class="gpu-hint">RTX 3060 / 4060 · vision encoder adds ~1–2 GB</div>
+        </div>
+        <div class="caps">
+          <span class="cap hot">vision</span><span class="cap hot">OCR</span>
+          <span class="cap cool">GUI agent</span><span class="cap cool">video</span>
+          <span class="cap">tool-calling</span>
+        </div>
+        <div class="deploy"><span class="pr">$ </span><span class="cmd">ollama run qwen3-vl:8b</span></div>
+        <p class="alts-h">Also consider</p>
+        <p class="alt"><b>Moondream 2</b> <span class="m">· 1.9B · ~2 GB · edge / sub-4 GB only</span></p>
+        <p class="alt"><b>MiniCPM-V 4.5</b> <span class="m">· 8B · ~6 GB · top document OCR</span></p>
+        <p class="alt"><b>Llama 3.2 Vision 11B</b> <span class="m">· ~8–12 GB · most tutorials · <span class="flag">Llama license</span></span></p>
+        <p class="alt"><b>LLaVA 1.6</b> <span class="m">· classic — superseded for OCR/reasoning; fine if already wired in</span></p>
+      </article>
+
+      <!-- vision high -->
+      <article class="card high">
+        <div class="card-head"><span>Vision</span><span class="tier-tag">◆ High VRAM</span></div>
+        <h3 class="model">Qwen3-VL 32B</h3>
+        <div class="maker"><span class="by">Alibaba · 32B dense</span><span class="lic cust">Tongyi Qianwen</span></div>
+        <div class="specs">
+          <div class="spec"><div class="k">Params</div><div class="v">32B <small>+ViT</small></div></div>
+          <div class="spec"><div class="k">Context</div><div class="v">256K<small>→1M</small></div></div>
+          <div class="spec"><div class="k">VRAM ·Q4</div><div class="v">~21 <small>GB</small></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-lab"><span>VRAM budget</span><span><b>fits 1× 24 GB</b></span></div>
+          <div class="track">
+            <div class="tick" style="left:8.3%"><span>8</span></div>
+            <div class="tick" style="left:16.7%"><span>16</span></div>
+            <div class="tick" style="left:25%"><span>24</span></div>
+            <div class="tick" style="left:50%"><span>48</span></div>
+            <div class="tick" style="left:83.3%"><span>80</span></div>
+            <div class="fill amber" style="width:21.9%"><span class="mk">21GB</span></div>
+          </div>
+          <div class="gpu-hint">RTX 3090 / 4090 / 5090 · best non-English OCR</div>
+        </div>
+        <div class="caps">
+          <span class="cap hot">vision</span><span class="cap hot">OCR+</span>
+          <span class="cap cool">3D grounding</span><span class="cap cool">GUI agent</span>
+          <span class="cap">long video</span>
+        </div>
+        <div class="deploy"><span class="pr">$ </span><span class="cmd">ollama run qwen3-vl:32b</span></div>
+        <p class="alts-h">Also consider</p>
+        <p class="alt"><b>Qwen 3.6-27B dense</b> <span class="m">· ~17 GB · Apache · vision baked-in — <span class="flag">llama.cpp / LM Studio (Ollama GGUF pending)</span></span></p>
+        <p class="alt"><b>Gemma 3 27B</b> <span class="m">· QAT int4 ~14 GB · 140+ langs · strong MMMU</span></p>
+        <p class="alt"><b>Llama 3.2 Vision 90B</b> <span class="m">· ~64 GB · multi-GPU / Apple unified</span></p>
+      </article>
+    </section>
+
+    <!-- ============ COL 3: READING / RESEARCH ============ -->
+    <section class="col">
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16H6.5A2.5 2.5 0 0 0 4 21.5ZM20 5.5A2.5 2.5 0 0 0 17.5 3H12v16h5.5A2.5 2.5 0 0 1 20 21.5Z"/>
+        </svg>
+        <div>
+          <div class="cat-name">Reading &amp; Research</div>
+          <div class="cat-job">RAG · summarize · reason · long-doc</div>
+        </div>
+      </div>
+
+      <!-- reading low -->
+      <article class="card low">
+        <div class="card-head"><span>Research</span><span class="tier-tag lo">● Low VRAM</span></div>
+        <h3 class="model">Qwen3 8B</h3>
+        <div class="maker"><span class="by">Alibaba · 8B dense</span><span class="lic perm">Apache 2.0</span></div>
+        <div class="specs">
+          <div class="spec"><div class="k">Params</div><div class="v">8B <small>dense</small></div></div>
+          <div class="spec"><div class="k">Context</div><div class="v">256K</div></div>
+          <div class="spec"><div class="k">VRAM ·Q4</div><div class="v">~6 <small>GB</small></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-lab"><span>VRAM budget</span><span><b>fits 1× 8 GB</b></span></div>
+          <div class="track">
+            <div class="tick" style="left:8.3%"><span>8</span></div>
+            <div class="tick" style="left:16.7%"><span>16</span></div>
+            <div class="tick" style="left:25%"><span>24</span></div>
+            <div class="tick" style="left:50%"><span>48</span></div>
+            <div class="tick" style="left:83.3%"><span>80</span></div>
+            <div class="fill green" style="width:6.25%"><span class="mk">6GB</span></div>
+          </div>
+          <div class="gpu-hint">8 GB GPU / laptop · stable RAG default</div>
+        </div>
+        <div class="caps">
+          <span class="cap hot">reasoning mode</span><span class="cap hot">tool-calling</span>
+          <span class="cap cool">JSON / structured</span><span class="cap">256K ctx</span>
+          <span class="cap">multilingual</span>
+        </div>
+        <div class="deploy"><span class="pr">$ </span><span class="cmd">ollama run qwen3:8b</span></div>
+        <p class="alts-h">Also consider</p>
+        <p class="alt"><b>Phi-4-mini</b> <span class="m">· 3.8B · ~3 GB · MIT · best tiny reasoner</span></p>
+        <p class="alt"><b>Phi-4 14B</b> <span class="m">· ~9 GB · MIT · 84.8% MMLU · beats GPT-4o on math</span></p>
+        <p class="alt"><b>Gemma 3 12B</b> <span class="m">· ~8 GB · multimodal RAG · 140+ langs</span></p>
+        <p class="alt"><span class="m">↳ tip: set <b style="font-family:var(--mono);font-size:11px">"think": false</b> for plain output under tight token budgets</span></p>
+      </article>
+
+      <!-- reading high -->
+      <article class="card high">
+        <div class="card-head"><span>Research</span><span class="tier-tag">◆ High VRAM</span></div>
+        <h3 class="model">DeepSeek-R1</h3>
+        <div class="maker"><span class="by">DeepSeek · 671B MoE</span><span class="lic perm">MIT</span></div>
+        <div class="specs">
+          <div class="spec"><div class="k">Params</div><div class="v">671B <small>MoE</small></div></div>
+          <div class="spec"><div class="k">Strength</div><div class="v">Reason</div></div>
+          <div class="spec"><div class="k">Distills</div><div class="v">8–32B</div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-lab"><span>VRAM budget</span><span><b>full = server</b></span></div>
+          <div class="track">
+            <div class="tick" style="left:8.3%"><span>8</span></div>
+            <div class="tick" style="left:16.7%"><span>16</span></div>
+            <div class="tick" style="left:25%"><span>24</span></div>
+            <div class="tick" style="left:50%"><span>48</span></div>
+            <div class="tick" style="left:83.3%"><span>80</span></div>
+            <div class="fill server" style="width:100%"><span class="mk">SERVER</span></div>
+          </div>
+          <div class="gpu-hint">distills run local: r1:8b ~6 · r1:14b ~10 · r1:32b ~20 GB</div>
+        </div>
+        <div class="caps">
+          <span class="cap hot">reasoning SOTA</span><span class="cap cool">chain-of-thought</span>
+          <span class="cap">math / logic</span><span class="cap">distills run local</span>
+        </div>
+        <div class="deploy"><span class="pr">$ </span><span class="cmd">ollama run deepseek-r1:32b</span> <span style="color:var(--faint)">(distill)</span></div>
+        <p class="alts-h">Also consider</p>
+        <p class="alt"><b>Llama 4 Scout</b> <span class="m">· 10M context · long-doc champion · serious hardware</span></p>
+        <p class="alt"><b>Qwen3 235B-A22B</b> <span class="m">· balanced reasoning flagship · Apache · MoE</span></p>
+        <p class="alt"><b>DeepSeek-V4</b> <span class="m">· newer flagship · reasoning + agentic · 1M ctx</span></p>
+        <p class="alt"><b>Llama 3.3 70B</b> <span class="m">· ~43 GB · GPT-4-class general · <span class="flag">Llama license</span></span></p>
+      </article>
+    </section>
+
+  </main>
+
+  <!-- ===================== RAG PLUMBING BAND ===================== -->
+  <section class="ragband">
+    <div class="ragband-head">
+      <h2>RAG Plumbing</h2>
+      <span class="sub">Embedders + Rerankers · the retrieval layer</span>
+    </div>
+    <p class="ragband-intro">Two-stage retrieval: an <b>embedder</b> turns chunks into vectors and pulls the top 50–100 candidates fast; a <b>reranker</b> (cross-encoder) re-scores those survivors against the query for <b>+15–40% precision</b>. These models are small — CPU to a few GB — so pick by <b>dimensions, context, language, and license</b>, not VRAM tier.</p>
+
+    <div class="ragcols">
+
+      <!-- EMBEDDERS -->
+      <div class="ragcol">
+        <h3>Embedders <span class="cnt">vector retrieval</span></h3>
+        <div class="scards">
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">all-MiniLM-L6</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">23M · 384d · 256 ctx · EN</div>
+            <div class="sc-for">Ultra-light edge &amp; prototyping; runs on anything.</div>
+            <div class="sc-pull"><span class="pr">$ </span>ollama pull all-minilm</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">nomic-embed-text</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">137M · 768d · 8K ctx · EN</div>
+            <div class="sc-for">Lightweight default &amp; most-pulled. Set <b style="font-family:var(--mono)">num_ctx</b> for the full 8K window.</div>
+            <div class="sc-pull"><span class="pr">$ </span>ollama pull nomic-embed-text</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">mxbai-embed-large</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">335M · 1024d · 512 ctx · EN</div>
+            <div class="sc-for">Strong English-only baseline with richer 1024-dim vectors.</div>
+            <div class="sc-pull"><span class="pr">$ </span>ollama pull mxbai-embed-large</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">embeddinggemma</span><span class="lic cust">Gemma</span></div>
+            <div class="sc-spec">300M · MRL 768→128d · 100+ langs</div>
+            <div class="sc-for">Best-in-class sub-500M multilingual; truncatable dims to save storage.</div>
+            <div class="sc-pull"><span class="pr">$ </span>ollama pull embeddinggemma</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">bge-m3</span><span class="lic perm">MIT</span></div>
+            <div class="sc-spec">568M · dense+sparse+ColBERT · 8K · 100+ langs</div>
+            <div class="sc-for">Hybrid-search workhorse — three retrieval modes in one model. The production default.</div>
+            <div class="sc-pull"><span class="pr">$ </span>ollama pull bge-m3</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">qwen3-embedding</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">0.6 / 4 / 8B · MRL ≤4096d · 32K · multiling.</div>
+            <div class="sc-for">SOTA open accuracy; 8B ≈ 70.6 MTEB at ~5 GB Q4. Instruction-aware.</div>
+            <div class="sc-pull"><span class="pr">$ </span>ollama pull qwen3-embedding</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RERANKERS -->
+      <div class="ragcol">
+        <h3>Rerankers <span class="cnt">cross-encoder re-sort</span></h3>
+        <div class="scards">
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">bge-reranker-v2-m3</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">568M · cross-encoder · multilingual</div>
+            <div class="sc-for">Safe default workhorse — well-tested, runs on a consumer GPU.</div>
+            <div class="sc-pull host"># serve via TEI / Infinity / FlagEmbedding</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">gte-reranker-modernbert</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">149M · cross-encoder · EN</div>
+            <div class="sc-for">GPU-budget winner — matches 1.2B-class accuracy at a fraction of the footprint.</div>
+            <div class="sc-pull host"># serve via TEI / Infinity</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">qwen3-reranker</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">0.6 / 4 / 8B · 32K ctx · 100+ langs</div>
+            <div class="sc-for">Instruction-guided relevance — tell it what "relevant" means. 0.6B is the sweet spot; 4B+ is slow.</div>
+            <div class="sc-pull host"># serve via TEI / vLLM</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">mxbai-rerank-large-v2</span><span class="lic perm">Apache</span></div>
+            <div class="sc-spec">~0.5B · cross-encoder · multilingual</div>
+            <div class="sc-for">Permissive accuracy alternative to BGE; clean for commercial shipping.</div>
+            <div class="sc-pull host"># serve via TEI / Infinity</div>
+          </div>
+
+          <div class="scard">
+            <div class="sc-head"><span class="sc-name">jina-reranker-v3</span><span class="lic nc">CC-BY-NC</span></div>
+            <div class="sc-spec">0.6B · &lt;200ms · multilingual</div>
+            <div class="sc-for">Lowest latency in the top tier — but weights are <b>non-commercial</b>; use the Jina API for production.</div>
+            <div class="sc-pull host"># Jina API for commercial use</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <p class="rag-note"><b>TWO TRUTHS:</b> the retriever sets the ceiling — a reranker can't surface what recall already missed, so fix embeddings/chunking first. And reranker size ≠ quality; start small and only scale up if your golden-set eval justifies it.<br><b>NOTE:</b> rerankers aren't part of Ollama's embedding API — serve them with Hugging Face TEI, Infinity, or FlagEmbedding alongside your Ollama stack.</p>
+  </section>
+
+  <!-- ===================== FOOTNOTES ===================== -->
+  <footer class="footnote">
+    <p><b>VRAM rule of thumb</b>At Q4 figure roughly <span style="color:var(--ink)">0.6 GB × billions of params</span> for weights, then add KV-cache for your context window. "Memory" means GPU VRAM or Apple unified memory.</p>
+    <p><b>Why these picks</b>Heroes favour real Ollama / llama.cpp availability and reliable tool-calling, not just leaderboard rank. Dense models tend to beat MoE on agent-loop reliability at the same size.</p>
+    <p><b>This moves fast</b>The open-weight field shifts monthly — new GLM, Kimi, DeepSeek, Qwen and Llama point-releases land constantly. Treat this as a June 2026 snapshot and confirm params, license and context on the live model card.</p>
+  </footer>
+
+</div>
+</body>
+</html>

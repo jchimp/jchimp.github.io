@@ -1,0 +1,1453 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="How-tos, references, notes, and project write-ups.">
+      
+      
+        <meta name="author" content="Jeremy Champion">
+      
+      
+        <link rel="canonical" href="https://jchimp.tech/articles/claude-code-folders/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.51">
+    
+    
+      
+        <title>Claude Code - From Four Terminals to One Good Folder - Jeremy's Lab Notes</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.62c9b9cc.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/jchimp.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/homepage.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-XXXXXXXXXX"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-XXXXXXXXXX",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#claude-code-from-four-terminals-to-one-good-folder" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Jeremy&#x27;s Lab Notes" class="md-header__button md-logo" aria-label="Jeremy's Lab Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jeremy's Lab Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Claude Code - From Four Terminals to One Good Folder
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/jchimp/jchimp.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jchimp/jchimp.github.io
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link">
+        
+  
+  Articles
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+      
+    
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../projects/" class="md-tabs__link">
+          
+  
+  Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+      
+    
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../gallery/" class="md-tabs__link">
+          
+  
+  Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../links/" class="md-tabs__link">
+        
+  
+  Links
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Jeremy&#x27;s Lab Notes" class="md-nav__button md-logo" aria-label="Jeremy's Lab Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+
+    </a>
+    Jeremy's Lab Notes
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jchimp/jchimp.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jchimp/jchimp.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Home
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Articles
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Projects
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Projects
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Overview
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/backup-sqlexpressdb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Backup-SQLExpressDB
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/zonerr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Zonerr
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/jrepo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  JRepo
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/key-rex/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Key-Rex
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/townpump-locator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Town Pump Locator
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Gallery
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Gallery
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Overview
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gallery/computer-hardware-chart-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Computer Hardware Chart
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gallery/characters-to-electrons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Characters to Electrons
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gallery/blockchain-interactive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  How a Blockchain Works
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gallery/claude-code-folders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Claude Code Folders
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gallery/connector-pinout-poster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Connector Pinout Poster
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Links
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  About
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-folders-hold-the-entire-configuration-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Two folders hold the entire configuration layer
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claudemd-suggests-settingsjson-enforces" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CLAUDE.md suggests, settings.json enforces
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#three-primitives-package-repeated-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Three primitives package repeated work
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-a-scripts-inventory-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Example: a scripts inventory command
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#subagents-earn-their-own-context-window-at-a-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Subagents earn their own context window, at a cost
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-routing-has-four-levers-and-no-autorouter" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Model routing has four levers and no autorouter
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#headless-mode-connects-claude-code-to-the-rest-of-the-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Headless mode connects Claude Code to the rest of the CLI
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-pipeline-made-of-these-parts" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        A pipeline made of these parts
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+  
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+  
+
+
+<h1 id="claude-code-from-four-terminals-to-one-good-folder">Claude Code - From Four Terminals to One Good Folder<a class="headerlink" href="#claude-code-from-four-terminals-to-one-good-folder" title="Permanent link">&para;</a></h1>
+<p>Notes from configuring Claude Code properly after several months of running it ad hoc across multiple sessions.</p>
+<p>Claude Code is configured by a set of files in your home folder and in the repo (directory) your are working in. Without those files, every session starts cold and the orchestration happens by hand; with them, configuration carries context across sessions and prior work accumulates.</p>
+<p>View the poster here: <strong><a href="../../files/claude-code-folders/claude-code-folders.html" target="_blank" rel="noopener">Claude Code Folders</a></strong></p>
+<h2 id="two-folders-hold-the-entire-configuration-layer">Two folders hold the entire configuration layer<a class="headerlink" href="#two-folders-hold-the-entire-configuration-layer" title="Permanent link">&para;</a></h2>
+<p>User-level config lives at <code>~/.claude/</code>. Project-level config lives at <code>&lt;repo&gt;/.claude/</code>. Both can contain the same files; the project layer overrides the user layer where they conflict, which is what allows a shared team setup without breaking individual preferences. A managed-policy layer sits above both for organizational use and is irrelevant to most homelab setups.</p>
+<p>Inside either folder:</p>
+<ul>
+<li><code>CLAUDE.md</code>: natural-language instructions loaded as system context at session start.</li>
+<li><code>settings.json</code>: permissions, default model, hooks, environment variables.</li>
+<li><code>commands/&lt;name&gt;.md</code>: slash commands.</li>
+<li><code>agents/&lt;name&gt;.md</code>: subagents.</li>
+<li><code>skills/&lt;name&gt;/SKILL.md</code>: skills.</li>
+<li><code>.mcp.json</code>: MCP server definitions, typically project-only.</li>
+</ul>
+<p>The <code>.local</code> variants (<code>CLAUDE.local.md</code>, <code>settings.local.json</code>) get gitignored automatically and house per-machine quirks or anything that should not propagate to the team copy.</p>
+<h2 id="claudemd-suggests-settingsjson-enforces">CLAUDE.md suggests, settings.json enforces<a class="headerlink" href="#claudemd-suggests-settingsjson-enforces" title="Permanent link">&para;</a></h2>
+<p>This is the most important distinction in the configuration model, and the one most often missed. CLAUDE.md is loaded as model context that the assistant tries to honor. settings.json gates actual tool execution. A rule like "do not delete files without confirmation" written in CLAUDE.md is a strong nudge. The same rule written as a <code>deny</code> entry in settings.json is a hard stop, regardless of what the model decides.</p>
+<ul>
+<li><strong><code>CLAUDE.md</code></strong> sets <strong>preferences</strong>.</li>
+<li><strong><code>settings.json</code></strong> and <code>hooks</code> <strong>set hard limits</strong>.</li>
+</ul>
+<p>Minimal user-level <code>~/.claude/CLAUDE.md</code>, edited down to the only sentences that survived three months of use:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gh"># Environment</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">-</span><span class="w"> </span>WSL2 Ubuntu on Windows. VS Code via Remote-WSL.
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">-</span><span class="w"> </span>Plans before edits. Small diffs.
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gh"># Defaults</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">-</span><span class="w"> </span>Read-only against any database unless explicitly told otherwise.
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">-</span><span class="w"> </span>Treat .env, *.pem, anything in secrets/ as off-limits to read.
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">-</span><span class="w"> </span>Match existing code style in a repo over personal defaults.
+</span></code></pre></div>
+<p>Matching <code>~/.claude/settings.json</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;opusplan&quot;</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;includeCoAuthoredBy&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;permissions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">&quot;allow&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">      </span><span class="s2">&quot;Read&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Grep&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Glob&quot;</span><span class="p">,</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">      </span><span class="s2">&quot;Bash(git status:*)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(git diff:*)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(git log:*)&quot;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="p">],</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">&quot;ask&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Write&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Edit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(git push:*)&quot;</span><span class="p">],</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">&quot;deny&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">      </span><span class="s2">&quot;Bash(rm -rf:*)&quot;</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">      </span><span class="s2">&quot;Read(.env)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Read(**/*.pem)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Read(**/secrets/**)&quot;</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="p">]</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Setting the default model to <code>opusplan</code> routes Opus to plan mode and Sonnet to execution. Most coding work does not need Opus to write the actual edits; it benefits from Opus thinking about which edits to make.</p>
+<h2 id="three-primitives-package-repeated-work">Three primitives package repeated work<a class="headerlink" href="#three-primitives-package-repeated-work" title="Permanent link">&para;</a></h2>
+<p>Commands, skills, and subagents are three distinct things that get conflated.</p>
+<p>A <strong>slash command</strong> is a saved prompt with optional arguments. Lives at <code>.claude/commands/&lt;name&gt;.md</code>. Use when the wording is the only thing being reused, possibly with <code>$1</code> or <code>$ARGUMENTS</code> interpolation.</p>
+<p>A <strong>skill</strong> is a saved procedure with structured steps and optional helper files. Lives at <code>.claude/skills/&lt;name&gt;/SKILL.md</code>. Use when the work has multiple steps, expects a specific output shape, or benefits from supporting files (templates, scripts) colocated with the procedure.</p>
+<p>A <strong>subagent</strong> is a saved worker that runs in its own context window with its own tool permissions. Lives at <code>.claude/agents/&lt;name&gt;.md</code>. Use when the work would otherwise pollute the main session's context, or when the work needs narrower tool access than the main session has.</p>
+<p>Mnemonic: command is a saved prompt, skill is a saved procedure, subagent is a saved worker with its own brain.</p>
+<h2 id="example-a-scripts-inventory-command">Example: a scripts inventory command<a class="headerlink" href="#example-a-scripts-inventory-command" title="Permanent link">&para;</a></h2>
+<p>A typical case where a slash command earns the trouble: documenting a <code>~/scripts/</code> directory that has accumulated <code>final.py</code>, <code>final_v2.py</code>, <code>final_REAL.py</code>, and several files last touched in 2022. The prompt for it gets typed a few times before it becomes obvious it belongs in a file.</p>
+<p><code>.claude/commands/inventory-scripts.md</code>:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>---
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>description: Inventory a scripts directory and propose a sane organization
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>argument-hint: [path]
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>allowed-tools: Read, Glob, Grep, Bash
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="gu">model: sonnet</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="gu">---</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>Look at directory <span class="sb">`$1`</span>. Do not move or delete anything.
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="k">1.</span> Find all .py, .sh, .sql, .ps1 files. Group by extension. Note total count and size.
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="k">2.</span> Read the first 30 lines of each (skip files &gt;1MB). Infer purpose in one sentence.
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="k">3.</span> Flag suspected duplicates and near-duplicates: similar names, similar imports, similar first lines.
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="k">4.</span> Flag risk: hardcoded paths, embedded secrets, references to hosts or databases that may no longer exist.
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="k">5.</span> Propose a structure by purpose (backups/, db-pulls/, monitoring/, one-offs/, archive/), with rename suggestions for the <span class="sb">`final_REAL_v3`</span> situation.
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="k">6.</span> Write the plan to PLAN.md. Do not execute.
+</span></code></pre></div>
+<blockquote>
+<p>The <code>$1</code> is the first argument on the command line just line any other script.</p>
+</blockquote>
+<p>Invoked from a session:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&gt; /inventory-scripts ~/scripts
+</span></code></pre></div>
+<p>The command writes its analysis to <code>PLAN.md</code>. A follow-up message ("Execute the plan. Move, do not delete. Generate INDEX.md describing every script. Log moves to MOVES.log.") triggers the actual reorganization with a paper trail.</p>
+<p>The same pattern transfers cleanly to <code>~/sql/</code> directories, archived dotfiles, and the <code>/tmp/stuff/</code> folder that has been on the disk for two years.</p>
+<h2 id="subagents-earn-their-own-context-window-at-a-cost">Subagents earn their own context window, at a cost<a class="headerlink" href="#subagents-earn-their-own-context-window-at-a-cost" title="Permanent link">&para;</a></h2>
+<p>The point of a subagent is not raw capability; the main session can do anything a subagent can. The point is keeping the main session's context clean. When a subagent reads twenty files looking for a pattern, only its summary returns to the main session. The twenty file reads stay in the subagent's context and disappear when it exits.</p>
+<p>This is the highest-leverage feature for long sessions and also the most expensive feature by token count. Subagent-heavy workflows commonly burn around 7x the tokens of a single-thread session, since each subagent carries its own system prompt and context. Worth it for parallel fan-out (read N repos at once, return N summaries) and for noisy investigation. Not worth it for one-off edits.</p>
+<p>Subagents are markdown files with YAML frontmatter:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>---
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>name: schema-investigator
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>description: Read-only DB and schema analysis. Use proactively for schema pulls and &quot;what does this table do&quot; questions.
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>tools: Read, Grep, Glob, Bash
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="gu">model: sonnet</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="gu">---</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>Investigate schemas and report findings. Never modify data or run DDL/DML.
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>When invoked:
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="k">1.</span> Locate connection config without echoing secrets.
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="k">2.</span> Enumerate requested objects.
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="k">3.</span> Return a tight summary, not raw dumps.
+</span></code></pre></div>
+<p><code>tools</code> is the safety control: a subagent without <code>Write</code> cannot write even if asked. <code>model</code> is the routing control: this agent will run on Sonnet regardless of what the main session is on. <code>description</code> is what the main agent uses to decide when to delegate, so it should read like a job posting rather than a label.</p>
+<h2 id="model-routing-has-four-levers-and-no-autorouter">Model routing has four levers and no autorouter<a class="headerlink" href="#model-routing-has-four-levers-and-no-autorouter" title="Permanent link">&para;</a></h2>
+<p>There is no built-in "route this task to the right model" setting, and at the time of writing it is a requested feature rather than a shipped one. Routing is manual at four levels of increasing specificity:</p>
+<ol>
+<li>Live, in-session: <code>/model sonnet | opus | haiku | opusplan</code>.</li>
+<li>At launch: <code>claude --model sonnet</code>.</li>
+<li>As a default: the <code>model</code> key in <code>settings.json</code>.</li>
+<li>Per subagent: the <code>model:</code> field in agent frontmatter.</li>
+</ol>
+<p>A heuristic that holds up across mixed sysadmin and coding work:</p>
+<ul>
+<li>Sonnet by default. Around 90% of work fits.</li>
+<li>Opus when synthesizing across many inputs, debugging subtle multi-file behavior, or making architecture decisions.</li>
+<li>Haiku for mechanical bulk work: renames, formatting, simple transforms.</li>
+<li><code>opusplan</code> as the session default when work involves real planning. Opus during plan mode, Sonnet during execution. Substantially cheaper than running Opus throughout, with no quality drop on the execution side.</li>
+</ul>
+<p>Setting <code>model:</code> per subagent removes most day-to-day routing decisions. A <code>repo-summarizer</code> pinned to Sonnet and an <code>instruction-writer</code> pinned to Opus will route themselves correctly without intervention.</p>
+<h2 id="headless-mode-connects-claude-code-to-the-rest-of-the-cli">Headless mode connects Claude Code to the rest of the CLI<a class="headerlink" href="#headless-mode-connects-claude-code-to-the-rest-of-the-cli" title="Permanent link">&para;</a></h2>
+<p><code>claude -p "&lt;prompt&gt;"</code> runs non-interactively. No session, no editor. It reads <code>stdin</code>, prints to <code>stdout</code>, and <code>exits</code>. With <code>--output-format json</code> it becomes a normal tool inside bash pipelines, cron jobs, and CI.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Triage SSH brute-force attempts from auth.log</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>cat<span class="w"> </span>/var/log/auth.log<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>claude<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Group failed SSH attempts by source IP. Output JSON: [{ip, count, first_seen, ports[]}]&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">           </span>--output-format<span class="w"> </span>json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | select(.count &gt; 10)&#39;</span>
+</span></code></pre></div>
+<p>This is the bridge from "AI in the editor" to "AI as a step inside an existing pipeline." A surprising amount of homelab automation (log triage, schema documentation, repo summarization, certificate inventory) collapses into headless one-liners once the corresponding subagents or commands exist.</p>
+<p><code>--dangerously-skip-permissions</code> bypasses the per-step confirmations and exists for trusted automation. It is appropriate for sandboxes and inappropriate against any system with real data, since the confirmation prompt is the only thing standing between a runaway tool call and the filesystem.</p>
+<h2 id="a-pipeline-made-of-these-parts">A pipeline made of these parts<a class="headerlink" href="#a-pipeline-made-of-these-parts" title="Permanent link">&para;</a></h2>
+<p>The payoff for setting all of this up: complex workflows assemble from these primitives without manual coordination at runtime.</p>
+<p>Done by hand, reading four legacy repos and synthesizing their summaries into instructions for a downstream agent takes an afternoon and four browser tabs. Configured, it is one command:</p>
+<ol>
+<li>One main session. <code>/add-dir</code> each repo into context.</li>
+<li>A slash command (<code>/build-agent-spec</code>) delegates to a <code>repo-summarizer</code> subagent per repo, in parallel. Each runs on Sonnet, read-only, and writes its summary to <code>summaries/&lt;repo&gt;.md</code>.</li>
+<li>Once all summaries exist, the same command delegates to an <code>instruction-writer</code> subagent on Opus to synthesize the final spec from the collected files.</li>
+</ol>
+<p>Total interaction at the keyboard: one command. The configuration files do the orchestration. Once the interactive version works, the same run can execute headlessly via <code>claude -p "/build-agent-spec ..."</code> and live in cron.</p>
+<h1 id="file-layout">File layout:<a class="headerlink" href="#file-layout" title="Permanent link">&para;</a></h1>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>~/.claude/                      # user, global
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  CLAUDE.md
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  settings.json
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  commands/&lt;name&gt;.md
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>  agents/&lt;name&gt;.md
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>  skills/&lt;name&gt;/SKILL.md
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>&lt;repo&gt;/.claude/                 # project, in git
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>  settings.json
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>  settings.local.json           # gitignored
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>  rules/*.md                    # path-scoped instructions
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>  commands/, agents/, skills/
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>  .mcp.json
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>&lt;repo&gt;/CLAUDE.md                # project instructions, in git
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>&lt;repo&gt;/CLAUDE.local.md          # personal project notes, gitignored
+</span></code></pre></div>
+<p>One operating habit subsumes all of the above: if a prompt or explanation gets typed twice, it belongs in a file. CLAUDE.md line, slash command, skill, or subagent. The choice of which is mechanical once the three primitives are clear.</p>
+<h2 id="cheat-block">Cheat block<a class="headerlink" href="#cheat-block" title="Permanent link">&para;</a></h2>
+<p>In-session slash commands:</p>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/init</code></td>
+<td>bootstrap a project CLAUDE.md from the repo</td>
+</tr>
+<tr>
+<td><code>/memory</code></td>
+<td>show all loaded instructions; debug missing rules here</td>
+</tr>
+<tr>
+<td><code>/model</code></td>
+<td>switch model live in the current session</td>
+</tr>
+<tr>
+<td><code>/agents</code></td>
+<td>create and manage subagents interactively</td>
+</tr>
+<tr>
+<td><code>/add-dir</code></td>
+<td>bring another directory into the session's context</td>
+</tr>
+<tr>
+<td><code>/rewind</code></td>
+<td>roll back Claude's edits to an earlier state</td>
+</tr>
+<tr>
+<td><code>/compact</code></td>
+<td>summarize current context to free token space</td>
+</tr>
+<tr>
+<td><code>/clear</code></td>
+<td>reset context entirely</td>
+</tr>
+<tr>
+<td><code>/ide</code></td>
+<td>connect an external terminal to a VS Code window</td>
+</tr>
+</tbody>
+</table>
+<p>Keyboard:</p>
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Shift+Tab</code></td>
+<td>cycle Default -&gt; Auto-Accept -&gt; Plan modes</td>
+</tr>
+<tr>
+<td><code>Ctrl+Esc</code></td>
+<td>open the VS Code extension panel</td>
+</tr>
+<tr>
+<td><code>Ctrl+B</code></td>
+<td>background a running task</td>
+</tr>
+<tr>
+<td><code>Alt+K</code></td>
+<td>insert <code>@file#lines</code> from the current editor selection</td>
+</tr>
+</tbody>
+</table>
+<p>CLI flags:</p>
+<table>
+<thead>
+<tr>
+<th>flag</th>
+<th>purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--model &lt;alias&gt;</code></td>
+<td>override model for this launch</td>
+</tr>
+<tr>
+<td><code>-p "..."</code> / <code>--print</code></td>
+<td>headless, non-interactive</td>
+</tr>
+<tr>
+<td><code>--output-format json</code></td>
+<td>parseable output</td>
+</tr>
+<tr>
+<td><code>--resume</code></td>
+<td>reopen a past conversation</td>
+</tr>
+<tr>
+<td><code>--add-dir &lt;path&gt;</code></td>
+<td>extra working directory at launch</td>
+</tr>
+<tr>
+<td><code>--dangerously-skip-permissions</code></td>
+<td>bypass confirmations; sandbox only</td>
+</tr>
+</tbody>
+</table>
+<p>Model aliases:</p>
+<table>
+<thead>
+<tr>
+<th>alias</th>
+<th>when to reach for it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sonnet</code></td>
+<td>default, ~90% of work</td>
+</tr>
+<tr>
+<td><code>opus</code></td>
+<td>architecture, multi-input synthesis, hard debugging</td>
+</tr>
+<tr>
+<td><code>haiku</code></td>
+<td>mechanical bulk, simple lookups, raw speed</td>
+</tr>
+<tr>
+<td><code>opusplan</code></td>
+<td>session default when work involves real planning</td>
+</tr>
+</tbody>
+</table>
+
+  
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-arrow-up" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Jeremy Champion
+    </div>
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/jchimp" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.instant","navigation.instant.prefetch","navigation.tabs","navigation.sections","navigation.expand","navigation.top","navigation.path","search.highlight","search.suggest","content.code.copy","content.code.annotate","content.tabs.link"],"search":"../../assets/javascripts/workers/search.b6b7e04f.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7f30b55.min.js"></script>
+      
+    
+  </body>
+</html>

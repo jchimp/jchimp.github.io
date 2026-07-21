@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coins as a Chain of Custody — UTXO Explorer</title>
+<style>
+  :root{
+    --paper:#edeeea; --ink:#16191b; --slate:#565e63; --hair:#c7cac4;
+    --teal:#1b5563; --teal-soft:#dbe6e6; --teal-line:#2a7287;
+    --red:#9b362b; --card:#f8f9f5; --white:#fff;
+    --mono:ui-monospace,"DejaVu Sans Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+  header{padding:44px 0 22px;border-bottom:1.5px solid var(--ink)}
+  .eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:var(--slate);text-transform:uppercase}
+  h1{font-size:clamp(32px,5.5vw,56px);line-height:1.04;letter-spacing:-.02em;margin:12px 0 0;font-weight:800}
+  .lede{font-size:18px;color:var(--slate);max-width:820px;margin:14px 0 0}
+  code,.m{font-family:var(--mono)}
+  section{padding:30px 0}
+  .controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  button{font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid var(--ink);
+    background:var(--white);color:var(--ink);padding:9px 14px;border-radius:8px}
+  button:hover{background:var(--ink);color:var(--paper)}
+  button.ghost{border-color:var(--hair);color:var(--slate)}
+  button.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  button:focus-visible{outline:3px solid var(--teal-line);outline-offset:2px}
+  .stat{font-family:var(--mono);font-size:13.5px;color:var(--slate)}
+  .txwrap{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;padding:10px}
+  svg.tx{width:100%;height:auto;display:block;font-family:var(--mono)}
+  .node{cursor:pointer}
+  .out rect{fill:var(--white);stroke:var(--ink);stroke-width:1.6}
+  .out.utxo rect{stroke:var(--teal);stroke-width:2.6}
+  .out text{fill:var(--ink)}
+  .txn rect{fill:var(--ink)} .txn text{fill:#fff}
+  .edge{stroke:var(--slate);stroke-width:1.8;fill:none;marker-end:url(#arr)}
+  .lit .edge:not(.on){opacity:.1}
+  .lit .node:not(.on){opacity:.18}
+  .out.on rect{fill:var(--teal-soft);stroke:var(--teal-line);stroke-width:2.8}
+  .txn.on rect{fill:var(--teal)}
+  .edge.on{stroke:var(--teal-line);stroke-width:2.9}
+  .dimspent .out.spent{opacity:.16}.dimspent .txn{opacity:.4}.dimspent .edge{opacity:.16}
+  .legend{font-family:var(--mono);font-size:12.5px;color:var(--slate);display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;margin-top:26px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;padding:20px 22px}
+  .bal{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+  .balrow{display:grid;grid-template-columns:64px 1fr 54px;align-items:center;gap:12px;font-family:var(--mono);font-size:14px}
+  .bar{height:18px;background:var(--teal-soft);border:1px solid var(--teal);border-radius:4px;position:relative}
+  .bar span{position:absolute;left:0;top:0;bottom:0;background:var(--teal);border-radius:3px}
+  footer{border-top:1.5px solid var(--ink);padding:20px 0 50px;margin-top:14px}
+  .note{font-style:italic;color:var(--slate);font-size:13.5px;max-width:860px}
+  a{color:var(--teal)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="eyebrow">Interactive · Plate 02</div>
+  <h1>A Coin Is a Chain of Custody</h1>
+  <p class="lede">There are no account balances in Bitcoin. A coin is an <b>unspent transaction output</b> (a UTXO).
+    Spending consumes old outputs and creates new ones, each sealed to the next owner — so every coin carries an
+    unbroken line back to where it was minted. Click any coin to trace it.</p>
+</div></header>
+
+<section><div class="wrap">
+  <div class="controls">
+    <button id="utxoBtn">Show only spendable coins (UTXOs)</button>
+    <button class="ghost" id="clearBtn">Clear highlight</button>
+    <span class="stat" id="stat">Tip: click a coin (the white/teal boxes) to light up its history.</span>
+  </div>
+
+  <div class="txwrap">
+    <svg class="tx" id="svg" viewBox="0 0 1000 470" role="img" aria-label="Transaction graph"></svg>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--white);border:1.6px solid var(--ink)"></i>spent output</span>
+    <span><i style="background:var(--white);border:2.6px solid var(--teal)"></i>UTXO (spendable)</span>
+    <span><i style="background:var(--ink)"></i>transaction</span>
+    <span><i style="background:var(--teal-soft);border:1px solid var(--teal-line)"></i>highlighted lineage</span>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <b>How to read this</b>
+      <hr style="border:0;border-top:1px solid var(--hair);margin:8px 0 12px">
+      <p style="margin:0 0 10px;font-size:15.5px">Black squares are <b>transactions</b>. The boxes they point to are
+        <b>outputs</b> — chunks of coin assigned to an owner. An arrow <i>into</i> a transaction is an input: it spends
+        an earlier output. So value flows left to right, output → transaction → new output.</p>
+      <p style="margin:0;font-size:15.5px"><b>Coinbase</b> is the special transaction that mints new coin with no input —
+        the origin of every chain of custody here. The teal-outlined boxes on the right are the current
+        <b>UTXO set</b>: the only coins that can still be spent.</p>
+    </div>
+    <div class="card">
+      <b>Spendable balances</b> <span class="stat">= sum of each owner's UTXOs</span>
+      <hr style="border:0;border-top:1px solid var(--hair);margin:8px 0 14px">
+      <div class="bal" id="bal"></div>
+      <p class="stat" style="margin:14px 0 0">A wallet "balance" is just the total of the unspent outputs locked to your keys.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <b>Ownership — why only you can spend your UTXOs</b>
+    <hr style="border:0;border-top:1px solid var(--hair);margin:8px 0 12px">
+    <p style="margin:0 0 8px;font-size:15.5px">Each output is locked to an owner's <b>public key</b> (their address).
+      To spend it you attach a <b>signature</b> made with the matching secret <b>private key</b>; anyone can verify the
+      signature with the public key, but no one can forge it or work back to the secret.</p>
+    <p class="note" style="margin:0">This is where prime numbers actually live in Bitcoin — the signatures use
+      elliptic-curve math over a prime field. Mining (the other plate) is brute-force hashing, not prime-finding.</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <p class="note">Teaching model: amounts and owners are illustrative. Total coin is conserved across every
+    transaction (inputs in = outputs out). Real Bitcoin works exactly this way — every payment is a graph of
+    consumed and created outputs. — Plate 02 of the blockchain set.</p>
+</div></footer>
+
+<script>
+/* transaction / UTXO model */
+const txs=[
+ {id:'T0',label:'Coinbase',inputs:[],outputs:['o0']},
+ {id:'T1',label:'Tx 1',inputs:['o0'],outputs:['o1','o2']},
+ {id:'T2',label:'Tx 2',inputs:['o1'],outputs:['o3','o4']},
+ {id:'T3',label:'Tx 3',inputs:['o2'],outputs:['o5','o6']},
+];
+const O={o0:{owner:'Alice',amt:50},o1:{owner:'Bob',amt:30},o2:{owner:'Alice',amt:20},
+ o3:{owner:'Carol',amt:10},o4:{owner:'Bob',amt:20},o5:{owner:'Carol',amt:15},o6:{owner:'Alice',amt:5}};
+const producer=o=>txs.find(t=>t.outputs.includes(o));
+const consumer=o=>txs.find(t=>t.inputs.includes(o));
+const isUTXO=o=>!consumer(o);
+
+/* fixed layout (centers) */
+const TXP={T0:[80,235],T1:[345,235],T2:[665,130],T3:[665,360]};
+const OP ={o0:[210,235],o1:[500,130],o2:[500,330],o3:[835,75],o4:[835,180],o5:[835,330],o6:[835,430]};
+
+const svg=document.getElementById('svg');
+const ns='http://www.w3.org/2000/svg';
+function el(t,a,html){const e=document.createElementNS(ns,t);for(const k in a)e.setAttribute(k,a[k]);if(html!=null)e.innerHTML=html;return e;}
+function edgePath(a,b){const[x1,y1]=a,[x2,y2]=b,mx=(x1+x2)/2;return `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2-9} ${y2}`;}
+
+function build(){
+  svg.innerHTML='<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#565e63"/></marker></defs>';
+  const edges=[];
+  txs.forEach(t=>{
+    t.inputs.forEach(o=>edges.push([OP[o],TXP[t.id],t.id,o]));
+    t.outputs.forEach(o=>edges.push([TXP[t.id],OP[o],t.id,o]));
+  });
+  edges.forEach(([a,b,tx,o])=>svg.appendChild(el('path',{class:'edge','data-tx':tx,'data-out':o,d:edgePath(a,b)})));
+  txs.forEach(t=>{const[x,y]=TXP[t.id];const g=el('g',{class:'node txn','data-tx':t.id});
+    g.appendChild(el('rect',{x:x-36,y:y-23,width:72,height:46,rx:7}));
+    g.appendChild(el('text',{x,y:y-2,'text-anchor':'middle','font-size':13,'font-weight':'bold'},t.id));
+    g.appendChild(el('text',{x,y:y+15,'text-anchor':'middle','font-size':10,fill:'#bcd'},t.label));
+    svg.appendChild(g);});
+  Object.keys(O).forEach(o=>{const[x,y]=OP[o];const u=isUTXO(o);
+    const g=el('g',{class:'node out '+(u?'utxo':'spent'),'data-out':o,tabindex:0,role:'button',
+      'aria-label':`${O[o].owner} ${O[o].amt} coin, ${u?'unspent':'spent'}`});
+    g.appendChild(el('rect',{x:x-60,y:y-21,width:120,height:42,rx:8}));
+    g.appendChild(el('text',{x,y:y-3,'text-anchor':'middle','font-size':13,'font-weight':'bold'},`${O[o].owner}  ${O[o].amt}`));
+    g.appendChild(el('text',{x,y:y+13,'text-anchor':'middle','font-size':9.5,fill:'#565e63'},u?o+' · UTXO':o+' · spent'));
+    g.addEventListener('click',()=>trace(o));
+    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();trace(o);}});
+    svg.appendChild(g);});
+}
+function lineage(o){const N=new Set(),T=new Set();
+ (function up(x){N.add(x);const p=producer(x);if(p){T.add(p.id);p.inputs.forEach(up);}})(o);
+ (function down(x){N.add(x);const c=consumer(x);if(c){T.add(c.id);c.outputs.forEach(down);}})(o);
+ return {N,T};}
+function clearHL(){svg.classList.remove('lit');svg.querySelectorAll('.on').forEach(e=>e.classList.remove('on'));}
+function trace(o){
+  svg.classList.remove('dimspent');document.getElementById('utxoBtn').classList.remove('active');
+  clearHL();svg.classList.add('lit');
+  const{N,T}=lineage(o);
+  N.forEach(n=>svg.querySelector(`.out[data-out="${n}"]`)?.classList.add('on'));
+  T.forEach(t=>svg.querySelector(`.txn[data-tx="${t}"]`)?.classList.add('on'));
+  svg.querySelectorAll('.edge').forEach(e=>{if(N.has(e.dataset.out)&&T.has(e.dataset.tx))e.classList.add('on');});
+  document.getElementById('stat').textContent =
+    `${o}: ${O[o].owner}'s ${O[o].amt} coins · custody ${[...T].sort().join(' → ')}` + (isUTXO(o)?' · still spendable':' · already spent');
+}
+document.getElementById('clearBtn').addEventListener('click',()=>{svg.classList.remove('dimspent');clearHL();
+  document.getElementById('utxoBtn').classList.remove('active');
+  document.getElementById('stat').textContent='Tip: click a coin to light up its history.';});
+document.getElementById('utxoBtn').addEventListener('click',e=>{
+  clearHL();const on=svg.classList.toggle('dimspent');e.target.classList.toggle('active',on);
+  document.getElementById('stat').textContent= on
+    ?'Spendable coins = the unspent outputs. Everything dimmed has already been consumed.'
+    :'Tip: click a coin to light up its history.';});
+
+/* balances = sum of each owner's UTXOs */
+function balances(){
+  const owners={};let max=0;
+  Object.keys(O).forEach(o=>{if(isUTXO(o)){owners[O[o].owner]=(owners[O[o].owner]||0)+O[o].amt;}});
+  Object.values(owners).forEach(v=>max=Math.max(max,v));
+  const wrap=document.getElementById('bal');wrap.innerHTML='';
+  Object.entries(owners).sort((a,b)=>b[1]-a[1]).forEach(([name,v])=>{
+    const row=document.createElement('div');row.className='balrow';
+    row.innerHTML=`<span>${name}</span><div class="bar"><span style="width:${(v/max*100)}%"></span></div><span style="text-align:right">${v}</span>`;
+    wrap.appendChild(row);
+  });
+}
+build();balances();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+/* =====================================================================
+   Layout (Zensical only — these target Material DOM Obsidian lacks)
+   ===================================================================== */
+
+/* Pull the content up a touch + tighten the H1 gap */
+.md-main__inner { margin-top: 0.5rem; }
+.md-typeset h1  { margin-bottom: 0.75rem; }
+
+/* When an .article--no-nav is on the page, widen the column it sits in */
+.md-main__inner:has(.article--no-nav) .md-content {
+  max-width: none;
+  flex: 1 1 auto;     /* in case the parent is flex */
+}
+
+/* …but keep the prose itself readable */
+.article--no-nav .md-typeset,
+.article--no-nav > .article__body {
+  max-width: 70ch;
+  margin-inline: auto;
+}
+
+/* =====================================================================
+   Theming lives in stylesheets/jchimp.css ("Lab Bench") — this file is
+   Zensical DOM layout only. The old "Slate Aurora" palette/element
+   grammar (ember/teal, mono h1-h6, zebra tables, drop shadows) has been
+   retired here since it conflicted with the Lab Bench brand negative
+   rules (no gradients/shadows, no zebra tables, mono reserved for
+   instrumentation). Add new --md-* overrides or element grammar to
+   jchimp.css, not here, so light/dark stay defined in one place.
+   ===================================================================== */

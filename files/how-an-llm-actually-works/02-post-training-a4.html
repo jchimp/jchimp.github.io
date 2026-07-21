@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The A4 box — post-training</title>
+<style>
+  :root{
+    --ground:#E9EDF2;--paper:#F3F6FA;--ink:#17243F;--mid:#566687;
+    --faint:#C9D2DF;--grid:#D7DEE8;--accent:#C2462A;--accent-soft:#F0DAD2;
+    --sft:#234D78;--rl:#2C5A4A;--reason:#7A2E9D;
+    --mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;background:var(--ground);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:26px 26px;color:var(--ink);font-family:var(--mono);line-height:1.5;padding:22px 14px 60px;
+  }
+  .sheet{max-width:780px;margin:0 auto;}
+  .titlebar{border:1.5px solid var(--ink);background:var(--paper);padding:14px 16px;margin-bottom:24px;position:relative;}
+  .titlebar::before,.titlebar::after{content:"";position:absolute;width:9px;height:9px;border:1.5px solid var(--mid);}
+  .titlebar::before{top:-1.5px;left:-1.5px;border-right:none;border-bottom:none;}
+  .titlebar::after{bottom:-1.5px;right:-1.5px;border-left:none;border-top:none;}
+  .eyebrow{font-size:10.5px;letter-spacing:.22em;color:var(--mid);text-transform:uppercase;}
+  h1{font-size:18px;margin:6px 0 4px;font-weight:700;}
+  .sub{font-size:12px;color:var(--mid);margin:0;}
+
+  .blocklabel{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--ink);margin:30px 0 12px;display:flex;align-items:center;gap:9px;}
+  .blocklabel .tab{background:var(--ink);color:#fff;padding:2px 8px;font-size:10px;letter-spacing:.12em;}
+  .blocklabel.s2 .tab{background:var(--sft);}
+  .blocklabel.s3 .tab{background:var(--rl);}
+  .blocklabel.s4 .tab{background:var(--reason);}
+
+  .note{font-size:12.5px;color:var(--mid);margin:0 0 14px;line-height:1.55;}
+  .note .em{color:var(--ink);}
+
+  .panel{border:1.4px solid var(--ink);background:var(--paper);padding:14px;}
+  .panel.soft{border-color:var(--mid);}
+
+  /* pipeline strip */
+  .pipe{border:1.4px solid var(--mid);background:var(--paper);padding:14px;}
+  .pstep{border:1.3px solid var(--ink);background:#fbfcfe;padding:9px 11px;border-left-width:5px;}
+  .pstep .t{font-weight:700;font-size:12.5px;display:block;}
+  .pstep .d{font-size:11px;color:var(--mid);}
+  .pstep.base{border-left-color:var(--mid);}
+  .pstep.sft{border-left-color:var(--sft);}
+  .pstep.rm{border-left-color:var(--accent);}
+  .pstep.rl{border-left-color:var(--rl);}
+  .pstep.rs{border-left-color:var(--reason);}
+  .pstep.frz{border-left-color:var(--ink);background:var(--accent-soft);}
+  .parrow{height:16px;display:flex;align-items:center;justify-content:center;}
+  .parrow svg{display:block;}
+
+  /* stepper */
+  .tabs{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+  .tab-btn{font-family:var(--mono);font-size:11.5px;border:1.4px solid var(--ink);background:#fbfcfe;color:var(--ink);padding:7px 11px;cursor:pointer;font-weight:700;flex:1;min-width:90px;}
+  .tab-btn[aria-pressed="true"]{background:var(--ink);color:#fff;}
+  .tab-btn:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;}
+  .prompt-line{font-size:11.5px;color:var(--mid);margin-bottom:10px;}
+  .prompt-line b{color:var(--ink);}
+  .resp{border:1.4px solid var(--faint);background:#fbfcfe;padding:11px 12px;font-size:12px;line-height:1.6;white-space:pre-wrap;min-height:96px;color:var(--ink);}
+  .resp .ghost{color:var(--mid);font-style:italic;}
+  .changed{font-size:11.5px;margin-top:11px;border-top:1.2px dashed var(--faint);padding-top:10px;color:var(--mid);line-height:1.55;}
+  .changed b{color:var(--accent);}
+  .pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+  .pill{font-size:10px;letter-spacing:.04em;border:1.2px solid var(--faint);color:var(--faint);padding:3px 8px;border-radius:11px;background:var(--ground);transition:.25s;}
+  .pill.on{border-color:var(--rl);color:#fff;background:var(--rl);}
+
+  /* rlhf loop */
+  .loop{border:1.5px solid var(--accent);background:var(--paper);padding:14px;}
+  .loop .lt{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;}
+  .lstep{border:1.3px solid var(--ink);background:#fbfcfe;padding:8px 10px;font-size:11.5px;}
+  .lstep b{font-weight:700;}
+  .lstep .d{display:block;font-size:10.5px;color:var(--mid);margin-top:1px;}
+  .larrow{height:15px;display:flex;align-items:center;justify-content:center;}
+  .lcycle{font-size:11px;color:var(--accent);text-align:center;margin-top:9px;font-weight:700;}
+  .leash{font-size:11px;color:var(--mid);border:1.2px dashed var(--mid);padding:8px 10px;margin-top:10px;}
+  .leash b{color:var(--ink);}
+
+  /* constitutional */
+  .cai{border:1.4px solid var(--ink);background:var(--paper);padding:14px;}
+  .cai .const{border:1.3px solid var(--reason);background:rgba(122,46,157,.05);padding:10px 11px;font-size:11.5px;margin-bottom:12px;}
+  .cai .const b{color:var(--reason);}
+  .phase{border:1.3px solid var(--faint);background:#fbfcfe;padding:10px 11px;margin-bottom:10px;}
+  .phase h4{margin:0 0 5px;font-size:12px;font-weight:700;color:var(--reason);}
+  .phase .flow{font-size:11px;color:var(--ink);line-height:1.7;}
+  .phase .flow .seg{display:inline-block;border:1px solid var(--faint);background:var(--ground);padding:1px 6px;margin:1px;border-radius:2px;}
+
+  /* reasoning */
+  .reason-box{border:1.5px solid var(--reason);background:var(--paper);padding:14px;}
+  .reason-box .rt{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--reason);font-weight:700;margin-bottom:10px;}
+  .cot{border:1.3px solid var(--faint);background:#fbfcfe;padding:11px 12px;font-size:12px;line-height:1.7;}
+  .cot .think{color:var(--mid);}
+  .cot .ans{color:var(--ink);font-weight:700;}
+  .verify{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11.5px;}
+  .verify .ok{color:var(--rl);font-weight:700;border:1.3px solid var(--rl);padding:2px 8px;background:rgba(44,90,74,.08);}
+  .verify .rew{color:var(--reason);font-weight:700;}
+
+  .takeaway{margin-top:28px;border:1.5px solid var(--accent);background:var(--paper);}
+  .takeaway .bar2{background:var(--accent);color:#fff;padding:8px 13px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;}
+  .takeaway .body{padding:13px 14px;}
+  .takeaway p{margin:0 0 9px;font-size:12.5px;line-height:1.55;}
+  .takeaway p:last-child{margin:0;}
+  .takeaway .key{color:var(--accent);font-weight:700;}
+  .foot{margin-top:24px;font-size:10.5px;color:var(--mid);text-align:center;}
+
+  @media (min-width:600px){
+    .lgrid,.cgrid{display:grid;}
+  }
+  /* ---- breadcrumb nav (reference set) ---- */
+  .breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+  .crumb{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;min-height:46px;padding:5px 8px;border:1.4px solid var(--ink);background:var(--paper);text-decoration:none;color:var(--ink);transition:transform .12s ease,border-color .12s ease,background .12s ease;}
+  .crumb .n{font-size:13px;font-weight:700;line-height:1;}
+  .crumb .c{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-top:3px;}
+  .crumb.home .n{font-size:16px;}
+  .crumb:hover,.crumb:focus-visible{border-color:var(--accent);background:#fff;transform:translateY(-2px);outline:none;}
+  .crumb:hover .c,.crumb:focus-visible .c{color:var(--accent);}
+  .crumb.active{background:var(--accent);border-color:var(--accent);cursor:default;}
+  .crumb.active .n{color:#fff;}
+  .crumb.active .c{color:var(--accent-soft);}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <nav class="breadcrumbs" aria-label="Reference set">
+    <a class="crumb home" href="index.html" aria-label="Dashboard hub"><span class="n">⌂</span><span class="c">hub</span></a>
+    <a class="crumb" href="01-two-machine-overview.html" aria-label="01 — The two-machine overview"><span class="n">01</span><span class="c">map</span></a>
+    <span class="crumb active" aria-current="page" aria-label="02 — Post-training (current)"><span class="n">02</span><span class="c">a4</span></span>
+    <a class="crumb" href="03-b5-tool-loop.html" aria-label="03 — The two loops"><span class="n">03</span><span class="c">b5</span></a>
+    <a class="crumb" href="04-attention-forward-pass.html" aria-label="04 — Attention and the forward pass"><span class="n">04</span><span class="c">fwd</span></a>
+    <a class="crumb" href="05-positional-encoding-rope.html" aria-label="05 — Position and RoPE"><span class="n">05</span><span class="c">pos</span></a>
+  </nav>
+
+  <div class="titlebar">
+    <div class="eyebrow">Schematic · the A4 box, opened</div>
+    <h1>Teaching a predictor to be an assistant</h1>
+    <p class="sub">Pretraining loads knowledge. Post-training installs behavior — using the same gradient descent, but new data and a borrowed objective: human (and AI) judgment.</p>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="blocklabel"><span class="tab">map</span> The post-training pipeline</div>
+  <div class="pipe">
+    <div class="pstep base"><span class="t">Base model</span><span class="d">a document completer — fluent, knowledgeable, but not yet "an assistant"</span></div>
+    <div class="parrow"><svg width="12" height="16"><line x1="6" y1="0" x2="6" y2="10" stroke="#17243F" stroke-width="1.3"/><path d="M2.5 7 L6 14 L9.5 7" fill="none" stroke="#17243F" stroke-width="1.3"/></svg></div>
+    <div class="pstep sft"><span class="t">1 · Supervised fine-tuning (SFT)</span><span class="d">imitate thousands of written demonstrations of good assistant answers</span></div>
+    <div class="parrow"><svg width="12" height="16"><line x1="6" y1="0" x2="6" y2="10" stroke="#17243F" stroke-width="1.3"/><path d="M2.5 7 L6 14 L9.5 7" fill="none" stroke="#17243F" stroke-width="1.3"/></svg></div>
+    <div class="pstep rm"><span class="t">2 · Reward model</span><span class="d">learn a scorer of "how good is this answer?" from ranked preferences</span></div>
+    <div class="parrow"><svg width="12" height="16"><line x1="6" y1="0" x2="6" y2="10" stroke="#17243F" stroke-width="1.3"/><path d="M2.5 7 L6 14 L9.5 7" fill="none" stroke="#17243F" stroke-width="1.3"/></svg></div>
+    <div class="pstep rl"><span class="t">3 · RL (RLHF + Constitutional AI)</span><span class="d">push the model to generate answers the scorer rates highly</span></div>
+    <div class="parrow"><svg width="12" height="16"><line x1="6" y1="0" x2="6" y2="10" stroke="#17243F" stroke-width="1.3"/><path d="M2.5 7 L6 14 L9.5 7" fill="none" stroke="#17243F" stroke-width="1.3"/></svg></div>
+    <div class="pstep rs"><span class="t">4 · Reasoning RL</span><span class="d">reward chains of thought that reach verifiably correct answers</span></div>
+    <div class="parrow"><svg width="12" height="16"><line x1="6" y1="0" x2="6" y2="10" stroke="#C2462A" stroke-width="1.4"/><path d="M2.5 7 L6 14 L9.5 7" fill="none" stroke="#C2462A" stroke-width="1.4"/></svg></div>
+    <div class="pstep frz"><span class="t">→ Aligned model → evals (A5) → frozen (A6)</span><span class="d">behavior now baked into the weights</span></div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="blocklabel s2"><span class="tab">try it</span> One prompt, four stages</div>
+  <p class="note">Same input, same knowledge underneath. Watch what each stage <span class="em">changes about behavior</span>.</p>
+  <div class="panel">
+    <div class="prompt-line"><b>user:</b> can you help me get better at running?</div>
+    <div class="tabs">
+      <button class="tab-btn" data-s="0" aria-pressed="true">Base</button>
+      <button class="tab-btn" data-s="1" aria-pressed="false">+ SFT</button>
+      <button class="tab-btn" data-s="2" aria-pressed="false">+ RLHF / CAI</button>
+      <button class="tab-btn" data-s="3" aria-pressed="false">+ Reasoning</button>
+    </div>
+    <div class="resp" id="resp"></div>
+    <div class="pills" id="pills">
+      <span class="pill" data-p="fmt">assistant format</span>
+      <span class="pill" data-p="follow">follows instruction</span>
+      <span class="pill" data-p="tailor">tailors to you</span>
+      <span class="pill" data-p="safe">calibrated &amp; safe</span>
+      <span class="pill" data-p="think">deliberates first</span>
+    </div>
+    <div class="changed" id="changed"></div>
+  </div>
+
+  <!-- RLHF LOOP -->
+  <div class="blocklabel s3"><span class="tab">stage 2–3</span> You can't code "good" — so learn it</div>
+  <p class="note">There's no formula for "helpful." The workaround: have people <span class="em">rank</span> model answers, train a <span class="em">reward model</span> to predict those preferences, then use it as the objective for reinforcement learning.</p>
+  <div class="loop">
+    <div class="lt">⟳ the RLHF loop</div>
+    <div class="lstep"><b>① Policy generates</b><span class="d">the assistant model produces a few candidate answers</span></div>
+    <div class="larrow"><svg width="12" height="15"><line x1="6" y1="0" x2="6" y2="9" stroke="#17243F" stroke-width="1.2"/><path d="M3 7 L6 13 L9 7" fill="none" stroke="#17243F" stroke-width="1.2"/></svg></div>
+    <div class="lstep"><b>② Reward model scores</b><span class="d">the learned scorer rates each one — standing in for a human judge</span></div>
+    <div class="larrow"><svg width="12" height="15"><line x1="6" y1="0" x2="6" y2="9" stroke="#17243F" stroke-width="1.2"/><path d="M3 7 L6 13 L9 7" fill="none" stroke="#17243F" stroke-width="1.2"/></svg></div>
+    <div class="lstep"><b>③ Update the policy</b><span class="d">gradient step that makes high-scoring answers more likely</span></div>
+    <div class="lcycle">↻ repeat millions of times</div>
+    <div class="leash"><b>The leash:</b> a penalty keeps the policy close to the SFT model, so it can't "reward-hack" into weird text that games the scorer but reads as nonsense.</div>
+  </div>
+
+  <!-- CONSTITUTIONAL AI -->
+  <div class="blocklabel s3"><span class="tab">Anthropic</span> Constitutional AI — write the values down</div>
+  <p class="note">Asking humans to label harmful content at scale is slow and grim. Constitutional AI replaces much of it with an <span class="em">explicit written constitution</span> and lets the model supply its own feedback against it.</p>
+  <div class="cai">
+    <div class="const"><b>constitution</b> — a set of plain-language principles (e.g. "choose the response that is most helpful and honest while least likely to be harmful"). Transparent and editable, instead of buried in crowd labels.</div>
+    <div class="phase">
+      <h4>Phase A · critique &amp; revise (supervised)</h4>
+      <div class="flow"><span class="seg">draft answer</span> → <span class="seg">critique it vs a principle</span> → <span class="seg">rewrite</span> → <span class="seg">train on the rewrite</span></div>
+    </div>
+    <div class="phase">
+      <h4>Phase B · RL from AI feedback (RLAIF)</h4>
+      <div class="flow"><span class="seg">model compares two answers vs the constitution</span> → <span class="seg">that becomes preference data</span> → <span class="seg">trains the reward model</span> → <span class="seg">RL as above</span></div>
+    </div>
+    <p class="note" style="margin:4px 0 0;">Net effect: the AI helps judge harmlessness, guided by stated rules — so oversight <span class="em">scales</span>, and the governing values are something you can read.</p>
+  </div>
+
+  <!-- REASONING RL -->
+  <div class="blocklabel s4"><span class="tab">stage 4</span> Where the breadcrumbs get trained in</div>
+  <p class="note">For tasks with a <span class="em">checkable</span> answer (math, code), you don't need human preference at all. Let the model write a long chain of thought, then <span class="em">automatically verify the result</span> and reward the chains that land correctly. It learns that thinking first pays off.</p>
+  <div class="reason-box">
+    <div class="rt">◇ reward from a verifier, not a human</div>
+    <div class="cot"><span class="think">user: what's 17 × 24?
+think: 17 × 24 = 17 × 25 − 17
+      = 425 − 17
+      = 408</span>
+<span class="ans">answer: 408</span></div>
+    <div class="verify"><span class="ok">✓ verifier: 408 correct</span> <span class="rew">→ reinforce this chain</span></div>
+    <p class="note" style="margin:11px 0 0;">Crucially, the reward is on the <span class="em">outcome</span>, so the model is free to discover <span class="em">which</span> steps help — and it converges on writing them out. Each step it emits becomes context the next forward pass can attend back to. <span class="em">This stage trains the habit; attention + RoPE are what use it.</span></p>
+  </div>
+
+  <!-- TAKEAWAY -->
+  <div class="takeaway">
+    <div class="bar2">The whole map, in one line</div>
+    <div class="body">
+      <p>Pretraining presses <span class="key">knowledge</span> into the weights; post-training presses in <span class="key">behavior</span> — and behavior is learned by borrowing an objective the model could never be handed directly: <span class="key">judgment</span>, first human, then AI-against-a-constitution, then an automatic verifier.</p>
+      <p>After this, the weights freeze (A6) and the whole serving stack — harness loop, token loop, attention, position — runs on a model that has been taught not just what words come next, but <em>how to be useful, careful, and deliberate</em> while choosing them.</p>
+    </div>
+  </div>
+
+  <p class="foot">High-level description of standard methods (SFT, RLHF, Constitutional AI, RL with verifiable rewards). Example text and numbers are illustrative; current production recipes aren't public.</p>
+
+</div>
+
+<script>
+  const STAGES = [
+    {
+      key:0,
+      resp:'…can you help me get better at swimming? can you help me with my diet? can you help me find a running group near me?\n\n[Top tips for beginner runners — 2024 guide]\n1. Start with a run/walk…',
+      ghost:true,
+      pills:[],
+      changed:'<b>Base model.</b> It just continues the text — pattern-matching to FAQ lists and articles it saw in pretraining. It doesn\'t grasp that it\'s supposed to answer <em>you</em>.'
+    },
+    {
+      key:1,
+      resp:'Here are some tips to improve your running:\n\n1. Increase mileage gradually (about 10% per week).\n2. Add one interval session weekly.\n3. Take rest days.\n4. Get properly fitted shoes.',
+      ghost:false,
+      pills:['fmt','follow'],
+      changed:'<b>+ SFT.</b> Trained to imitate demonstrations, it now speaks in the assistant format and follows the instruction — but it\'s generic and one-size-fits-all. It doesn\'t check what you actually need.'
+    },
+    {
+      key:2,
+      resp:'Happy to help. One quick question so I don\'t guess: are you training for a race, or building general fitness?\n\nEither way, the safe universal win is adding mileage slowly (~10%/week) and keeping at least one rest day. If you tell me your current weekly distance, I\'ll tailor a plan.',
+      ghost:false,
+      pills:['fmt','follow','tailor','safe'],
+      changed:'<b>+ RLHF / Constitutional AI.</b> Tuned toward what people actually prefer and what\'s safe — it tailors, asks before assuming, stays concise, and knows when to add a caution. Same facts, much better judgment.'
+    },
+    {
+      key:3,
+      resp:'think: they didn\'t give weekly mileage. Safest is to ask, but I can still give a principle that holds for any level: progressive overload + recovery. I\'ll lead with the question, then the universal advice.\n\nHappy to help — quick question: race training or general fitness? Meanwhile: build mileage ~10%/week, keep a rest day, and add one interval session once that feels easy.',
+      ghost:false,
+      pills:['fmt','follow','tailor','safe','think'],
+      changed:'<b>+ Reasoning RL.</b> For harder problems it now deliberates first — laying down intermediate steps before answering. Rewarded for reaching good/correct outcomes, it learned that thinking on the page improves the result.'
+    }
+  ];
+
+  const respEl=document.getElementById("resp");
+  const changedEl=document.getElementById("changed");
+  const pillEls=[...document.querySelectorAll("#pills .pill")];
+  const tabs=[...document.querySelectorAll(".tab-btn")];
+
+  function render(i){
+    const s=STAGES[i];
+    respEl.innerHTML = s.ghost ? '<span class="ghost">'+s.resp+'</span>' : s.resp;
+    changedEl.innerHTML = s.changed;
+    pillEls.forEach(p=>p.classList.toggle("on", s.pills.includes(p.dataset.p)));
+    tabs.forEach(t=>t.setAttribute("aria-pressed", parseInt(t.dataset.s,10)===i));
+  }
+  tabs.forEach(t=>t.addEventListener("click",()=>render(parseInt(t.dataset.s,10))));
+  render(0);
+</script>
+</body>
+</html>

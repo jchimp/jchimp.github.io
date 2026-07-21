@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B5 close-up — the two loops</title>
+<style>
+  :root{
+    --ground:#E9EDF2;--paper:#F3F6FA;--ink:#17243F;--mid:#566687;
+    --faint:#C9D2DF;--grid:#D7DEE8;--accent:#C2462A;--accent-soft:#F0DAD2;
+    --offline:#2C5A4A;--online:#234D78;
+    --kw:#7A2E9D;--str:#2C5A4A;--com:#8794AB;
+    --mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;background:var(--ground);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:26px 26px;color:var(--ink);font-family:var(--mono);line-height:1.5;padding:22px 14px 60px;
+  }
+  .sheet{max-width:780px;margin:0 auto;}
+  .titlebar{border:1.5px solid var(--ink);background:var(--paper);padding:14px 16px;margin-bottom:26px;position:relative;}
+  .titlebar::before,.titlebar::after{content:"";position:absolute;width:9px;height:9px;border:1.5px solid var(--mid);}
+  .titlebar::before{top:-1.5px;left:-1.5px;border-right:none;border-bottom:none;}
+  .titlebar::after{bottom:-1.5px;right:-1.5px;border-left:none;border-top:none;}
+  .eyebrow{font-size:10.5px;letter-spacing:.22em;color:var(--mid);text-transform:uppercase;}
+  h1{font-size:18px;margin:6px 0 4px;font-weight:700;}
+  .sub{font-size:12px;color:var(--mid);margin:0;}
+
+  .blocklabel{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--ink);margin:30px 0 12px;display:flex;align-items:center;gap:9px;}
+  .blocklabel .tab{background:var(--ink);color:#fff;padding:2px 8px;font-size:10px;letter-spacing:.12em;}
+  .blocklabel.inner .tab{background:var(--online);}
+  .blocklabel.outer .tab{background:var(--accent);}
+
+  .note{font-size:12px;color:var(--mid);margin:0 0 14px;line-height:1.5;}
+  .note .em{color:var(--ink);}
+
+  /* code blocks */
+  .code{
+    border:1.4px solid var(--ink);background:#fbfcfe;
+    overflow-x:auto;padding:13px 14px;font-size:11.5px;line-height:1.7;
+    white-space:pre;
+  }
+  .code.inner{border-left:4px solid var(--online);}
+  .code.outer{border-left:4px solid var(--accent);}
+  .com{color:var(--com);font-style:italic;}
+  .kw{color:var(--kw);font-weight:700;}
+  .str{color:var(--str);}
+  .fn{color:var(--online);}
+  .hl{background:var(--accent-soft);display:inline-block;width:100%;}
+
+  /* loop ring diagram */
+  .rings{border:1.4px solid var(--mid);background:var(--paper);padding:18px 14px;margin:14px 0 4px;}
+  .ring-outer{border:1.6px dashed var(--accent);padding:14px 12px 12px;position:relative;}
+  .ring-outer > .tag{position:absolute;top:-9px;left:12px;background:var(--paper);padding:0 7px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  .ring-inner{border:1.6px solid var(--online);padding:13px 12px 11px;position:relative;background:rgba(35,77,120,.05);}
+  .ring-inner > .tag{position:absolute;top:-9px;left:12px;background:#eef2f7;padding:0 7px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--online);font-weight:700;}
+  .ring-row{font-size:11.5px;color:var(--ink);margin:3px 0;}
+  .ring-row .cyc{color:var(--online);font-weight:700;}
+  .ring-outer .ring-row .cyc{color:var(--accent);}
+  .ring-mid{font-size:11px;color:var(--mid);margin:7px 0 0;font-style:italic;}
+
+  /* filmstrip */
+  .strip{display:flex;flex-direction:column;gap:0;margin-top:14px;}
+  .frame{border:1.3px solid var(--faint);background:var(--paper);padding:0;overflow:hidden;}
+  .frame .head{display:flex;justify-content:space-between;align-items:center;background:var(--ground);padding:6px 11px;border-bottom:1.2px solid var(--faint);}
+  .frame .head .step{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);font-weight:700;}
+  .frame .head .who{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.06em;}
+  .frame .ctx{padding:9px 11px;font-size:11px;line-height:1.65;}
+  .msg{padding:2px 0;}
+  .msg .role{display:inline-block;min-width:74px;color:var(--mid);}
+  .msg.system .role{color:var(--mid);}
+  .msg.user .role{color:var(--online);font-weight:700;}
+  .msg.assistant .role{color:var(--offline);font-weight:700;}
+  .msg.tool .role{color:var(--accent);font-weight:700;}
+  .msg.new{background:var(--accent-soft);}
+  .arrow{height:20px;display:flex;align-items:center;justify-content:center;}
+  .arrow svg{display:block;}
+
+  .takeaway{margin-top:28px;border:1.5px solid var(--accent);background:var(--paper);}
+  .takeaway .bar{background:var(--accent);color:#fff;padding:8px 13px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;}
+  .takeaway .body{padding:13px 14px;}
+  .takeaway p{margin:0 0 9px;font-size:12.5px;line-height:1.55;}
+  .takeaway p:last-child{margin:0;}
+  .takeaway .key{color:var(--accent);font-weight:700;}
+
+  .foot{margin-top:24px;font-size:10.5px;color:var(--mid);text-align:center;}
+  /* ---- breadcrumb nav (reference set) ---- */
+  .breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+  .crumb{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;min-height:46px;padding:5px 8px;border:1.4px solid var(--ink);background:var(--paper);text-decoration:none;color:var(--ink);transition:transform .12s ease,border-color .12s ease,background .12s ease;}
+  .crumb .n{font-size:13px;font-weight:700;line-height:1;}
+  .crumb .c{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-top:3px;}
+  .crumb.home .n{font-size:16px;}
+  .crumb:hover,.crumb:focus-visible{border-color:var(--accent);background:#fff;transform:translateY(-2px);outline:none;}
+  .crumb:hover .c,.crumb:focus-visible .c{color:var(--accent);}
+  .crumb.active{background:var(--accent);border-color:var(--accent);cursor:default;}
+  .crumb.active .n{color:#fff;}
+  .crumb.active .c{color:var(--accent-soft);}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <nav class="breadcrumbs" aria-label="Reference set">
+    <a class="crumb home" href="index.html" aria-label="Dashboard hub"><span class="n">⌂</span><span class="c">hub</span></a>
+    <a class="crumb" href="01-two-machine-overview.html" aria-label="01 — The two-machine overview"><span class="n">01</span><span class="c">map</span></a>
+    <a class="crumb" href="02-post-training-a4.html" aria-label="02 — Post-training"><span class="n">02</span><span class="c">a4</span></a>
+    <span class="crumb active" aria-current="page" aria-label="03 — The two loops (current)"><span class="n">03</span><span class="c">b5</span></span>
+    <a class="crumb" href="04-attention-forward-pass.html" aria-label="04 — Attention and the forward pass"><span class="n">04</span><span class="c">fwd</span></a>
+    <a class="crumb" href="05-positional-encoding-rope.html" aria-label="05 — Position and RoPE"><span class="n">05</span><span class="c">pos</span></a>
+  </nav>
+
+  <div class="titlebar">
+    <div class="eyebrow">Schematic · close-up of B5 + B7</div>
+    <h1>Two loops, one stateless function</h1>
+    <p class="sub">The model is a pure function: tokens in → one token out. Everything that feels like "an agent" is a loop the harness wraps around it.</p>
+  </div>
+
+  <!-- RINGS -->
+  <div class="rings">
+    <div class="ring-outer">
+      <span class="tag">Outer loop · the harness (agency lives here)</span>
+      <div class="ring-row"><span class="cyc">↻</span> build context → call model → did it ask for a tool? → run it → inject result → repeat</div>
+      <div class="ring-inner">
+        <span class="tag">Inner loop · generate() (one model call)</span>
+        <div class="ring-row"><span class="cyc">↻</span> forward pass → sample 1 token → append → forward pass → … → STOP</div>
+        <div class="ring-mid">runs once per token in a single reply</div>
+      </div>
+      <div class="ring-mid">each outer turn runs the entire inner loop once</div>
+    </div>
+  </div>
+
+  <!-- INNER LOOP CODE -->
+  <div class="blocklabel inner"><span class="tab">B5 · B6</span> Inner loop — the forward pass</div>
+  <p class="note">One call to <span class="em">generate()</span>. The weights are read-only the whole time. The only trick is the <span class="em">KV cache</span>: process the whole prompt once ("prefill"), then feed just the new token each step ("decode") and reuse what's cached — that's why there's a pause, then streaming.</p>
+  <div class="code inner"><span class="kw">def</span> <span class="fn">generate</span>(token_ids):           <span class="com"># token_ids = ENTIRE context so far</span>
+    kv_cache = []                       <span class="com"># per-call speedup, thrown away after</span>
+    out = []
+
+    <span class="com"># PREFILL: one big pass over the whole prompt</span>
+    logits, kv_cache = model.<span class="fn">forward</span>(token_ids, kv_cache)
+
+    <span class="kw">while</span> True:
+        next_id = <span class="fn">sample</span>(logits)         <span class="com"># temp / top-p pick one token</span>
+        <span class="kw">if</span> next_id == STOP: <span class="kw">break</span>
+        out.<span class="fn">append</span>(next_id)
+        <span class="fn">stream</span>(next_id)                 <span class="com"># &lt;- this is the "typing" you see</span>
+
+        <span class="com"># DECODE: feed ONLY the new token, reuse the cache</span>
+        logits, kv_cache = model.<span class="fn">forward</span>([next_id], kv_cache)
+
+    <span class="kw">return</span> out
+</div>
+  <p class="note" style="margin-top:12px;">Inside each <span class="em">model.forward</span>: the token IDs hit the embedding layer (weights), then every transformer layer does attention (each token reads every earlier token) + an MLP, ending in a probability over the whole vocabulary. No state survives the call — <span class="em">the model has already forgotten this turn.</span></p>
+
+  <!-- OUTER LOOP CODE -->
+  <div class="blocklabel outer"><span class="tab">B7</span> Outer loop — the tool harness</div>
+  <p class="note">This is the "bolting on more than chat" part. Plain backend code. The model <span class="em">never runs a tool</span> — it emits a structured request, the harness executes it, and <span class="em">"injecting" the result just means appending a message and calling the model again.</span></p>
+  <div class="code outer">messages = [system_prompt, user_msg]    <span class="com"># &lt;- this list IS the memory</span>
+
+<span class="kw">while</span> True:
+    prompt = <span class="fn">tokenize</span>(<span class="fn">render</span>(messages, tool_defs))
+    reply  = <span class="fn">generate</span>(prompt)            <span class="com"># the entire inner loop runs here</span>
+    turn   = <span class="fn">parse</span>(reply)
+
+<span class="hl">    <span class="kw">if</span> turn.tool_call:                  <span class="com"># model asked for a tool</span></span>
+<span class="hl">        result = <span class="fn">run_tool</span>(turn.name, turn.args)   <span class="com"># search() / exec() ...</span></span>
+<span class="hl">        messages.<span class="fn">append</span>(turn)            <span class="com"># record the request</span></span>
+<span class="hl">        messages.<span class="fn">append</span>(<span class="fn">tool_msg</span>(result)) <span class="com"># INJECT the result</span></span>
+<span class="hl">        <span class="kw">continue</span>                        <span class="com"># &lt;- call the model AGAIN</span></span>
+
+    <span class="kw">else</span>:
+        messages.<span class="fn">append</span>(turn)
+        <span class="kw">return</span> turn.text                 <span class="com"># final answer, loop ends</span>
+</div>
+  <p class="note" style="margin-top:12px;">The model "reads" the tool result with <span class="em">no special channel</span> — it's just more tokens in <span class="em">messages</span> on the next pass. The harness re-renders the whole growing list each turn (prefix-cached so it isn't wasteful). The model is stateless; <span class="em">the messages list is the entire state of the conversation.</span></p>
+
+  <!-- FILMSTRIP -->
+  <div class="blocklabel"><span class="tab" style="background:var(--mid)">trace</span> Watch the context grow</div>
+  <p class="note">"What's the weather in Tokyo?" — new lines added each turn are highlighted. That accumulation is the whole mechanism.</p>
+
+  <div class="strip">
+    <div class="frame">
+      <div class="head"><span class="step">Turn 0 · context in</span><span class="who">→ model</span></div>
+      <div class="ctx">
+        <div class="msg system"><span class="role">system</span>You are Claude. Tools: get_weather…</div>
+        <div class="msg user new"><span class="role">user</span>What's the weather in Tokyo?</div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg width="14" height="20"><line x1="7" y1="0" x2="7" y2="14" stroke="#566687" stroke-width="1.3"/><path d="M3 11 L7 18 L11 11" fill="none" stroke="#566687" stroke-width="1.3"/></svg></div>
+
+    <div class="frame">
+      <div class="head"><span class="step">Turn 0 · model out → harness runs tool</span><span class="who">tool_call</span></div>
+      <div class="ctx">
+        <div class="msg assistant new"><span class="role">assistant</span>↳ tool_call: get_weather(city="Tokyo")</div>
+        <div class="msg tool new"><span class="role">tool</span>↳ harness executes → "18°C, rain" → appends result</div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg width="14" height="20"><line x1="7" y1="0" x2="7" y2="14" stroke="#C2462A" stroke-width="1.3"/><path d="M3 11 L7 18 L11 11" fill="none" stroke="#C2462A" stroke-width="1.3"/></svg></div>
+
+    <div class="frame">
+      <div class="head"><span class="step">Turn 1 · full context back in</span><span class="who">→ model</span></div>
+      <div class="ctx">
+        <div class="msg system"><span class="role">system</span>You are Claude. Tools: get_weather…</div>
+        <div class="msg user"><span class="role">user</span>What's the weather in Tokyo?</div>
+        <div class="msg assistant"><span class="role">assistant</span>tool_call: get_weather(city="Tokyo")</div>
+        <div class="msg tool new"><span class="role">tool</span>18°C, rain  &nbsp;&larr; now readable as plain context</div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg width="14" height="20"><line x1="7" y1="0" x2="7" y2="14" stroke="#566687" stroke-width="1.3"/><path d="M3 11 L7 18 L11 11" fill="none" stroke="#566687" stroke-width="1.3"/></svg></div>
+
+    <div class="frame">
+      <div class="head"><span class="step">Turn 1 · model out → no tool → done</span><span class="who">final</span></div>
+      <div class="ctx">
+        <div class="msg assistant new"><span class="role">assistant</span>It's 18°C and raining in Tokyo right now.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEAWAY -->
+  <div class="takeaway">
+    <div class="bar">The punchline for a programmer</div>
+    <div class="body">
+      <p>There's barely any magic. A <span class="key">stateless tokens→token function</span> sits inside a <span class="key">while-loop</span> that detects a structured request, runs ordinary code, appends the output, and calls the function again.</p>
+      <p>Every "agentic" capability — search, code execution, file editing, multi-step planning — is the <span class="key">same loop</span> with a bigger tool list. The model supplies judgment about <em>what</em> to call; the harness supplies the <em>doing</em> and the <em>memory</em>.</p>
+      <p>You could write the outer loop in an afternoon (you basically have, in your FastAPI projects). The hard part isn't the loop — it's the frozen file it calls.</p>
+    </div>
+  </div>
+
+  <p class="foot">Pseudocode is illustrative of the control flow, not a literal copy of any internal harness.</p>
+
+</div>
+</body>
+</html>

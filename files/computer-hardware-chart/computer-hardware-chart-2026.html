@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Hardware Chart — 2026 Remaster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF0F2; --panel:#FBFCFD; --ink:#14222C; --muted:#5D6C76; --line:#C7D0D6;
+  --line-soft:#DDE3E7; --gold:#C9A227; --gold-soft:#E2CB7A;
+  --pcb:#E1E9E1; --pcb-line:#9DB29D; --chip:#26343E; --metal:#D8DDE0; --metal-line:#8B959C;
+  --black-plastic:#2A3B46;
+  --intel:#D4E5F6; --intel-line:#2D6FB5;
+  --amd:#DBEDD8; --amd-line:#3F8243;
+  --apple:#EAEBEF; --apple-line:#7C828C;
+  --both:#D5EEED; --both-line:#1F8E8A;
+  --other:#EFEAE0; --other-line:#8A7A55;
+  --new:#D4541F; --new-soft:#F7E3D8;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{background:var(--paper);}
+body{
+  font-family:'IBM Plex Sans',system-ui,sans-serif; color:var(--ink);
+  background:var(--paper); padding:0 0 40px;
+}
+.sheet{max-width:1480px; margin:0 auto; padding:0 18px;}
+
+/* ============ MASTHEAD ============ */
+.masthead{padding:26px 0 10px; border-bottom:3px solid var(--ink); position:relative;}
+.masthead .eyebrow{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:2px;
+}
+.masthead h1{
+  font-family:'Saira Condensed',sans-serif; font-weight:800; font-size:clamp(38px,6vw,76px);
+  line-height:.95; letter-spacing:.01em; text-transform:uppercase;
+}
+.masthead h1 .yr{color:var(--new);}
+.masthead .sub{
+  font-size:13px; color:var(--muted); margin-top:6px; max-width:880px; line-height:1.45;
+}
+.masthead .sub b{color:var(--ink); font-weight:600;}
+.ruler{display:block; width:100%; height:18px; margin-top:14px;}
+
+/* ============ CONTROL BAR ============ */
+.controls{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  padding:12px 0; border-bottom:1px solid var(--line); margin-bottom:18px;
+  position:sticky; top:0; background:var(--paper); z-index:50;
+}
+.controls .lbl{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin-right:2px;
+}
+.chip{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; padding:5px 11px;
+  border:1px solid var(--line); border-radius:999px; background:var(--panel);
+  cursor:pointer; color:var(--ink); transition:all .12s;
+}
+.chip:hover{border-color:var(--ink);}
+.chip.on{background:var(--ink); color:var(--panel); border-color:var(--ink);}
+.chip.newtoggle.on{background:var(--new); border-color:var(--new);}
+.controls .spacer{flex:1;}
+.chip.print{border-style:dashed;}
+.legend{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.legend .key{display:flex; align-items:center; gap:5px; font-size:11px; font-family:'IBM Plex Mono',monospace;}
+.legend .sw{width:14px; height:14px; border-radius:3px; border:1.5px solid;}
+
+/* ============ POSTER GRID ============ */
+.poster{
+  display:grid; gap:18px;
+  grid-template-columns:280px minmax(0,1fr) 312px;
+  grid-template-areas:
+    "ram storage slots"
+    "ram ports   slots"
+    "cpu cpu     cpu"
+    "power power power";
+}
+section{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 14px 16px; min-width:0;}
+#sec-ram{grid-area:ram;} #sec-storage{grid-area:storage;} #sec-ports{grid-area:ports;}
+#sec-slots{grid-area:slots;} #sec-cpu{grid-area:cpu;} #sec-power{grid-area:power;}
+
+section>h2{
+  font-family:'Saira Condensed',sans-serif; font-weight:700; font-size:24px;
+  text-transform:uppercase; letter-spacing:.03em; line-height:1;
+  padding-bottom:8px; margin-bottom:4px; border-bottom:2px solid var(--ink);
+  display:flex; align-items:baseline; gap:8px;
+}
+section>h2 .n{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:400; color:var(--muted); letter-spacing:0;}
+.subhead{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--muted);
+  margin:14px 0 8px; padding-bottom:4px; border-bottom:1px dashed var(--line);
+}
+.note{font-size:11px; color:var(--muted); line-height:1.5; margin-top:10px;}
+.note b{color:var(--ink);}
+
+/* ============ TILES ============ */
+.grid{display:flex; flex-wrap:wrap; gap:6px 10px; align-items:flex-end;}
+.grid.col{flex-direction:column; align-items:stretch; gap:8px;}
+.tile{
+  display:flex; flex-direction:column; gap:3px; padding:7px 8px 6px;
+  border:1px solid transparent; border-radius:5px; cursor:default;
+  transition:border-color .12s, background .12s, opacity .2s;
+  position:relative;
+}
+.tile:hover{border-color:var(--line); background:var(--paper);}
+.tile svg{display:block;}
+.tile .nm{font-size:11.5px; font-weight:600; line-height:1.2; margin-top:4px;}
+.tile .mt{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); line-height:1.35;}
+.tile.dim{opacity:.18; filter:grayscale(1);}
+.tile .newdot{
+  position:absolute; top:5px; right:5px; width:8px; height:8px; border-radius:50%;
+  background:var(--new); display:none;
+}
+.hl-new .tile.isnew{border-color:var(--new); background:var(--new-soft);}
+.hl-new .tile.isnew .newdot{display:block;}
+.hl-new .tile:not(.isnew){opacity:.35;}
+
+/* vendor tinting on cpu tiles */
+.tile.v-intel .vband{background:var(--intel); border-color:var(--intel-line);}
+.tile.v-amd   .vband{background:var(--amd);   border-color:var(--amd-line);}
+.tile.v-apple .vband{background:var(--apple); border-color:var(--apple-line);}
+.tile.v-both  .vband{background:var(--both);  border-color:var(--both-line);}
+.tile.v-other .vband{background:var(--other); border-color:var(--other-line);}
+.vband{
+  align-self:flex-start; font-family:'IBM Plex Mono',monospace; font-size:9px;
+  letter-spacing:.12em; text-transform:uppercase; padding:2px 7px;
+  border:1px solid; border-radius:3px; margin-bottom:6px;
+}
+
+/* CPU section layout */
+#cpu-flow{display:flex; flex-wrap:wrap; gap:8px 14px; align-items:flex-end;}
+.cpu-tile{align-items:center; text-align:center;}
+.cpu-tile .nm{font-size:12px;}
+.scalebar{display:flex; align-items:center; gap:10px; margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted);}
+
+/* PCIe bandwidth mini chart */
+.bw{margin-top:8px;}
+.bw .row{display:flex; align-items:center; gap:8px; margin:4px 0;}
+.bw .g{font-family:'IBM Plex Mono',monospace; font-size:10px; width:64px; color:var(--ink);}
+.bw .bar{height:11px; background:var(--ink); border-radius:2px; min-width:3px;}
+.bw .row.future .bar{background:repeating-linear-gradient(45deg,var(--muted),var(--muted) 3px,transparent 3px,transparent 6px);}
+.bw .v{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted);}
+
+/* tooltip */
+#tip{
+  position:fixed; z-index:200; max-width:280px; background:var(--ink); color:#F2F5F7;
+  font-size:11.5px; line-height:1.5; padding:9px 11px; border-radius:6px;
+  pointer-events:none; opacity:0; transition:opacity .1s; box-shadow:0 6px 24px rgba(10,20,28,.25);
+}
+#tip .t{font-weight:600; margin-bottom:2px;}
+#tip .y{font-family:'IBM Plex Mono',monospace; font-size:10px; color:#9FB3BF; margin-bottom:4px;}
+#tip.show{opacity:1;}
+
+/* footer */
+.colophon{
+  margin-top:20px; padding-top:12px; border-top:3px solid var(--ink);
+  display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); line-height:1.6;
+}
+
+@media (max-width:1100px){
+  .poster{grid-template-columns:minmax(0,1fr); grid-template-areas:"ram" "storage" "ports" "slots" "cpu" "power";}
+}
+
+/* ============ PRINT ============ */
+@media print{
+  @page{size:A2 portrait; margin:10mm;}
+  html,body{background:#fff;}
+  .controls{display:none;}
+  .masthead{padding-top:0;}
+  .sheet{max-width:none; padding:0;}
+  section{border-color:#bbb; break-inside:avoid;}
+  .tile{break-inside:avoid;}
+  .tile.dim{opacity:1; filter:none;}
+  .hl-new .tile:not(.isnew){opacity:1;}
+  #tip{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header class="masthead">
+  <div class="eyebrow">Reference poster · v2.0 · drawn to scale where noted</div>
+  <h1>Computer Hardware Chart <span class="yr">— 2026 Remaster</span></h1>
+  <p class="sub">Four decades of connectors, sockets, modules and slots — the originals from the classic
+  <b>v1.7c (2009)</b> wall chart, plus everything that arrived (and started aging out) since:
+  USB-C &amp; Thunderbolt, M.2 &amp; NVMe, DDR4/DDR5, LPCAMM2, the giant server sockets, and the
+  connectors that came and went in between. Redrawn as flat vector linework. Hover any item for its story.</p>
+  <svg class="ruler" id="ruler" preserveAspectRatio="none"></svg>
+</header>
+
+<div class="controls" id="controls">
+  <span class="lbl">Era</span>
+  <button class="chip era on" data-era="all">All</button>
+  <button class="chip era" data-era="80">’70s–’80s</button>
+  <button class="chip era" data-era="90">’90s</button>
+  <button class="chip era" data-era="00">2000s</button>
+  <button class="chip era" data-era="10">2010s</button>
+  <button class="chip era" data-era="20">2020s</button>
+  <button class="chip newtoggle" id="newToggle">● New since the 2009 chart</button>
+  <span class="spacer"></span>
+  <div class="legend">
+    <span class="key"><span class="sw" style="background:var(--intel);border-color:var(--intel-line)"></span>Intel</span>
+    <span class="key"><span class="sw" style="background:var(--amd);border-color:var(--amd-line)"></span>AMD</span>
+    <span class="key"><span class="sw" style="background:var(--both);border-color:var(--both-line)"></span>AMD/Intel</span>
+    <span class="key"><span class="sw" style="background:var(--apple);border-color:var(--apple-line)"></span>Apple</span>
+    <span class="key"><span class="sw" style="background:var(--other);border-color:var(--other-line)"></span>Other</span>
+  </div>
+  <button class="chip print" onclick="window.print()">⎙ Print / Save as PDF</button>
+</div>
+
+<main class="poster" id="poster">
+  <section id="sec-ram"><h2>Memory <span class="n" id="n-ram"></span></h2><div id="ram-body"></div></section>
+  <section id="sec-storage"><h2>Storage &amp; Drive Interfaces <span class="n" id="n-storage"></span></h2><div id="storage-body"></div></section>
+  <section id="sec-ports"><h2>Ports <span class="n" id="n-ports"></span></h2><div id="ports-body"></div></section>
+  <section id="sec-slots"><h2>Expansion Slots <span class="n" id="n-slots"></span></h2><div id="slots-body"></div></section>
+  <section id="sec-cpu">
+    <h2>CPU Sockets — drawn to a common scale <span class="n">2 px per mm · ordered by debut year</span></h2>
+    <div id="cpu-body"></div>
+  </section>
+  <section id="sec-power"><h2>Power Connectors <span class="n" id="n-power"></span></h2><div id="power-body"></div></section>
+</main>
+
+<footer class="colophon">
+  <div>COMPUTER HARDWARE CHART · 2026 REMASTER<br>
+  An homage to the original photographic wall chart, v1.7c (2009) — beloved of IT closets everywhere.<br>
+  All hardware redrawn as original flat vector illustrations; dimensions approximate, scale as noted.</div>
+  <div style="text-align:right">● marks hardware introduced after the 2009 original<br>
+  Print → “Save as PDF” preserves all artwork as vectors.<br>
+  Set paper to A2/A1 for wall-poster output.</div>
+</footer>
+
+</div>
+<div id="tip"></div>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <pattern id="pgaDots" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="2.5" r="1.25" fill="var(--ink)"/>
+    </pattern>
+    <pattern id="lgaDots" width="3" height="3" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.65" fill="var(--gold)"/>
+    </pattern>
+    <pattern id="lgaDotsDense" width="2.2" height="2.2" patternUnits="userSpaceOnUse">
+      <circle cx="1.1" cy="1.1" r="0.5" fill="var(--gold)"/>
+    </pattern>
+  </defs>
+</svg>
+<script>
+/* ================================================================
+   SVG DRAWING LIBRARY — all generators return SVG markup strings.
+   Flat technical style. Colors via CSS variables.
+   ================================================================ */
+const INK='var(--ink)', LINE='var(--metal-line)', METAL='var(--metal)',
+      GOLD='var(--gold)', GOLDS='var(--gold-soft)', PCB='var(--pcb)',
+      PCBL='var(--pcb-line)', CHIP='var(--chip)', BLK='var(--black-plastic)',
+      PANEL='var(--panel)', PAPER='var(--paper)';
+
+function S(w,h,inner,dispW){
+  const dw = dispW||w;
+  return `<svg width="${dw}" height="${Math.round(h*dw/w)}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+const R=(x,y,w,h,f,s,rx=0,sw=1.4)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${f}" ${s?`stroke="${s}" stroke-width="${sw}"`:''}/>`;
+const C=(x,y,r,f,s,sw=1.4)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" ${s?`stroke="${s}" stroke-width="${sw}"`:''}/>`;
+const P=(d,f,s,sw=1.4)=>`<path d="${d}" fill="${f}" ${s?`stroke="${s}" stroke-width="${sw}" stroke-linejoin="round"`:''}/>`;
+const L=(x1,y1,x2,y2,s,sw=1.2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${s}" stroke-width="${sw}"/>`;
+
+/* ---- pin-dot rows helper ---- */
+function dots(cx,cy,counts,gapX,gapY,r,fill){
+  let o='';
+  counts.forEach((n,ri)=>{
+    const y=cy+ri*gapY, x0=cx-((n-1)*gapX)/2;
+    for(let i=0;i<n;i++) o+=C(x0+i*gapX,y,r,fill);
+  });
+  return o;
+}
+/* ---- gold contact ticks along an edge ---- */
+function ticks(x,y,w,n,h=4,fill=GOLD){
+  let o=''; const g=w/n;
+  for(let i=0;i<n;i++) o+=R(x+i*g+g*0.18,y,g*0.64,h,fill);
+  return o;
+}
+
+/* ================= RAM MODULES ================= */
+/* scale 1.5 px/mm */
+function ramModule({lenMM,hMM=24,chips=8,chipRows=1,notchFrac=null,sideNotch=true,fill=PCB}){
+  const k=1.5, w=lenMM*k, h=hMM*k, edge=6;
+  let o=R(0,0,w,h,fill,PCBL,2);
+  // chips
+  const cw=(w-16)/chips - 4;
+  for(let r2=0;r2<chipRows;r2++){
+    for(let i=0;i<chips;i++){
+      o+=R(8+i*((w-16)/chips)+2, 4+r2*((h-edge-10)/chipRows), cw, (h-edge-12)/chipRows, CHIP);
+    }
+  }
+  // edge contacts split by notch
+  if(notchFrac===null){ o+=ticks(3,h-edge,w-6,Math.min(48,Math.round(w/5)),edge-1); }
+  else{
+    const nx=w*notchFrac, nw=5;
+    const n1=Math.max(3,Math.round((nx-4)/5)), n2=Math.max(3,Math.round((w-nx-8)/5));
+    o+=ticks(3,h-edge,nx-6,n1,edge-1)+ticks(nx+nw+2,h-edge,w-nx-nw-6,n2,edge-1);
+    o+=P(`M${nx-3},${h} v-${edge+2} a4,4 0 0 1 ${nw+5},0 v${edge+2} z`,PANEL,PCBL,1.2);
+  }
+  if(sideNotch){ o+=C(3,h*0.35,3.4,PANEL,PCBL,1.2)+C(w-3,h*0.35,3.4,PANEL,PCBL,1.2); }
+  return S(w,h+1,o);
+}
+function lpcamm(){
+  const k=1.5,w=78*k,h=23*k;
+  let o=P(`M4,0 H${w-4} a4,4 0 0 1 4,4 V${h-4} a4,4 0 0 1 -4,4 H4 a4,4 0 0 1 -4,-4 V4 a4,4 0 0 1 4,-4 z`,PCB,PCBL,1.6);
+  o+=R(10,8,40,18,CHIP)+R(56,8,40,18,CHIP)+R(10,h-14,86,8,GOLDS,GOLD,0.8);
+  o+=C(6,6,2.6,PANEL,PCBL,1.1)+C(w-6,6,2.6,PANEL,PCBL,1.1)+C(w/2,6,2.6,PANEL,PCBL,1.1);
+  // land-grid hint
+  for(let i=0;i<14;i++) o+=R(12+i*6,h-12,3,4,GOLD);
+  return S(w,h+1,o);
+}
+
+/* ================= STORAGE ================= */
+function pinHeader(cols,rows=2,missing=null){ // IDE/floppy style
+  const g=4.4,w=cols*g+8,h=rows*g+8;
+  let o=R(0,0,w,h,BLK,INK,1.5);
+  for(let r2=0;r2<rows;r2++)for(let c=0;c<cols;c++){
+    if(missing&&missing[0]===c&&missing[1]===r2)continue;
+    o+=R(4+c*g+1,4+r2*g+1,g-2.2,g-2.2,GOLDS);
+  }
+  return S(w,h,o);
+}
+function sataConn(dataPins=7,withPower=false){
+  const dp=dataPins*4.5+10, pp=15*3.4+10;
+  const w=withPower?dp+pp+8:dp, h=16;
+  let seg=(x,wid,n)=>P(`M${x},2 h${wid} v12 h-${wid-8} l-8,-5 z`,BLK,INK,1.4)+ticks(x+4,5,wid-12,n,5,GOLDS);
+  let o=seg(1,dp-2,dataPins);
+  if(withPower) o+=seg(dp+6,pp-2,15);
+  return S(w,h+2,o);
+}
+function m2Card(lenMM,keyed='M'){
+  const k=1.4, w=lenMM*k, h=22*k;
+  let o=R(0,0,w,h,PCB,PCBL,2);
+  o+=R(w*0.2,5,w*0.5,h-12,CHIP)+C(w-6,h/2,3,PANEL,PCBL,1.2);
+  // edge connector with key notch(es)
+  const ey=0; // connector on left
+  o=R(8,0,w-8,h,PCB,PCBL,2)+R(w*0.32,5,w*0.46,h-10,CHIP)+C(w-7,h/2,3.2,PANEL,PCBL,1.2);
+  const nB=h*0.26, nM=h*0.74;
+  let edge=`M8,0 v${h}`;
+  o+=R(0,1,8,h-2,GOLDS,GOLD,0.8);
+  if(keyed==='M'||keyed==='B+M') o+=R(-1,nM-3,10,6,PANEL)+L(0,nM-3,8,nM-3,GOLD,0.8)+L(0,nM+3,8,nM+3,GOLD,0.8);
+  if(keyed==='B'||keyed==='B+M') o+=R(-1,nB-3,10,6,PANEL)+L(0,nB-3,8,nB-3,GOLD,0.8)+L(0,nB+3,8,nB+3,GOLD,0.8);
+  for(let i=0;i<Math.round(h/4);i++) o+=R(1,2+i*4,6,2.4,GOLD);
+  return S(w,h+1,o);
+}
+function chipBGA(wmm,hmm){
+  const k=2.4,w=wmm*k,h=hmm*k;
+  let o=R(0,0,w,h,CHIP,INK,1.4,1.2)+C(5,5,1.6,PAPER);
+  return S(w,h,o);
+}
+
+/* ================= PORTS (120x70 canvas) ================= */
+const PW=120,PH=70;
+function port(inner){return S(PW,PH,inner,76);}
+function dsub(rows,scale=1){
+  const maxn=rows[0];
+  const w=Math.max(48,maxn*7.0*scale+16), h=28;
+  const x=(PW-w)/2, y=(PH-h)/2, inset=6;
+  let o=P(`M${x},${y} H${x+w} L${x+w-inset},${y+h} H${x+inset} Z`,METAL,LINE);
+  o+=C(x-9,PH/2,4,PANEL,LINE)+C(x+w+9,PH/2,4,PANEL,LINE);
+  const gy=h/(rows.length+1), gapX=(w-16)/maxn*1.0;
+  rows.forEach((n,i)=>{ o+=dots(PW/2, y+gy*(i+1), [n], gapX*scaleFix(scale), 0, 1.9, INK); });
+  function scaleFix(s){return 1;}
+  return port(o);
+}
+function dviPort(){
+  const w=84,h=26,x=(PW-w)/2,y=(PH-h)/2;
+  let o=R(x,y,w,h,METAL,LINE,4);
+  // 3x8 grid + analog cross
+  for(let r2=0;r2<3;r2++)for(let c=0;c<8;c++) o+=R(x+8+c*6.4,y+5+r2*6.4,3,3,INK);
+  o+=L(x+66,y+5,x+66,y+21,LINE,1.2);
+  o+=R(x+71,y+11,6,4,INK)+R(x+71,y+5,2.6,2.6,INK)+R(x+74.4,y+5,2.6,2.6,INK)+R(x+71,y+18.4,2.6,2.6,INK)+R(x+74.4,y+18.4,2.6,2.6,INK);
+  o+=C(x-6,PH/2,3.6,PANEL,LINE)+C(x+w+6,PH/2,3.6,PANEL,LINE);
+  return port(o);
+}
+function ps2(){
+  let o=C(PW/2,PH/2,21,METAL,LINE)+C(PW/2,PH/2,16,BLK,INK,1.2);
+  o+=R(PW/2-3,PH/2-17,6,6,PANEL);
+  o+=dots(PW/2,PH/2-3,[2],13,0,2,GOLDS);
+  o+=dots(PW/2,PH/2+4,[2],19,0,2,GOLDS);
+  o+=dots(PW/2,PH/2+10,[2],8,0,2,GOLDS);
+  return port(o);
+}
+function rj(n){ // rj45=8, rj11=4
+  const w=n===8?44:34, h=36, x=(PW-w)/2, y=(PH-h)/2;
+  let o=P(`M${x},${y} h${w} v${h*0.55} h-${w*0.18} v${h*0.25} h-${w*0.2} v${h*0.2} h-${w*0.24} v-${h*0.2} h-${w*0.2} v-${h*0.25} h-${w*0.18} z`,BLK,INK,1.4);
+  o+=ticks(x+6,y+2,w-12,n,6,GOLDS);
+  return port(o);
+}
+function usbA(tongue){
+  const w=58,h=24,x=(PW-w)/2,y=(PH-h)/2;
+  let o=R(x,y,w,h,METAL,LINE,2)+R(x+4,y+4,w-8,h-8,BLK);
+  o+=R(x+6,y+6,w-12,8,tongue);
+  o+=ticks(x+12,y+7,w-24,4,5,GOLDS);
+  return port(o);
+}
+function usbB(){
+  const w=34,h=30,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x},${y+8} l8,-8 h${w-16} l8,8 v${h-8} h-${w} z`,METAL,LINE);
+  o+=P(`M${x+5},${y+10} l5,-5 h${w-20} l5,5 v${h-13} h-${w+10} z`,BLK);
+  o+=dots(PW/2,y+12,[2],10,0,2.2,GOLDS)+dots(PW/2,y+22,[2],16,0,2.2,GOLDS);
+  return port(o);
+}
+function usbMini(){
+  const w=34,h=14,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x},${y} h${w} v${h*0.5} l-6,${h*0.5} h-${w-12} l-6,-${h*0.5} z`,METAL,LINE);
+  o+=ticks(x+6,y+3,w-12,5,4,GOLDS);
+  return port(o);
+}
+function usbMicro(wide=false){
+  const w=wide?56:34,h=11,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x+4},${y} h${w-8} l4,4 v${h-4} h-${w} v-${h-4} z`,METAL,LINE);
+  o+=ticks(x+5,y+3,w-10,wide?10:5,4,GOLDS);
+  if(wide) o+=L(PW/2+4,y,PW/2+4,y+h,LINE,1.2);
+  return port(o);
+}
+function usbC(bolt=false,note=''){
+  const w=52,h=17,x=(PW-w)/2,y=(PH-h)/2;
+  let o=R(x,y,w,h,METAL,LINE,8.5)+R(x+3,y+3,w-6,h-6,BLK,null,5.5);
+  o+=R(x+9,y+7.2,w-18,2.6,GOLDS,null,1.3);
+  if(bolt) o+=P(`M${PW/2+33},${PH/2-9} l-5,9 h4 l-6,10 l9,-12 h-4 l5,-7 z`,INK);
+  return port(o);
+}
+function hdmi(scale=1){
+  const w=58*scale,h=18*scale,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x},${y} h${w} v${h*0.55} l-${w*0.14},${h*0.45} h-${w*0.72} l-${w*0.14},-${h*0.45} z`,METAL,LINE);
+  o+=ticks(x+w*0.12,y+3*scale,w*0.76,Math.round(9*scale)+1,5*scale,GOLDS);
+  return port(o);
+}
+function dpPort(mini=false){
+  if(mini){
+    const w=38,h=15,x=(PW-w)/2,y=(PH-h)/2;
+    let o=R(x,y,w,h,METAL,LINE,3)+R(x+4,y+4,w-8,h-8,BLK);
+    o+=R(x+8,y+6,8,4,GOLDS)+R(x+22,y+6,8,4,GOLDS);
+    return port(o);
+  }
+  const w=52,h=18,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x+8},${y} h${w-8} v${h} h-${w} v-${h-9} z`,METAL,LINE);
+  o+=ticks(x+8,y+4,w-16,10,5,GOLDS);
+  return port(o);
+}
+function firewire(p9=false){
+  if(p9){
+    const w=24,h=30,x=(PW-w)/2,y=(PH-h)/2;
+    let o=R(x,y,w,h,METAL,LINE,3)+R(x+4,y+4,w-8,h-8,BLK)+R(x+8,y+10,8,12,GOLDS);
+    return port(o);
+  }
+  const w=22,h=34,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x},${y+6} a${w/2},${w/2} 0 0 1 ${w},0 v${h-6} h-${w} z`,METAL,LINE);
+  o+=R(x+7,y+8,8,18,BLK)+R(x+9,y+11,4,12,GOLDS);
+  return port(o);
+}
+function esata(){
+  const w=52,h=12,x=(PW-w)/2,y=(PH-h)/2;
+  let o=R(x,y,w,h,BLK,INK,1.4,1)+R(x-4,y+2,4,8,METAL,LINE,0,1)+R(x+w,y+2,4,8,METAL,LINE,0,1);
+  o+=ticks(x+8,y+3,w-16,7,4.5,GOLDS);
+  return port(o);
+}
+function lightning(){
+  const w=36,h=10,x=(PW-w)/2,y=(PH-h)/2;
+  let o=R(x,y,w,h,METAL,LINE,5)+ticks(x+5,y+2.6,w-10,8,4.6,GOLDS);
+  return port(o);
+}
+function audioJack(ring){
+  let o=C(PW/2,PH/2,15,ring,INK,1.6)+C(PW/2,PH/2,6.5,BLK,INK,1.4)+C(PW/2,PH/2,2.6,'#000');
+  return port(o);
+}
+function toslink(){
+  const w=26,h=26,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x},${y+5} l5,-5 h${w-10} l5,5 v${h-5} h-${w} z`,BLK,INK,1.5);
+  o+=C(PW/2,PH/2+2,5,'#C0392B')+C(PW/2,PH/2+2,2.4,'#E8B4AC');
+  return port(o);
+}
+function sfp(){
+  const w=78,h=22,x=(PW-w)/2,y=(PH-h)/2;
+  let o=R(x,y,w,h,METAL,LINE,2)+R(x+6,y+5,w-22,h-10,BLK);
+  o+=P(`M${x+w-12},${y+4} a7,7 0 0 1 0,14`, 'none',LINE,1.6);
+  o+=ticks(x+10,y+8,w-32,12,6,GOLDS);
+  return port(o);
+}
+function sdCard(micro=false){
+  if(micro){
+    const w=22,h=32,x=(PW-w)/2,y=(PH-h)/2;
+    let o=P(`M${x},${y+6} l5,-6 h${w-5} v${h*0.55} l-4,4 v${h*0.32} h-${w-4} z`,BLK,INK,1.4);
+    o+=ticks(x+4,y+2,w-8,8,5,GOLDS);
+    return port(o);
+  }
+  const w=32,h=40,x=(PW-w)/2,y=(PH-h)/2;
+  let o=P(`M${x},${y} h${w-8} l8,8 v${h-8} h-${w} z`,BLK,INK,1.4);
+  o+=ticks(x+4,y+3,w-10,9,6,GOLDS)+R(x+2,y+16,4,10,METAL,LINE,1,1);
+  return port(o);
+}
+function rfCoax(){
+  let o=C(PW/2,PH/2,13,METAL,LINE)+C(PW/2,PH/2,8,BLK,INK,1.2)+C(PW/2,PH/2,2,GOLDS);
+  return port(o);
+}
+
+/* ================= EXPANSION SLOTS ================= */
+/* horizontal edge slots, 1.3 px/mm */
+function slot(segsMM,color,keyGap=4){
+  const k=1.3,h=14; const total=segsMM.reduce((a,b)=>a+b,0)*k+(segsMM.length-1)*keyGap;
+  let o='',x=0;
+  segsMM.forEach(mm=>{
+    const w=mm*k;
+    o+=R(x,0,w,h,color,INK,2,1.3);
+    o+=ticks(x+3,4,w-6,Math.max(3,Math.round(w/4.2)),6,GOLDS);
+    x+=w+keyGap;
+  });
+  return S(total,h+1,o);
+}
+function m2Socket(){
+  const w=46,h=14;
+  let o=R(0,0,w,h,BLK,INK,2,1.3);
+  o+=ticks(3,4,w*0.62,9,6,GOLDS)+ticks(w*0.72,4,w*0.22,3,6,GOLDS);
+  return S(w,h+1,o);
+}
+
+/* ================= CPU SOCKETS — 2 px/mm true scale ================= */
+const CPUSCALE=2.0;
+function cpuPGA(wmm,hmm){
+  const w=wmm*CPUSCALE,h=hmm*CPUSCALE;
+  let o=R(0,0,w,h,PAPER,INK,3,1.6);
+  o+=R(5,5,w-10,h-10,'url(#pgaDots)');
+  const c=Math.min(w,h)*0.30;
+  o+=R((w-c)/2,(h-c)/2,c,c,PAPER);
+  o+=R(w-7,h*0.25,4,h*0.5,INK); // ZIF lever hint
+  return S(w,h,o);
+}
+function cpuLGA(wmm,hmm,dense=false){
+  const w=wmm*CPUSCALE,h=hmm*CPUSCALE;
+  let o=R(0,0,w,h,PAPER,INK,3,1.6);
+  o+=R(4,4,w-8,h-8,dense?'url(#lgaDotsDense)':'url(#lgaDots)');
+  const cw=w*0.28,ch=h*0.24;
+  o+=R((w-cw)/2,(h-ch)/2,cw,ch,PAPER);
+  o+=L(2,-3,w-12,-3,INK,2.2); // load arm hint
+  return S(w,h+2,o,undefined);
+}
+function cpuDIP(wmm,hmm,pins){
+  const w=wmm*CPUSCALE,h=hmm*CPUSCALE;
+  let o=R(0,4,w,h,CHIP,INK,2,1.4)+C(7,h/2+4,2.6,PAPER);
+  const n=pins/2,g=w/n;
+  for(let i=0;i<n;i++){o+=R(i*g+g*0.25,0,g*0.5,5,GOLDS);o+=R(i*g+g*0.25,h+3,g*0.5,5,GOLDS);}
+  return S(w,h+8,o);
+}
+function cpuSlot(wmm){
+  const w=wmm*CPUSCALE,h=11*CPUSCALE;
+  let o=R(0,0,w,h,BLK,INK,2,1.4);
+  o+=ticks(4,6,w*0.28,18,10,GOLDS)+ticks(w*0.36,6,w*0.6,40,10,GOLDS);
+  return S(w,h+1,o);
+}
+function cpuSoC(){
+  const w=46*CPUSCALE,h=28*CPUSCALE;
+  let o=R(0,0,w,h,PCB,PCBL,3,1.6);
+  o+=R(8,8,w*0.52,h-16,CHIP,INK,2,1.2);
+  o+=R(w*0.66,8,w*0.26,(h-20)/2,'#4A5A66',INK,2,1)+R(w*0.66,12+(h-20)/2,w*0.26,(h-20)/2,'#4A5A66',INK,2,1);
+  o+=`<text x="${8+w*0.26}" y="${h/2+4}" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#E8EDF0">M-SERIES</text>`;
+  return S(w,h,o);
+}
+
+/* ================= POWER CONNECTORS ================= */
+function powerConn(cols,rows=2,extra=null){
+  const g=11,w=cols*g+8,h=rows*g+8;
+  let o=R(0,0,w,h,BLK,INK,3,1.4);
+  for(let r2=0;r2<rows;r2++)for(let c=0;c<cols;c++) o+=C(4+g/2+c*g,4+g/2+r2*g,3.4,PANEL,LINE,1);
+  o+=R(w/2-7,-4,14,5,BLK,INK,1,1.2); // clip
+  let totW=w, pre='';
+  if(extra==='sideband'){ // 12VHPWR 4 small pins above
+    for(let i=0;i<4;i++) pre+=C(w/2-16.5+i*11,-9,2.2,PANEL,LINE,1);
+    pre+=R(w/2-24,-14,48,9,BLK,INK,2,1.2)+pre;
+    return S(w,h+16,`<g transform="translate(0,15)">${o}</g>${R(w/2-26,0,52,10,BLK,INK,2,1.2)}${[0,1,2,3].map(i=>C(w/2-16.5+i*11,5,2.2,PANEL,LINE,1)).join('')}`);
+  }
+  return S(w,h+5,`<g transform="translate(0,4)">${o}</g>`);
+}
+function molex(n=4,small=false){
+  const g=small?9:13,w=n*g+10,h=small?16:20;
+  let o=P(`M3,0 h${w-6} l3,${h*0.3} v${h*0.7} h-${w} v-${h*0.7} z`,PANEL,LINE,1.5);
+  for(let i=0;i<n;i++) o+=C(5+g/2+i*g,h*0.55,small?2.6:3.6,BLK,INK,1);
+  return S(w,h+1,o);
+}
+function sataPower(){
+  const w=15*3.6+8,h=14;
+  let o=P(`M1,2 h${w-2} v10 h-${w-10} l-8,-5 z`,BLK,INK,1.4)+ticks(5,5,w-12,15,5,GOLDS);
+  return S(w,h+2,o);
+}
+
+/* ================================================================
+   DATA — nm, mt(meta), yr(debut), years(display), nw(new since '09), tip
+   ================================================================ */
+const DATA = {
+
+ram_desktop: [
+ {nm:'30-pin SIPP', mt:'pins, no edge connector · 1983', yr:1983, years:'1983–early ’90s', tip:'Single In-line Pin Package — actual metal pins you bent installing it. Quickly replaced by the socketed SIMM.', svg:ramModule({lenMM:80,hMM:18,chips:9,notchFrac:null,sideNotch:false})},
+ {nm:'30-pin SIMM', mt:'8-bit bus · 1985', yr:1985, years:'1985–mid ’90s', tip:'Installed in banks of 2 or 4 to match the CPU bus width. 256 KB–16 MB per stick.', svg:ramModule({lenMM:89,hMM:18,chips:9,notchFrac:null})},
+ {nm:'72-pin SIMM', mt:'32-bit bus · 1989', yr:1989, years:'1989–late ’90s', tip:'EDO and FPM DRAM lived here. The center notch stopped you from installing 30-pin sticks.', svg:ramModule({lenMM:108,hMM:25,chips:8,notchFrac:0.5})},
+ {nm:'168-pin SDRAM DIMM', mt:'PC66/100/133 · 1993', yr:1993, years:'1993–2002', tip:'First synchronous DRAM. Two notches, 3.3 V, and the eternal PC100 vs PC133 question.', svg:ramModule({lenMM:133,hMM:28,chips:8,notchFrac:0.42})},
+ {nm:'184-pin RDRAM RIMM', mt:'Rambus · 1999', yr:1999, years:'1999–2003', tip:'Intel’s expensive detour. Required continuity modules (CRIMMs) in empty slots and wore metal heat spreaders.', svg:ramModule({lenMM:133,hMM:28,chips:4,notchFrac:0.47,fill:'#D9DDE1'})},
+ {nm:'184-pin DDR DIMM', mt:'DDR-200→400 · 2000', yr:2000, years:'2000–05', tip:'Double Data Rate — transfers on both clock edges. One off-center notch.', svg:ramModule({lenMM:133,hMM:28,chips:8,notchFrac:0.55})},
+ {nm:'240-pin DDR2 DIMM', mt:'DDR2-400→1066 · 2003', yr:2003, years:'2003–09', tip:'Same length, different notch position — the gold standard of “why won’t this fit” lessons.', svg:ramModule({lenMM:133,hMM:28,chips:8,notchFrac:0.48})},
+ {nm:'240-pin DDR3 DIMM', mt:'DDR3-800→2133 · 2007', yr:2007, years:'2007–15', tip:'1.5 V, then 1.35 V “L” variants. The last generation on the 2009 chart.', svg:ramModule({lenMM:133,hMM:28,chips:8,notchFrac:0.41})},
+ {nm:'288-pin DDR4 DIMM', mt:'DDR4-2133→3200 · 2014', yr:2014, nw:1, years:'2014–22', tip:'288 pins in the same 133 mm — a curved “smile” edge eased insertion force. XMP overclocking went mainstream here.', svg:ramModule({lenMM:133,hMM:29,chips:8,notchFrac:0.45})},
+ {nm:'288-pin DDR5 DIMM', mt:'DDR5-4800→8000+ · 2021', yr:2021, nw:1, years:'2021–', tip:'Power management moved onto the stick (PMIC), two independent 32-bit sub-channels, and on-die ECC.', svg:ramModule({lenMM:133,hMM:29,chips:10,notchFrac:0.5})},
+ {nm:'ECC RDIMM (DDR4/5)', mt:'registered, server · 288-pin', yr:2014, nw:1, years:'2014–', tip:'Register chip buffers the address bus; extra DRAM die per rank stores ECC. The notch differs so it won’t fit consumer boards.', svg:ramModule({lenMM:133,hMM:29,chips:9,chipRows:2,notchFrac:0.44})},
+],
+ram_notebook: [
+ {nm:'72-pin SO-DIMM', mt:'32-bit · early ’90s', yr:1992, years:'’90s', tip:'Small Outline — about half DIMM length for laptops.', svg:ramModule({lenMM:60,hMM:22,chips:4,notchFrac:0.35})},
+ {nm:'144-pin SO-DIMM', mt:'SDRAM · 1996', yr:1996, years:'1996–2003', tip:'SDRAM era laptop memory.', svg:ramModule({lenMM:67.6,hMM:24,chips:4,notchFrac:0.45})},
+ {nm:'200-pin SO-DIMM', mt:'DDR/DDR2 · 2001', yr:2001, years:'2001–09', tip:'DDR and DDR2 shared the pin count but not the notch position.', svg:ramModule({lenMM:67.6,hMM:26,chips:4,notchFrac:0.55})},
+ {nm:'204-pin SO-DIMM', mt:'DDR3 · 2008', yr:2008, years:'2008–15', tip:'DDR3 for laptops, and famously for many small NAS boxes.', svg:ramModule({lenMM:67.6,hMM:26,chips:4,notchFrac:0.5})},
+ {nm:'260-pin SO-DIMM', mt:'DDR4 · 2014', yr:2014, nw:1, years:'2014–22', tip:'DDR4 mobile. Also the home of cheap-NAS upgrade culture.', svg:ramModule({lenMM:69.6,hMM:26,chips:4,notchFrac:0.45})},
+ {nm:'262-pin SO-DIMM', mt:'DDR5 · 2021', yr:2021, nw:1, years:'2021–', tip:'DDR5 SO-DIMM — possibly the last of its line as CAMM arrives.', svg:ramModule({lenMM:69.6,hMM:26,chips:4,notchFrac:0.5})},
+ {nm:'LPCAMM2', mt:'LPDDR5X, screw-down · 2024', yr:2024, nw:1, years:'2024–', tip:'The SO-DIMM successor: a flat compression-mount module bringing soldered-LPDDR speeds back to upgradeable form. History rhymes with the SIPP→SIMM jump.', svg:lpcamm()},
+],
+
+storage: [
+ {nm:'IDE / PATA 40-pin', mt:'3.5″ drives · 1986', yr:1986, years:'1986–2007', tip:'Master/slave jumpers, 80-conductor cables for ATA-66+, and pin 20 keyed out so you couldn’t flip the ribbon.', svg:pinHeader(20,2,[10,1])},
+ {nm:'IDE / PATA 44-pin', mt:'2.5″ laptop, power included · 1990s', yr:1992, years:'’90s–2008', tip:'Laptop IDE carried 5 V on the extra pins — no separate power cable.', svg:pinHeader(22,2,[10,1])},
+ {nm:'Floppy 34-pin', mt:'with the famous twist · 1976', yr:1981, years:'1981–2000s', tip:'The cable twist after the first connector is what made drive A: drive A:.', svg:pinHeader(17,2)},
+ {nm:'SCSI 50-pin', mt:'narrow SCSI · 1986', yr:1986, years:'1986–2000s', tip:'Termination, ID jumpers, and chains of devices. Server admins still flinch.', svg:pinHeader(25,2)},
+ {nm:'SCSI SCA 80-pin', mt:'hot-swap backplane', yr:1995, years:'’90s–2000s', tip:'Single Connector Attachment: data + power + config in one, for hot-swap server bays.', svg:pinHeader(30,2)},
+ {nm:'SATA (data)', mt:'7-pin · 1.5→6 Gb/s · 2003', yr:2003, years:'2003–', tip:'The L-shaped key killed the ribbon cable. Revisions I/II/III kept the same plug — a rare act of mercy.', svg:sataConn(7)},
+ {nm:'SATA (data + power)', mt:'7 + 15 pin', yr:2003, years:'2003–', tip:'The full drive-edge pairing on every 2.5″/3.5″ SATA drive.', svg:sataConn(7,true)},
+ {nm:'SAS', mt:'serial attached SCSI · 2004', yr:2004, years:'2004–', tip:'SCSI’s serial successor — SAS backplanes accept SATA drives, never the reverse. Note the bridged key.', svg:sataConn(7,true)},
+ {nm:'mSATA', mt:'full-mini-card SSD · 2009', yr:2009, nw:1, years:'2009–2016', tip:'SATA over a Mini-PCIe-shaped card. A transitional species, fully displaced by M.2.', svg:m2Card(50,'B')},
+ {nm:'M.2 2230', mt:'22×30 mm · Key M', yr:2013, nw:1, years:'2013–', tip:'The tiny one — Steam Deck and laptop Wi-Fi country.', svg:m2Card(30)},
+ {nm:'M.2 2242', mt:'22×42 mm', yr:2013, nw:1, years:'2013–', tip:'Common in ThinkPads and embedded boards.', svg:m2Card(42)},
+ {nm:'M.2 2280 · NVMe (Key M)', mt:'22×80 mm · PCIe ×4', yr:2013, nw:1, years:'2013–', tip:'THE modern SSD. Key M = up to PCIe ×4. Gen5 drives now ship heatsinks bigger than the drive.', svg:m2Card(80,'M')},
+ {nm:'M.2 2280 · SATA (Key B+M)', mt:'two notches = SATA-speed', yr:2013, nw:1, years:'2013–22', tip:'Two notches usually means a SATA drive in M.2 clothing — the great eBay listing trap of the 2010s.', svg:m2Card(80,'B+M')},
+ {nm:'M.2 22110', mt:'22×110 mm · server', yr:2014, nw:1, years:'2014–', tip:'Extra length for power-loss capacitors on datacenter drives.', svg:m2Card(110)},
+ {nm:'U.2 (SFF-8639)', mt:'2.5″ NVMe · 2015', yr:2015, nw:1, years:'2015–', tip:'NVMe in a hot-swappable 2.5″ bay — the server answer to M.2’s screwdriver problem.', svg:sataConn(7,true)},
+ {nm:'eMMC (BGA)', mt:'soldered flash · 11.5×13 mm', yr:2011, nw:1, years:'2011–', tip:'Budget-laptop storage soldered straight to the board. The reason 32 GB Chromebooks exist.', svg:chipBGA(13,11.5)},
+],
+};
+
+DATA.ports = [
+ {nm:'PS/2', mt:'6-pin mini-DIN', yr:1987, years:'1987–2010s', tip:'Purple keyboard, green mouse. Not hot-pluggable — and N-key-rollover purists kept it alive for decades.', svg:ps2()},
+ {nm:'Serial DE-9', mt:'RS-232', yr:1984, years:'’80s–today (industrial)', tip:'Officially DE-9, eternally called DB-9. Still configuring switches and routers in 2026.', svg:dsub([5,4])},
+ {nm:'Parallel DB-25', mt:'Centronics / LPT', yr:1981, years:'1981–2000s', tip:'Printers, ZIP drives, dongles, and LapLink cables. 8 glorious bits at a time.', svg:dsub([13,12],0.62)},
+ {nm:'Game port DA-15', mt:'joystick + MIDI', yr:1981, years:'’80s–2000s', tip:'Two rows, analog axes, and MIDI on pins 12/15. Lived on Sound Blasters.', svg:dsub([8,7],0.8)},
+ {nm:'VGA DE-15', mt:'analog video', yr:1987, years:'1987–2010s', tip:'Three rows of pins, infinite projector meetings. The blue connector that refused to die.', svg:dsub([5,5,5],0.9)},
+ {nm:'DVI-I (dual link)', mt:'digital + analog video', yr:1999, years:'1999–2015', tip:'The 24+5 grid: digital links plus the analog cross, so a passive VGA adapter could hang off it.', svg:dviPort()},
+ {nm:'RJ-11', mt:'phone / modem', yr:1976, years:'’70s–2000s', tip:'56k handshake noises live here. Surprisingly still on some all-in-one printers.', svg:rj(4)},
+ {nm:'RJ-45 Ethernet', mt:'10M→10GBASE-T', yr:1987, years:'1987–', tip:'The great survivor. Same plug from 10BASE-T to 10GbE — only the cable category changed.', svg:rj(8)},
+ {nm:'FireWire 400', mt:'IEEE 1394a · 6-pin', yr:1995, years:'1995–2008', tip:'DV camcorders and early iPods. Faster than USB 1.1 in practice, beaten by USB 2.0 in price.', svg:firewire()},
+ {nm:'FireWire 800', mt:'IEEE 1394b · 9-pin', yr:2003, years:'2003–2012', tip:'800 Mb/s and a new plug. Mostly a Mac and audio-interface affair.', svg:firewire(true)},
+ {nm:'USB-A 1.1 / 2.0', mt:'white/black tongue · 1996', yr:1996, years:'1996–', tip:'The connector with quantum superposition: always wrong-way-up on the first two tries.', svg:usbA('#E8EAEC')},
+ {nm:'USB-A 3.x', mt:'blue tongue · 5–10 Gb/s', yr:2008, nw:1, years:'2008–', tip:'Five extra contacts hidden behind the original four. The blue tongue marked SuperSpeed.', svg:usbA('#2D6FB5')},
+ {nm:'USB-B', mt:'printers, hubs', yr:1996, years:'1996–', tip:'The chunky square. Still shipping on printers and audio interfaces like it’s 1999.', svg:usbB()},
+ {nm:'USB Mini-B', mt:'5-pin', yr:2000, years:'2000–2012', tip:'Cameras, old controllers (hello PS3), early GPS units.', svg:usbMini()},
+ {nm:'USB Micro-B', mt:'phones, everything', yr:2007, years:'2007–2020', tip:'A decade of Android phones and the fragile little hook tabs we all broke.', svg:usbMicro()},
+ {nm:'USB 3.0 Micro-B', mt:'the wide one', yr:2009, nw:1, years:'2009–2020', tip:'Micro-B with a 5-pin sidecar bolted on. External hard drives only, mercifully.', svg:usbMicro(true)},
+ {nm:'USB-C', mt:'24-pin, reversible · 2014', yr:2014, nw:1, years:'2014–', tip:'One plug for data, video, and 240 W of power — and a thousand cables that each support a different subset.', svg:usbC()},
+ {nm:'Thunderbolt 1 / 2', mt:'mini-DP shape · 10–20 Gb/s', yr:2011, nw:1, years:'2011–2016', tip:'Intel’s “Light Peak,” shipped over copper in a Mini DisplayPort body.', svg:dpPort(true)},
+ {nm:'Thunderbolt 3 / 4 / 5', mt:'USB-C shape · 40–120 Gb/s', yr:2015, nw:1, years:'2015–', tip:'PCIe over a cable: eGPUs, 8K displays, docks. Look for the ⚡ — the shape alone tells you nothing.', svg:usbC(true)},
+ {nm:'Apple Lightning', mt:'8-pin reversible · 2012', yr:2012, nw:1, years:'2012–2024', tip:'Born after the 2009 chart, killed by EU regulation in 2024. A full lifecycle inside one poster revision.', svg:lightning()},
+ {nm:'HDMI', mt:'Type A · 1.0→2.1', yr:2003, years:'2003–', tip:'Same plug since 2003; HDMI 2.1 quietly raised it to 48 Gb/s for 4K120.', svg:hdmi()},
+ {nm:'Mini / Micro HDMI', mt:'Type C / D', yr:2006, nw:1, years:'2006–2010s', tip:'Cameras and tablets. Always missing the one adapter you need.', svg:hdmi(0.62)},
+ {nm:'DisplayPort', mt:'1.0→2.1 · 80 Gb/s', yr:2008, nw:1, years:'2008–', tip:'The PC monitor standard — one squared corner, a latch, and daisy-chaining via MST.', svg:dpPort()},
+ {nm:'Mini DisplayPort', mt:'Apple, then everyone', yr:2008, nw:1, years:'2008–2018', tip:'Apple’s 2008 shrink, later shared with Thunderbolt 1/2 — same socket, different silicon.', svg:dpPort(true)},
+ {nm:'eSATA', mt:'external SATA · 3–6 Gb/s', yr:2004, years:'2004–2013', tip:'Full SATA speed externally, but no power on the plug. USB 3.0 ate it alive.', svg:esata()},
+ {nm:'3.5 mm audio', mt:'TRS / TRRS', yr:1979, years:'forever', tip:'Lime out, pink mic, blue line-in. Pronounced dead on phones in 2016; alive everywhere else.', svg:audioJack('#7CB47C')},
+ {nm:'TOSLINK', mt:'optical S/PDIF', yr:1983, years:'1983–', tip:'Audio over a glowing red light. Squint and you can see the bits.', svg:toslink()},
+ {nm:'SFP / SFP+ / SFP28', mt:'1–25 Gb/s modular', yr:2001, nw:1, years:'2001–', tip:'The homelab flex: fiber or DAC into a hot-swap cage. SFP+ (10 Gb) is now cheap surplus gold.', svg:sfp()},
+ {nm:'SD card', mt:'UHS-I/II · 2 GB→2 TB', yr:1999, years:'1999–', tip:'UHS-II added a second pin row; the lock slider still confuses everyone.', svg:sdCard()},
+ {nm:'microSD', mt:'+ Express variants', yr:2005, nw:1, years:'2005–', tip:'Fingernail-sized; microSD Express now runs NVMe over the same footprint.', svg:sdCard(true)},
+ {nm:'Coax / RF', mt:'F-connector', yr:1970, years:'’70s–', tip:'Channel 3 or channel 4? Cable modems still end in one of these.', svg:rfCoax()},
+];
+
+DATA.slots = [
+ {nm:'ISA 8-bit', mt:'4.77 MHz · 1981', yr:1981, years:'1981–’90s', tip:'The original IBM PC bus. Set your IRQ and DMA jumpers and pray.', svg:slot([81],'var(--black-plastic)')},
+ {nm:'ISA 16-bit', mt:'8 MHz · 1984', yr:1984, years:'1984–2000s', tip:'The AT extension — that second segment carried 8 more data bits.', svg:slot([81,45],'var(--black-plastic)')},
+ {nm:'VESA Local Bus', mt:'ISA + VL extension · 1992', yr:1992, years:'1992–95', tip:'A comically long slot bolted onto ISA for 486-era video cards. Died with the 486.', svg:slot([81,45,55],'#6B4F3A')},
+ {nm:'PCI', mt:'32-bit · 133 MB/s · 1992', yr:1992, years:'1992–2010s', tip:'Plug and Play, mostly. The white slot that hosted two decades of sound and network cards.', svg:slot([15,68],'#E9E4D6')},
+ {nm:'PCI-X', mt:'64-bit server PCI · 1998', yr:1998, years:'1998–2008', tip:'Longer, faster server PCI — common on RAID and gigabit cards of the era.', svg:slot([15,68,40],'#E9E4D6')},
+ {nm:'AGP', mt:'1×→8× · graphics only · 1997', yr:1997, years:'1997–2006', tip:'A dedicated graphics slot with its own retention clip. 3dfx, GeForce 256, Radeon 9700 — all lived here.', svg:slot([30,42],'#8B5E3C')},
+ {nm:'PCIe ×1', mt:'25 mm', yr:2004, years:'2004–', tip:'Sound cards, capture cards, that one weird adapter.', svg:slot([9,10],'var(--black-plastic)')},
+ {nm:'PCIe ×4', mt:'39 mm', yr:2004, years:'2004–', tip:'NVMe adapters and 10 GbE NICs.', svg:slot([9,24],'var(--black-plastic)')},
+ {nm:'PCIe ×8', mt:'56 mm', yr:2004, years:'2004–', tip:'HBAs and most server cards.', svg:slot([9,41],'var(--black-plastic)')},
+ {nm:'PCIe ×16', mt:'89 mm · the GPU slot', yr:2004, years:'2004–', tip:'Physically unchanged since 2004 while bandwidth grew 32×. Reinforced with metal once GPUs hit 2 kg.', svg:slot([9,74],'var(--black-plastic)')},
+ {nm:'Mini PCIe', mt:'laptop Wi-Fi · 2005', yr:2005, nw:1, years:'2005–2015', tip:'Wi-Fi cards and mSATA SSDs shared this socket. Replaced by M.2 Key A/E.', svg:m2Socket()},
+ {nm:'M.2 socket (Key M)', mt:'the new expansion slot', yr:2013, nw:1, years:'2013–', tip:'Arguably the real successor to the expansion slot for storage — flat to the board, no cables.', svg:m2Socket()},
+];
+
+DATA.power = [
+ {nm:'Molex 4-pin', mt:'5 V + 12 V peripheral', yr:1981, years:'1981–', tip:'Required two hands and a grudge to unplug. Powered everything for 30 years.', svg:molex(4)},
+ {nm:'Berg / floppy 4-pin', mt:'3.5″ floppy power', yr:1984, years:'’80s–2000s', tip:'The tiny one — easy to misalign, with sparky consequences.', svg:molex(4,true)},
+ {nm:'ATX 20-pin', mt:'main board power · 1995', yr:1995, years:'1995–2004', tip:'ATX brought soft power-off: the OS could finally turn the PC off itself.', svg:powerConn(10)},
+ {nm:'ATX 24-pin', mt:'+4 for PCIe-era boards', yr:2004, years:'2004–', tip:'Four extra pins for PCIe power delivery; most plugs split 20+4 for compatibility.', svg:powerConn(12)},
+ {nm:'EPS 4-pin (P4)', mt:'CPU 12 V', yr:2000, years:'2000–', tip:'Added for the power-hungry Pentium 4 — the name stuck.', svg:powerConn(2)},
+ {nm:'EPS 8-pin', mt:'CPU 12 V · servers→desktops', yr:2003, years:'2003–', tip:'Modern boards often want two of these for big CPUs.', svg:powerConn(4)},
+ {nm:'SATA power', mt:'15-pin blade', yr:2003, years:'2003–', tip:'3.3/5/12 V on a slim blade. Bent ones cause the weirdest drive bugs.', svg:sataPower()},
+ {nm:'PCIe 6-pin', mt:'75 W', yr:2004, years:'2004–', tip:'The first GPU auxiliary plug, for cards that outgrew the slot’s 75 W.', svg:powerConn(3)},
+ {nm:'PCIe 8-pin (6+2)', mt:'150 W', yr:2007, years:'2007–', tip:'Stack several for big GPUs; the dangling +2 is a cable-management war crime.', svg:powerConn(4)},
+ {nm:'12VHPWR / 12V-2x6', mt:'600 W · 16-pin', yr:2022, nw:1, years:'2022–', tip:'One plug, 600 W, four sense pins — and a famous melting saga that forced the revised 12V-2x6. Seat it FULLY.', svg:powerConn(6,2,'sideband')},
+];
+
+DATA.cpu = [
+ {v:'other', nm:'DIP-40', pins:'40 pins', years:'1971–’80s', yr:1971, tip:'8086, Z80, 6502 — the chips that started it all, in a package you could pry out with a screwdriver.', svg:cpuDIP(51,15,40)},
+ {v:'both', nm:'Socket 7', pins:'321 PGA', years:'1994–99', yr:1994, tip:'The last truly open socket: Intel Pentium, AMD K6, Cyrix and IDT all fit the same board.', svg:cpuPGA(54,54)},
+ {v:'intel', nm:'Slot 1', pins:'242 contacts', years:'1997–2000', yr:1997, tip:'CPUs as cartridges! Pentium II/III on a card, so the L2 cache could ride alongside.', svg:cpuSlot(132)},
+ {v:'intel', nm:'Socket 370', pins:'370 PGA', years:'1999–2002', yr:1999, tip:'Pentium III and the beloved Celeron 300A overclocks. Back to flat sockets.', svg:cpuPGA(54,54)},
+ {v:'amd', nm:'Socket A (462)', pins:'462 PGA', years:'2000–04', yr:2000, tip:'Athlon XP country. Cracked cores from bad heatsink installs taught a generation patience.', svg:cpuPGA(54,54)},
+ {v:'intel', nm:'Socket 478', pins:'478 PGA', years:'2001–04', yr:2001, tip:'Pentium 4 and the NetBurst megahertz wars.', svg:cpuPGA(35,35)},
+ {v:'intel', nm:'LGA 775', pins:'775 lands', years:'2004–09', yr:2004, tip:'Intel flips the pins onto the board. Core 2 Duo made this the king of the 2009 chart.', svg:cpuLGA(37.5,37.5)},
+ {v:'amd', nm:'Socket 939', pins:'939 PGA', years:'2004–06', yr:2004, tip:'Athlon 64 — first consumer 64-bit, and the dual-core X2.', svg:cpuPGA(50,50)},
+ {v:'amd', nm:'AM2 / AM2+ / AM3', pins:'940/941 PGA', years:'2006–11', yr:2006, tip:'The long Phenom era. AM3 chips even worked in AM2+ boards — AMD’s compatibility habit starts here.', svg:cpuPGA(50,50)},
+ {v:'intel', nm:'LGA 1366', pins:'1366 lands', years:'2008–11', yr:2008, tip:'Nehalem Core i7: the memory controller moves onto the CPU, triple-channel DDR3.', svg:cpuLGA(45,42.5)},
+ {v:'intel', nm:'LGA 1156/1155/1150/1151', pins:'~1150 lands', years:'2009–17', yr:2009, nw:1, tip:'Eight years of nearly identical 37.5 mm squares (Sandy Bridge → Kaby Lake) that almost never cross-fit. The chipset-compatibility memes write themselves.', svg:cpuLGA(37.5,37.5)},
+ {v:'amd', nm:'FM1 / FM2 / FM2+', pins:'905–906 PGA', years:'2011–15', yr:2011, nw:1, tip:'The APU experiment: CPU and usable GPU on one die, for budget builds everywhere.', svg:cpuPGA(50,50)},
+ {v:'intel', nm:'LGA 2011 / 2066', pins:'2011–2066 lands', years:'2011–19', yr:2011, nw:1, tip:'HEDT: quad-channel memory, 40+ PCIe lanes, and the i7-Extreme tax.', svg:cpuLGA(56,51)},
+ {v:'amd', nm:'AM4', pins:'1331 PGA', years:'2016–22+', yr:2016, nw:1, tip:'One socket, five years, Ryzen 1000→5000. The community made “AM4 forever” a meme; AMD nearly honored it.', svg:cpuPGA(50,50)},
+ {v:'intel', nm:'LGA 3647', pins:'3647 lands', years:'2016–21', yr:2016, nw:1, tip:'Xeon Scalable goes rectangular — six-channel memory needed the width.', svg:cpuLGA(76,56,true)},
+ {v:'amd', nm:'TR4 / sTRX4 / SP3', pins:'4094 lands', years:'2017–', yr:2017, nw:1, tip:'Threadripper & EPYC: the package ships in a plastic sled you slide into a rail, torqued with a supplied driver. 64 cores.', svg:cpuLGA(58,75,true)},
+ {v:'intel', nm:'LGA 1200', pins:'1200 lands', years:'2020–21', yr:2020, nw:1, tip:'Comet/Rocket Lake — a brief stop before the big-little era.', svg:cpuLGA(37.5,37.5)},
+ {v:'apple', nm:'Apple M-series SoC', pins:'0 sockets — soldered', years:'2020–', yr:2020, nw:1, tip:'Apple exits the socket business entirely: CPU, GPU and RAM share one package. The chart’s first “socket” that isn’t one.', svg:cpuSoC()},
+ {v:'intel', nm:'LGA 1700', pins:'1700 lands', years:'2021–24', yr:2021, nw:1, tip:'Goes rectangular for Alder/Raptor Lake’s hybrid P+E cores — and bent under its own retention bracket (washer mods sold separately).', svg:cpuLGA(37.5,45)},
+ {v:'amd', nm:'AM5', pins:'1718 LGA', years:'2022–', yr:2022, nw:1, tip:'AMD finally goes LGA. The octopus-shaped IHS hides thick silicon that made early chips great at holding heat.', svg:cpuLGA(40,40)},
+ {v:'amd', nm:'SP5 (EPYC)', pins:'6096 lands', years:'2022–', yr:2022, nw:1, tip:'6,096 contacts, up to 192 cores (Zen 5c), 12-channel DDR5. Larger than some complete 1990s motherboards’ CPU+cache area.', svg:cpuLGA(72,76,true)},
+ {v:'intel', nm:'LGA 4677', pins:'4677 lands', years:'2023–', yr:2023, nw:1, tip:'Sapphire/Emerald Rapids Xeon. Eight memory channels and CXL over the same pads.', svg:cpuLGA(78,57,true)},
+ {v:'intel', nm:'LGA 1851', pins:'1851 lands', years:'2024–', yr:2024, nw:1, tip:'Arrow Lake / Core Ultra. Same cooler footprint as 1700 — peace in our time.', svg:cpuLGA(37.5,45)},
+];
+
+/* ================================================================
+   RENDER
+   ================================================================ */
+function decade(y){ return y<1990?'80':y<2000?'90':y<2010?'00':y<2020?'10':'20'; }
+function tile(it,cls=''){
+  const d=document.createElement('div');
+  d.className=`tile ${cls} ${it.nw?'isnew':''} ${it.v?('v-'+it.v):''}`;
+  d.dataset.era=decade(it.yr);
+  d.innerHTML=`${it.v?`<span class="vband">${({intel:'Intel',amd:'AMD',both:'AMD / Intel',apple:'Apple',other:'Other'})[it.v]}</span>`:''}
+    ${it.svg}
+    <span class="nm">${it.nm}${it.nw?' <span style="color:var(--new)">●</span>':''}</span>
+    <span class="mt">${it.mt||it.pins||''}${it.years?` · ${it.years}`:''}</span>
+    <span class="newdot"></span>`;
+  d.dataset.tip=it.tip||''; d.dataset.tname=it.nm; d.dataset.tyears=it.years||'';
+  return d;
+}
+function fill(id,items,cls,subgroups){
+  const host=document.getElementById(id);
+  if(subgroups){
+    subgroups.forEach(([label,arr])=>{
+      const h=document.createElement('div'); h.className='subhead'; h.textContent=label; host.appendChild(h);
+      const g=document.createElement('div'); g.className='grid';
+      arr.forEach(it=>g.appendChild(tile(it,cls))); host.appendChild(g);
+    });
+  } else {
+    const g=document.createElement('div'); g.className='grid';
+    items.forEach(it=>g.appendChild(tile(it,cls))); host.appendChild(g);
+  }
+}
+
+fill('ram-body',null,'',[
+  ['Desktop — 1.5 px per mm',DATA.ram_desktop],
+  ['Notebook',DATA.ram_notebook]]);
+fill('storage-body',DATA.storage);
+fill('ports-body',DATA.ports);
+fill('slots-body',DATA.slots);
+fill('power-body',DATA.power);
+
+/* CPU — chronological flow grouped by era */
+(function(){
+  const host=document.getElementById('cpu-body');
+  const groups=[['1971 – 1999',y=>y<2000],['2000 – 2009',y=>y>=2000&&y<2010],
+                ['2010 – 2019',y=>y>=2010&&y<2020],['2020 – 2026 · the giants',y=>y>=2020]];
+  groups.forEach(([label,fn])=>{
+    const h=document.createElement('div'); h.className='subhead'; h.textContent=label; host.appendChild(h);
+    const g=document.createElement('div'); g.className='grid'; g.id='cpu-flow-'+label[0];
+    DATA.cpu.filter(c=>fn(c.yr)).forEach(c=>g.appendChild(tile(c,'cpu-tile')));
+    host.appendChild(g);
+  });
+  const sb=document.createElement('div'); sb.className='scalebar';
+  sb.innerHTML=`<svg width="104" height="14" viewBox="0 0 104 14">
+     ${L(2,7,102,7,INK,1.4)}${L(2,2,2,12,INK,1.4)}${L(102,2,102,12,INK,1.4)}${L(52,4,52,10,INK,1.2)}</svg>
+     <span>50 mm at chart scale — every socket above shares it. From DIP-40 to SP5: 152× the contact count.</span>`;
+  host.appendChild(sb);
+})();
+
+/* PCIe bandwidth chart appended to slots */
+(function(){
+  const host=document.getElementById('slots-body');
+  const h=document.createElement('div'); h.className='subhead';
+  h.textContent='Same ×16 slot · ascending generations (one-direction GB/s)'; host.appendChild(h);
+  const wrap=document.createElement('div'); wrap.className='bw';
+  const gens=[['1.0 ’03',4],['2.0 ’07',8],['3.0 ’10',16],['4.0 ’17',32],['5.0 ’22',64],['6.0 ’26?',128,true]];
+  gens.forEach(([g,v,fut])=>{
+    const r=document.createElement('div'); r.className='row'+(fut?' future':'');
+    r.innerHTML=`<span class="g">${g}</span><span class="bar" style="width:${v*1.7}px"></span><span class="v">${v} GB/s</span>`;
+    wrap.appendChild(r);
+  });
+  host.appendChild(wrap);
+  const n=document.createElement('p'); n.className='note';
+  n.innerHTML='<b>The quiet story:</b> ISA, VLB, PCI, AGP and PCI-X all came and went — PCIe just kept doubling inside the same physical slot.';
+  host.appendChild(n);
+})();
+
+/* counts */
+const counts={'n-ram':DATA.ram_desktop.length+DATA.ram_notebook.length,'n-storage':DATA.storage.length,
+  'n-ports':DATA.ports.length,'n-slots':DATA.slots.length,'n-power':DATA.power.length};
+for(const k in counts) document.getElementById(k).textContent=counts[k]+' items';
+
+/* masthead ruler — mm ticks */
+(function(){
+  const r=document.getElementById('ruler'), W=1480;
+  let o=L(0,17,W,17,INK,2);
+  for(let x=0;x<=W;x+=8){ const big=(x/8)%10===0; o+=L(x,big?2:9,x,17,big?INK:'var(--line)',big?1.6:1); }
+  r.setAttribute('viewBox',`0 0 ${W} 18`); r.innerHTML=o;
+})();
+
+/* ================= INTERACTION ================= */
+const tipEl=document.getElementById('tip');
+document.addEventListener('pointerover',e=>{
+  const t=e.target.closest('.tile'); if(!t||!t.dataset.tip){tipEl.classList.remove('show');return;}
+  tipEl.innerHTML=`<div class="t">${t.dataset.tname}</div><div class="y">${t.dataset.tyears}</div>${t.dataset.tip}`;
+  tipEl.classList.add('show');
+});
+document.addEventListener('pointermove',e=>{
+  if(!tipEl.classList.contains('show'))return;
+  const m=12; let x=e.clientX+m, y=e.clientY+m;
+  const r=tipEl.getBoundingClientRect();
+  if(x+r.width>innerWidth-8)x=e.clientX-r.width-m;
+  if(y+r.height>innerHeight-8)y=e.clientY-r.height-m;
+  tipEl.style.left=x+'px'; tipEl.style.top=y+'px';
+});
+document.addEventListener('pointerout',e=>{ if(!e.target.closest('.tile')) tipEl.classList.remove('show'); });
+
+/* era filter */
+document.querySelectorAll('.chip.era').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.chip.era').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const era=btn.dataset.era;
+  document.querySelectorAll('.tile').forEach(t=>{
+    t.classList.toggle('dim', era!=='all' && t.dataset.era!==era);
+  });
+}));
+/* new-since-2009 highlight */
+document.getElementById('newToggle').addEventListener('click',function(){
+  this.classList.toggle('on');
+  document.getElementById('poster').classList.toggle('hl-new',this.classList.contains('on'));
+});
+</script>
+</body>
+</html>
