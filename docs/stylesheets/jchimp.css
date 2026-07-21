@@ -1,18 +1,16 @@
 /* ==========================================================================
-   jchimp.tech "Lab Bench" — Zensical theme
-   Place at docs/stylesheets/jchimp.css and register in zensical.toml
-   (see jchimp-zensical.toml alongside this file).
+   jchimp.tech "Lab Bench" — Zensical theme · v2 (Lab Bench v4.1)
+   Targets the MODERN variant (also compatible with classic).
+   docs/stylesheets/jchimp.css — register via extra_css in zensical.toml.
 
-   Zensical shares Material for MkDocs' HTML + CSS variable architecture:
-   light scheme = "default", dark scheme = "slate". This sheet overrides
-   the --md-* variables with Lab Bench tokens and applies the brand's
-   element grammar (heavy table head rule, no zebra, mono instrumentation).
+   Light scheme = "default", dark scheme = "slate". Variables are set at
+   high specificity and key grammar rules carry !important to survive the
+   modern variant's own styling.
 
-   Accent logic: green acts · brass warns · blue links · red = danger only.
+   Accent logic: green acts · plum names · brass warns · blue links ·
+   red means danger.
    ========================================================================== */
 
-/* ---------- type (fonts are loaded via zensical.toml theme.font;
-   Archivo for display is loaded here since config supports one text font) */
 @import url("https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&display=swap");
 
 :root {
@@ -23,38 +21,35 @@
 /* ==========================================================================
    LIGHT · "Slate" (scheme: default)
    ========================================================================== */
-[data-md-color-scheme="default"] {
-  /* ground & surfaces */
-  --md-default-bg-color:            #F6F7F8;
+:root,
+[data-md-color-scheme="default"],
+body[data-md-color-scheme="default"] {
+  --md-default-bg-color:            #F9F9F9;
   --md-default-fg-color:            #24272C;
   --md-default-fg-color--light:     #78808A;
   --md-default-fg-color--lighter:   #A6ADB6;
   --md-default-fg-color--lightest:  #DFE3E8;
 
-  /* primary drives header/sidebar (classic) and links */
-  --md-primary-fg-color:            #4F8A1E;
-  --md-primary-fg-color--light:     #6AA33A;
-  --md-primary-fg-color--dark:      #457A19;
+  --md-primary-fg-color:            #3D790C;
+  --md-primary-fg-color--light:     #5A9827;
+  --md-primary-fg-color--dark:      #336608;
   --md-primary-bg-color:            #FFFFFF;
   --md-primary-bg-color--light:     #FFFFFFB3;
 
-  /* accent = interactive highlights */
-  --md-accent-fg-color:             #457A19;
-  --md-accent-fg-color--transparent:#4F8A1E1A;
+  --md-accent-fg-color:             #336608;
+  --md-accent-fg-color--transparent:#3D790C1A;
   --md-accent-bg-color:             #FFFFFF;
 
-  /* prose links get their own blue, per brand */
   --md-typeset-a-color:             #2F6E93;
 
-  /* code */
   --md-code-bg-color:               #FFFFFF;
   --md-code-fg-color:               #3E434B;
-  --md-code-hl-color:               #4F8A1E26;
+  --md-code-hl-color:               #3D790C26;
   --md-code-hl-number-color:        #9A7118;
   --md-code-hl-special-color:       #A6402C;
   --md-code-hl-function-color:      #2F6E93;
-  --md-code-hl-constant-color:      #457A19;
-  --md-code-hl-keyword-color:       #4F8A1E;
+  --md-code-hl-constant-color:      #6D519B;   /* plum names types/constants */
+  --md-code-hl-keyword-color:       #3D790C;
   --md-code-hl-string-color:        #9A7118;
   --md-code-hl-name-color:          #24272C;
   --md-code-hl-operator-color:      #78808A;
@@ -63,91 +58,127 @@
   --md-code-hl-generic-color:       #78808A;
   --md-code-hl-variable-color:      #24272C;
 
-  /* misc chrome */
   --md-typeset-mark-color:          #9A71182E;
   --md-typeset-kbd-color:           #FFFFFF;
   --md-typeset-kbd-border-color:    #DFE3E8;
   --md-typeset-table-color:         #DFE3E8;
+
+  --md-header-bg-color:             #F9F9F9;
+  --md-header-fg-color:             #24272C;
   --md-footer-bg-color:             #24272C;
-  --md-footer-bg-color--dark:       #16181B;
-  --md-footer-fg-color:             #D5D8DC;
+  --md-footer-bg-color--dark:       #161A22;
+  --md-footer-fg-color:             #D5D8DE;
+
+  /* jchimp extras */
+  --jc-row-alt:  #F2F3F5;
+  --jc-wash-green: #EAF3E1; --jc-wash-plum: #F0EBF8;
+  --jc-wash-brass: #F5EEDF; --jc-wash-blue: #E7EFF4;
+  --jc-wash-danger:#F7E4DE;
+  --jc-term:  #6D519B;
+  --jc-warn:  #9A7118;
+  --jc-error: #A6402C;
 }
 
 /* ==========================================================================
-   DARK · "Workshop" (scheme: slate)
+   DARK · "Indigo Workshop" (scheme: slate)
    ========================================================================== */
-[data-md-color-scheme="slate"] {
-  --md-default-bg-color:            #16181B;
-  --md-default-fg-color:            #D5D8DC;
-  --md-default-fg-color--light:     #7F8791;
-  --md-default-fg-color--lighter:   #5C636D;
-  --md-default-fg-color--lightest:  #2D3138;
+[data-md-color-scheme="slate"],
+body[data-md-color-scheme="slate"] {
+  --md-default-bg-color:            #161A22;
+  --md-default-fg-color:            #D5D8DE;
+  --md-default-fg-color--light:     #828B98;
+  --md-default-fg-color--lighter:   #5C6470;
+  --md-default-fg-color--lightest:  #2F3440;
 
   --md-primary-fg-color:            #97C459;
   --md-primary-fg-color--light:     #A9D06F;
   --md-primary-fg-color--dark:      #86B24C;
-  --md-primary-bg-color:            #16181B;
-  --md-primary-bg-color--light:     #16181BB3;
+  --md-primary-bg-color:            #161A22;
+  --md-primary-bg-color--light:     #161A22B3;
 
   --md-accent-fg-color:             #A9D06F;
   --md-accent-fg-color--transparent:#97C4591F;
-  --md-accent-bg-color:             #16181B;
+  --md-accent-bg-color:             #161A22;
 
   --md-typeset-a-color:             #85B4CE;
 
-  --md-code-bg-color:               #1D2024;
+  --md-code-bg-color:               #1D222C;
   --md-code-fg-color:               #C3C8CE;
   --md-code-hl-color:               #97C45926;
   --md-code-hl-number-color:        #C9973F;
   --md-code-hl-special-color:       #C96A55;
   --md-code-hl-function-color:      #85B4CE;
-  --md-code-hl-constant-color:      #A9D06F;
+  --md-code-hl-constant-color:      #A98FC7;   /* plum */
   --md-code-hl-keyword-color:       #97C459;
   --md-code-hl-string-color:        #C9973F;
-  --md-code-hl-name-color:          #D5D8DC;
-  --md-code-hl-operator-color:      #7F8791;
-  --md-code-hl-punctuation-color:   #7F8791;
-  --md-code-hl-comment-color:       #5C636D;
-  --md-code-hl-generic-color:       #7F8791;
-  --md-code-hl-variable-color:      #D5D8DC;
+  --md-code-hl-name-color:          #D5D8DE;
+  --md-code-hl-operator-color:      #828B98;
+  --md-code-hl-punctuation-color:   #828B98;
+  --md-code-hl-comment-color:       #5C6470;
+  --md-code-hl-generic-color:       #828B98;
+  --md-code-hl-variable-color:      #D5D8DE;
 
   --md-typeset-mark-color:          #C9973F2E;
-  --md-typeset-kbd-color:           #1D2024;
-  --md-typeset-kbd-border-color:    #2D3138;
-  --md-typeset-table-color:         #2D3138;
-  --md-footer-bg-color:             #101113;
-  --md-footer-bg-color--dark:       #0C0D0F;
-  --md-footer-fg-color:             #7F8791;
+  --md-typeset-kbd-color:           #1D222C;
+  --md-typeset-kbd-border-color:    #2F3440;
+  --md-typeset-table-color:         #2F3440;
 
-  /* header/tabs readable on dark ground in modern variant */
-  --md-header-bg-color:             #16181B;
+  --md-header-bg-color:             #161A22;
+  --md-header-fg-color:             #D5D8DE;
+  --md-footer-bg-color:             #10141B;
+  --md-footer-bg-color--dark:       #0C0F15;
+  --md-footer-fg-color:             #828B98;
+
+  --jc-row-alt:  #1A1F28;
+  --jc-wash-green: #202A1E; --jc-wash-plum: #262130;
+  --jc-wash-brass: #2A2420; --jc-wash-blue: #1C2630;
+  --jc-wash-danger:#301F1C;
+  --jc-term:  #A98FC7;
+  --jc-warn:  #C9973F;
+  --jc-error: #C96A55;
 }
 
 /* ==========================================================================
-   Element grammar (both schemes)
+   Element grammar — high specificity + !important where the modern
+   variant's own component styles would otherwise win.
    ========================================================================== */
 
-/* --- headings: Archivo display, mono-caps h5 tier --- */
-.md-typeset h1,
-.md-typeset h2 {
-  font-family: var(--jc-font-display);
+/* --- header / tabs chrome (modern variant) --- */
+body .md-header,
+body .md-tabs {
+  background-color: var(--md-header-bg-color) !important;
+  color: var(--md-header-fg-color) !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+body .md-header__title,
+body .md-tabs__link {
+  color: var(--md-header-fg-color);
+}
+body .md-tabs__link--active,
+body .md-tabs__item--active .md-tabs__link {
+  color: var(--md-primary-fg-color) !important;
+}
+
+/* --- headings --- */
+body .md-typeset h1,
+body .md-typeset h2 {
+  font-family: var(--jc-font-display) !important;
   font-weight: 700;
   letter-spacing: -0.012em;
   color: var(--md-default-fg-color);
 }
-.md-typeset h1 { font-weight: 800; }
-.md-typeset h3 { font-weight: 600; }
-.md-typeset h5 {
-  font-family: var(--jc-font-mono);
+body .md-typeset h1 { font-weight: 800; }
+body .md-typeset h3 { font-weight: 600; }
+body .md-typeset h5 {
+  font-family: var(--jc-font-mono) !important;
   font-weight: 500;
   font-size: 0.68rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--md-default-fg-color--light);
 }
-
-/* accent stub under h1 — never full width */
-.md-typeset h1::after {
+body .md-typeset h1::after {
   content: "";
   display: block;
   width: 64px;
@@ -156,207 +187,134 @@
   background: var(--md-primary-fg-color);
 }
 
-/* hairline separator under section headings — the default rule, not the
-   scarce heavy 3px one (that stays reserved for masthead/table-head/footer) */
-.md-typeset h2,
-.md-typeset h3 {
-  padding-bottom: 0.35rem;
+/* --- rules --- */
+body .md-typeset hr {
   border-bottom: 1px solid var(--md-default-fg-color--lightest);
 }
 
-/* --- rules: five kinds, each with one job (BRAND.md §5) ---
-   hairline (default) · heavy 3px ink (masthead/table-head/footer only,
-   scarcity is the point) · tick (figure/diagram boundary) · labeled
-   (MONO CAPS section transition). Accent stub lives on h1::after above. */
-.md-typeset hr {
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
-}
-
-/* heavy 3px ink rule — use sparingly, not mid-content */
-.md-typeset hr.jc-rule-heavy {
-  height: 3px;
-  border: none;
-  background: var(--md-default-fg-color);
-}
-
-/* tick rule — hairline with short end ticks; markup: <div class="jc-rule-tick"></div> */
-.md-typeset .jc-rule-tick {
-  position: relative;
-  height: 1px;
-  margin: 1.5rem 0;
-  background: var(--md-default-fg-color--lightest);
-}
-.md-typeset .jc-rule-tick::before,
-.md-typeset .jc-rule-tick::after {
-  content: "";
-  position: absolute;
-  top: -3px;
-  width: 1px;
-  height: 7px;
-  background: var(--md-default-fg-color--lighter);
-}
-.md-typeset .jc-rule-tick::before { left: 0; }
-.md-typeset .jc-rule-tick::after { right: 0; }
-
-/* labeled rule — mono-caps tracked label between two hairlines;
-   markup: <div class="jc-rule-labeled">SECTION LABEL</div> */
-.md-typeset .jc-rule-labeled {
-  display: flex;
-  align-items: center;
-  gap: 0.75em;
-  margin: 2rem 0 1.25rem;
-  color: var(--md-default-fg-color--light);
-  font-family: var(--jc-font-mono);
-  font-weight: 500;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-.md-typeset .jc-rule-labeled::before,
-.md-typeset .jc-rule-labeled::after {
-  content: "";
-  flex: 1 1 auto;
-  height: 1px;
-  background: var(--md-default-fg-color--lightest);
-}
-
-/* --- tables: heavy head rule, hairline rows, no zebra (BRAND.md §5) ---
-   The modern variant ships filled/bordered tables with roomy padding,
-   5rem min-width heads, and a hover fill + inset shadow — all of which
-   must be neutralized here or the bench-sheet look never lands. */
-.md-typeset table:not([class]) {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
+/* --- tables: thin border, heavy head rule, subtle zebra, no verticals --- */
+body .md-typeset table:not([class]) {
+  border: 1px solid var(--md-default-fg-color--lightest) !important;
+  border-radius: 5px;
+  box-shadow: none !important;
+  background: var(--md-code-bg-color);
   font-size: 0.72rem;
 }
-.md-typeset table:not([class]) th {
-  font-family: var(--jc-font-mono);
+body .md-typeset table:not([class]) th {
+  font-family: var(--jc-font-mono) !important;
   font-weight: 500;
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--md-default-fg-color--light);
-  background: transparent;
-  border-bottom: 2px solid var(--md-default-fg-color);
-  min-width: 0;
-  padding: 0.5em 0.75em;
+  color: var(--md-default-fg-color--light) !important;
+  background: transparent !important;
+  border-bottom: 2px solid var(--md-default-fg-color) !important;
+  border-left: none !important;
+  border-right: none !important;
 }
-.md-typeset table:not([class]) td {
-  border-top: none;
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
-  padding: 0.6em 0.75em;
+body .md-typeset table:not([class]) td {
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
 }
-.md-typeset table:not([class]) tr:last-child td { border-bottom: none; }
-/* numerics right-aligned in mono (markdown `---:` columns emit align="right") */
-.md-typeset table:not([class]) td[align="right"] {
-  font-family: var(--jc-font-mono);
-  font-size: 0.68rem;
+body .md-typeset table:not([class]) tbody tr:nth-child(2n) {
+  background: var(--jc-row-alt) !important;
 }
-.md-typeset table:not([class]) tr:nth-child(2n) { background: transparent; } /* no zebra */
-.md-typeset table:not([class]) tbody tr:hover {
-  background: transparent;
-  box-shadow: none;
+body .md-typeset table:not([class]) tbody tr:hover {
+  background: var(--md-accent-fg-color--transparent) !important;
 }
-.md-typeset table:not([class]) tbody tr { transition: none; }
+body .md-typeset table:not([class]) tr:last-child td { border-bottom: none !important; }
 
-/* --- code blocks: bordered surface, no shadow --- */
-.md-typeset pre > code {
+/* --- code blocks --- */
+body .md-typeset pre > code {
   border: 1px solid var(--md-default-fg-color--lightest);
   border-radius: 5px;
 }
-.md-typeset code {
-  border-radius: 3px;
-}
+body .md-typeset code { border-radius: 3px; }
 
-/* --- admonitions: hairline surface, 3px semantic left bar, mono-caps title --- */
-.md-typeset .admonition,
-.md-typeset details {
-  border: 1px solid var(--md-default-fg-color--lightest);
-  border-left-width: 3px;
-  border-radius: 0 4px 4px 0;
-  box-shadow: none;
+/* --- admonitions: wash panels --- */
+body .md-typeset :is(.admonition, details) {
+  border: 1px solid var(--md-default-fg-color--lightest) !important;
+  border-left-width: 3px !important;
+  border-radius: 0 4px 4px 0 !important;
+  box-shadow: none !important;
   background: var(--md-code-bg-color);
   font-size: 0.72rem;
 }
-.md-typeset .admonition-title,
-.md-typeset summary {
-  font-family: var(--jc-font-mono);
+body .md-typeset :is(.admonition-title, summary) {
+  font-family: var(--jc-font-mono) !important;
   font-weight: 500;
   font-size: 0.62rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   background: transparent !important;
 }
-/* semantic bar colors: note/info → link blue · tip/success → green ·
-   warning → brass · danger/bug → danger red */
-.md-typeset .admonition.note,    .md-typeset details.note,
-.md-typeset .admonition.info,    .md-typeset details.info,
-.md-typeset .admonition.abstract,.md-typeset details.abstract {
-  border-left-color: var(--md-typeset-a-color);
+/* note/info/abstract → blue wash */
+body .md-typeset :is(.admonition, details):is(.note, .info, .abstract) {
+  border-left-color: var(--md-typeset-a-color) !important;
+  background: var(--jc-wash-blue) !important;
 }
-.md-typeset .note > .admonition-title,     .md-typeset .note > summary,
-.md-typeset .info > .admonition-title,     .md-typeset .info > summary,
-.md-typeset .abstract > .admonition-title, .md-typeset .abstract > summary {
-  color: var(--md-typeset-a-color);
+body .md-typeset :is(.note, .info, .abstract) > :is(.admonition-title, summary) {
+  color: var(--md-typeset-a-color) !important;
 }
-.md-typeset .admonition.tip,     .md-typeset details.tip,
-.md-typeset .admonition.success, .md-typeset details.success {
-  border-left-color: var(--md-primary-fg-color);
+/* tip/success/example → green wash */
+body .md-typeset :is(.admonition, details):is(.tip, .success, .example) {
+  border-left-color: var(--md-primary-fg-color) !important;
+  background: var(--jc-wash-green) !important;
 }
-.md-typeset .tip > .admonition-title,     .md-typeset .tip > summary,
-.md-typeset .success > .admonition-title, .md-typeset .success > summary {
-  color: var(--md-primary-fg-color--dark);
+body .md-typeset :is(.tip, .success, .example) > :is(.admonition-title, summary) {
+  color: var(--md-primary-fg-color--dark) !important;
 }
-.md-typeset .admonition.warning, .md-typeset details.warning,
-.md-typeset .admonition.question,.md-typeset details.question {
-  border-left-color: #9A7118;
+/* warning/question → brass wash */
+body .md-typeset :is(.admonition, details):is(.warning, .question) {
+  border-left-color: var(--jc-warn) !important;
+  background: var(--jc-wash-brass) !important;
 }
-[data-md-color-scheme="slate"] .md-typeset .admonition.warning,
-[data-md-color-scheme="slate"] .md-typeset details.warning {
-  border-left-color: #C9973F;
+body .md-typeset :is(.warning, .question) > :is(.admonition-title, summary) {
+  color: var(--jc-warn) !important;
 }
-.md-typeset .warning > .admonition-title, .md-typeset .warning > summary { color: #9A7118; }
-[data-md-color-scheme="slate"] .md-typeset .warning > .admonition-title,
-[data-md-color-scheme="slate"] .md-typeset .warning > summary { color: #C9973F; }
-.md-typeset .admonition.danger,  .md-typeset details.danger,
-.md-typeset .admonition.failure, .md-typeset details.failure,
-.md-typeset .admonition.bug,     .md-typeset details.bug {
-  border-left-color: #A6402C;
+/* danger/failure/bug → danger wash */
+body .md-typeset :is(.admonition, details):is(.danger, .failure, .bug) {
+  border-left-color: var(--jc-error) !important;
+  background: var(--jc-wash-danger) !important;
 }
-[data-md-color-scheme="slate"] .md-typeset .admonition.danger,
-[data-md-color-scheme="slate"] .md-typeset details.danger {
-  border-left-color: #C96A55;
+body .md-typeset :is(.danger, .failure, .bug) > :is(.admonition-title, summary) {
+  color: var(--jc-error) !important;
 }
-.md-typeset .danger > .admonition-title, .md-typeset .danger > summary { color: #A6402C; }
-[data-md-color-scheme="slate"] .md-typeset .danger > .admonition-title,
-[data-md-color-scheme="slate"] .md-typeset .danger > summary { color: #C96A55; }
+/* quote → plum wash: named/cited material */
+body .md-typeset :is(.admonition, details):is(.quote, .cite) {
+  border-left-color: var(--jc-term) !important;
+  background: var(--jc-wash-plum) !important;
+}
+body .md-typeset :is(.quote, .cite) > :is(.admonition-title, summary) {
+  color: var(--jc-term) !important;
+}
 
-/* --- blockquote: brass, per brand grammar --- */
-.md-typeset blockquote {
-  border-left: 3px solid #9A7118;
-  background: #FBF7EC;
+/* --- blockquote: brass --- */
+body .md-typeset blockquote {
+  border-left: 3px solid var(--jc-warn) !important;
+  background: var(--jc-wash-brass);
   border-radius: 0 3px 3px 0;
   color: var(--md-default-fg-color);
 }
-[data-md-color-scheme="slate"] .md-typeset blockquote {
-  border-left-color: #C9973F;
-  background: #2C2415;
-}
 
 /* --- buttons --- */
-.md-typeset .md-button {
+body .md-typeset .md-button {
   border-radius: 3px;
   border-color: var(--md-default-fg-color--lightest);
   color: var(--md-primary-fg-color--dark);
 }
-.md-typeset .md-button--primary {
-  background: var(--md-primary-fg-color);
-  border-color: var(--md-primary-fg-color);
-  color: var(--md-primary-bg-color);
+body .md-typeset .md-button--primary {
+  background: var(--md-primary-fg-color) !important;
+  border-color: var(--md-primary-fg-color) !important;
+  color: var(--md-primary-bg-color) !important;
 }
 
-/* --- nav/search chrome: flatten shadows --- */
-.md-search__form { border-radius: 4px; }
-.md-nav__title { box-shadow: none; }
+/* --- search / nav chrome: flatten --- */
+body .md-search__form { border-radius: 4px; box-shadow: none !important; }
+body .md-nav__title { box-shadow: none !important; }
+body .md-nav__link--active,
+body .md-nav__item .md-nav__link--active {
+  color: var(--md-primary-fg-color) !important;
+}
